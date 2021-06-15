@@ -3,200 +3,157 @@ defmodule Tr33ControlWeb.CommandComponent do
   require Logger
   alias Phoenix.LiveView.Socket
   alias Tr33Control.Commands
-  alias Tr33Control.Commands.{Command, Modifier}
+  alias Tr33Control.Commands.{Command, EnumParam, ValueParam}
+  alias Tr33ControlWeb.Display
+
+  @command_targets Application.compile_env!(:tr33_control, :targets)
 
   def mount(socket) do
     socket =
       socket
-      |> assign(:collapsed?, true)
+      |> assign(command_types: Commands.command_types())
+      |> assign(command_targets: @command_targets)
+      |> assign(modifiers_active: false)
 
     {:ok, socket}
   end
 
-  def update(update_assigns, %Socket{assigns: assigns} = socket) do
-    %{id: id} = Map.merge(assigns, update_assigns)
-    command = Commands.get_command(id)
-    modifiers = Commands.get_modifiers(id)
-    command_inputs = Commands.inputs(command, modifiers)
-    modifier_inputs = Enum.map(modifiers, &Commands.inputs(&1))
+  # index update, current command is already at that index. Do nothing
+  def update(%{index: index}, %Socket{assigns: %{command: %Command{index: index}}} = socket) do
+    {:ok, socket}
+  end
+
+  # index update, current command is differnt or does there is none at all. Fetch it
+  def update(%{index: index}, %Socket{} = socket) do
+    command = Commands.get_command(index)
+    {:ok, update_command(socket, command)}
+  end
+
+  # command update, its index matches the active one. Update
+  def update(%{command: %Command{index: i} = command}, %Socket{assigns: %{command: %Command{index: i}}} = socket) do
+    {:ok, update_command(socket, command)}
+  end
+
+  # command update, but its index does not match the active one. Ignore
+  def update(%{command: _}, socket) do
+    {:ok, socket}
+  end
+
+  def handle_event("toggle_target", %{"target" => target_str}, %Socket{} = socket) do
+    %{command: %Command{index: index}} = socket.assigns
+    target = String.to_existing_atom(target_str)
+    Commands.toggle_command_target(index, target)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("select_change", %{"strip_select" => index_str}, %Socket{} = socket) do
+    %Command{index: index} = socket.assigns.command
+
+    strip_index = String.to_integer(index_str)
+    Commands.update_command_param(index, :strip_index, strip_index)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("select_change", %{"command" => type_str}, %Socket{} = socket) do
+    %Command{index: index} = socket.assigns.command
+
+    type = String.to_existing_atom(type_str)
+    Commands.update_command_type(index, type)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("select_change", %{"_target" => [name_str]} = data, %Socket{} = socket) do
+    %Command{index: index} = socket.assigns.command
+
+    name = String.to_existing_atom(name_str)
+    value = Map.fetch!(data, name_str) |> String.to_existing_atom()
+
+    update_param(index, name, value)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("slider_change", %{"_target" => [name_str]} = data, %Socket{} = socket) do
+    %Command{index: index} = socket.assigns.command
+
+    name = String.to_existing_atom(name_str)
+    value = Map.fetch!(data, name_str) |> String.to_integer()
+
+    update_param(index, name, value)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("toggle_modifiers", _, %Socket{} = socket) do
+    modifier_count =
+      socket.assigns.command
+      |> Commands.get_modifier_params()
+      |> Enum.count()
 
     socket =
-      Enum.reduce(0..9, socket, fn index, socket_acc ->
-        assign(socket_acc, String.to_atom("input_#{index}"), Enum.at(command_inputs, index))
-      end)
-      |> assign(:id, id)
-      |> assign(:command_types, Commands.command_types())
-      |> assign(:command, command)
-      |> assign(:modifier_inputs, modifier_inputs)
-      |> maybe_set_collapsed?(command, Map.get(assigns, :command))
+      socket
+      |> assign(:modifiers_active, modifier_count != 0 || not socket.assigns.modifiers_active)
 
-    {:ok, socket}
+    {:noreply, socket}
   end
 
-  def handle_event("type_change", %{"type" => new_type}, %Socket{assigns: %{id: id}} = socket) do
-    Commands.get_command(id)
-    |> Map.take([:index, :target])
-    |> Map.put(:type, String.to_integer(new_type))
-    |> Commands.new_command!()
-    |> Command.defaults()
-    |> Commands.send_to_esp(true)
+  def handle_event("add_modifier", %{"name" => name_str}, %Socket{} = socket) do
+    name = String.to_existing_atom(name_str)
+    Commands.add_modifier(socket.assigns.command, name)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("delete_modifier", %{"name" => name_str}, %Socket{} = socket) do
+    name = String.to_existing_atom(name_str)
+    Commands.delete_modifier(socket.assigns.command, name)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("update_modifier", %{"name" => name_str} = data, %Socket{} = socket) do
+    name = String.to_existing_atom(name_str)
+
+    field_updates =
+      data
+      |> Map.drop(["name", "_target"])
+      |> Enum.map(fn
+        {"movement_type" = name, val} -> {String.to_existing_atom(name), String.to_existing_atom(val)}
+        {name, val} -> {String.to_existing_atom(name), String.to_integer(val)}
+      end)
+      |> Enum.into(%{})
+
+    Commands.update_modifier(socket.assigns.command, name, field_updates)
+    {:noreply, socket}
+  end
+
+  def handle_event(event, data, socket) do
+    Logger.warn("#{__MODULE__}: Unhandled event #{inspect(event)} Data: #{inspect(data)}")
+    {:noreply, socket}
+  end
+
+  defp update_command(%Socket{} = socket, command) do
+    modifier_params = Commands.get_modifier_params(command)
 
     socket
-    |> set_default_collapsed?(new_type)
-
-    Commands.get_modifiers(id)
-    |> Enum.each(&Commands.delete_modifier/1)
-
-    {:noreply, socket}
+    |> assign(command: command)
+    |> assign(value_params: Commands.list_value_params(command))
+    |> assign(enum_params: Commands.list_enum_params(command))
+    |> assign(color_palette_param: Commands.get_common_enum_param(command, :color_palette))
+    |> assign(strip_index_options: Commands.get_strip_index_options(command))
+    |> assign(modifier_names: Commands.list_modifier_names(command))
+    |> assign(modifier_params: modifier_params)
+    |> assign(modifiers_active: socket.assigns.modifiers_active || length(modifier_params) > 0)
   end
 
-  def handle_event("data_change", params, %Socket{assigns: %{id: id}} = socket) do
-    Commands.get_command(id)
-    |> Commands.edit_command!(params)
-    |> Commands.send_to_esp(true)
-
-    {:noreply, socket}
+  defp update_param(index, name, value) do
+    Commands.update_command_param(index, name, value)
   end
 
-  def handle_event("data_increase", %{"data-index" => data_index}, %Socket{assigns: %{id: id}} = socket) do
-    command = %Command{data: data} = Commands.get_command(id)
-    data_index = String.to_integer(data_index)
-
-    command
-    |> Commands.edit_command!(%{data: List.update_at(data, data_index, &increment_data(&1))})
-    |> Commands.send_to_esp(true)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("data_decrease", %{"data-index" => data_index}, %Socket{assigns: %{id: id}} = socket) do
-    command = %Command{data: data} = Commands.get_command(id)
-
-    command
-    |> Commands.edit_command!(%{data: List.update_at(data, String.to_integer(data_index), &decrement_data/1)})
-    |> Commands.send_to_esp(true)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("command_up", _params, %Socket{assigns: %{id: id}} = socket) do
-    Commands.get_command(id)
-    |> Commands.swap_commands(id - 1)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("command_down", _params, %Socket{assigns: %{id: id}} = socket) do
-    Commands.get_command(id)
-    |> Commands.swap_commands(id + 1)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("command_clone", _params, %Socket{assigns: %{id: id}} = socket) do
-    Commands.get_command(id)
-    |> Commands.clone_command(id + 1)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("command_toggle_enabled", _params, %Socket{assigns: %{id: id}} = socket) do
-    %Command{enabled: enabled} = command = Commands.get_command(id)
-
-    command
-    |> Commands.edit_command!(%{enabled: !enabled})
-    |> Commands.send_to_esp()
-
-    {:noreply, socket}
-  end
-
-  def handle_event("command_toggle_collapsed", _params, %Socket{assigns: assigns} = socket) do
-    {:noreply, assign(socket, :collapsed?, not Map.get(assigns, :collapsed?, false))}
-  end
-
-  def handle_event("modifier_create", %{"data-index" => data_index}, %Socket{assigns: %{id: id}} = socket) do
-    Commands.get_command(id)
-    |> Commands.create_modifier!(String.to_integer(data_index))
-
-    {:noreply, socket}
-  end
-
-  def handle_event("modifier_delete", %{"data-index" => data_index}, %Socket{assigns: %{id: id}} = socket) do
-    Commands.delete_modifier(id, String.to_integer(data_index))
-
-    {:noreply, socket}
-  end
-
-  def handle_event("modifier_change", %{"data_index" => data_index} = params, %Socket{assigns: %{id: id}} = socket) do
-    Commands.get_modifier(id, String.to_integer(data_index))
-    |> Commands.update_modifier!(params)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("modifier_increase", params, %Socket{assigns: %{id: id}} = socket) do
-    %{"data-index" => data_index, "variable-name" => variable_name} = params
-    key = String.to_existing_atom(variable_name)
-
-    modifier = %Modifier{} = Commands.get_modifier(id, String.to_integer(data_index))
-    params = %{key => Map.fetch!(modifier, key) |> increment_data()}
-    Commands.update_modifier!(modifier, params)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("modifier_decrease", params, %Socket{assigns: %{id: id}} = socket) do
-    %{"data-index" => data_index, "variable-name" => variable_name} = params
-    key = String.to_existing_atom(variable_name)
-
-    modifier = %Modifier{} = Commands.get_modifier(id, String.to_integer(data_index))
-    params = %{key => Map.fetch!(modifier, key) |> decrement_data()}
-    Commands.update_modifier!(modifier, params)
-
-    {:noreply, socket}
-  end
-
-  def handle_event("toggle_target", _params, %Socket{assigns: %{id: id}} = socket) do
-    Commands.get_command(id)
-    |> Map.update!(:target, &Tr33Control.ESP.toggle_target/1)
-    |> Commands.send_to_esp()
-
-    {:noreply, socket}
-  end
-
-  def handle_event(event, params, socket) do
-    Logger.warn("#{__MODULE__}: Unhandled event #{inspect(event)} Params: #{inspect(params)}")
-    {:noreply, socket}
-  end
-
-  # todo: this could be better handled with proper input validation
-  def increment_data(data), do: data + 1
-  # def increment_data(data, _max), do: data
-
-  def decrement_data(data) when data > 0, do: data + -1
-  def decrement_data(data), do: data
-
-  def increment_modifier_value(%Modifier{} = modifier, variable_name) do
-    case Map.fetch!(modifier, variable_name) do
-      number when is_number(number) -> number + 1
-      other -> other
-    end
-  end
-
-  def decrement_modifier_value(%Modifier{} = modifier, variable_name) do
-    case Map.fetch!(modifier, variable_name) do
-      number when is_number(number) and number > 0 -> number + -1
-      other -> other
-    end
-  end
-
-  def maybe_set_collapsed?(socket, %Command{type: type}, %Command{type: type}), do: socket
-
-  def maybe_set_collapsed?(socket, %Command{type: new_type}, _) do
-    set_default_collapsed?(socket, new_type)
-  end
-
-  def set_default_collapsed?(socket, new_type) do
-    assign(socket, :collapsed?, new_type == :disabled || new_type == "disabled")
+  defp modifier_active?(command, name) do
+    Commands.get_modifier(command, name) != nil
   end
 end

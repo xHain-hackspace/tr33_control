@@ -22,6 +22,5 @@ assets-update:
 	npm update --prefix assets
 	cd assets && npm install --force phoenix_live_view 	
 
-
 assets-build:
 	npm --prefix assets run deploy && mix phx.digest

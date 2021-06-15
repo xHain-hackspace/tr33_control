@@ -4,10 +4,15 @@ defmodule Tr33Control.UdpServer do
   alias Tr33Control.{Commands, ESP}
 
   @listen_port Application.fetch_env!(:tr33_control, :udp_listen_port)
-  @resync_packet "resync"
+  @sequence_header "SEQ"
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, [{:name, __MODULE__} | opts])
+  end
+
+  def toggle_debug() do
+    current = Application.get_env(:tr33_control, :udp_server_debug, false)
+    Application.put_env(:tr33_control, :udp_server_debug, not current)
   end
 
   # -- GenServer callbacks -----------------------------------------------------
@@ -23,32 +28,20 @@ defmodule Tr33Control.UdpServer do
     {:ok, state}
   end
 
-  def handle_info({:udp, _socket, address, port, @resync_packet}, state) do
-    Logger.debug("#{__MODULE__}: Resync request from #{inspect(address)}:#{inspect(port)}")
-    ESP.resync(address, port)
+  def handle_info({:udp, _socket, address, port, <<@sequence_header, sequence::size(8)>>}, state) do
+    debug_log("Incoming sequence \"#{sequence}\" from #{inspect(address)}:#{inspect(port)}")
+    ESP.handle_udp_sequence(address, port, sequence)
     {:noreply, state}
   end
 
-  def handle_info({:udp, _socket, address, port, data}, state) do
-    Logger.debug("#{__MODULE__}: Incoming command: #{inspect(data)}, from: #{inspect(address)}:#{inspect(port)}")
+  def handle_info({:udp, socket, address, port, protobuf}, state) do
+    debug_log("Incoming command: #{inspect(protobuf)}, from: #{inspect(address)}:#{inspect(port)}")
 
-    case Commands.new_command(data) do
-      {:ok, command} ->
-        Commands.send_to_esp(command)
-        # send_ack(socket, address, port)
-        Logger.debug("#{__MODULE__}: Valid command: #{inspect(command)}")
+    command = Commands.create_command(protobuf)
 
-      {:error, _error} ->
-        case Commands.new_event(data) do
-          {:ok, event} ->
-            Commands.send_to_esp(event)
-            # send_ack(socket, address, port)
-            Logger.debug("#{__MODULE__}: Valid event: #{inspect(event)}")
+    debug_log("Valid command: #{inspect(command)}")
 
-          {:error, error} ->
-            Logger.debug("#{__MODULE__}: Inalid command or event: #{inspect(data)}, Error: #{inspect(error)}")
-        end
-    end
+    send_ack(socket, address, port)
 
     {:noreply, state}
   end
@@ -60,5 +53,11 @@ defmodule Tr33Control.UdpServer do
 
   def send_ack(socket, address, port) do
     :gen_udp.send(socket, address, port, <<42>>)
+  end
+
+  def debug_log(message) do
+    if Application.get_env(:tr33_control, :udp_server_debug, false) do
+      Logger.debug("#{__MODULE__}: #{message}")
+    end
   end
 end

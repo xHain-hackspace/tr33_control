@@ -16,17 +16,67 @@ config :tr33_control, Tr33ControlWeb.Endpoint,
   live_view: [signing_salt: "HC+iC2aJ"]
 
 config :tr33_control,
-  ecto_repos: [Tr33Control.Repo],
-  command_max_index: 9,
   serial_port: System.get_env("SERIAL_PORT") || "ttyAMA0",
   udp_listen_port: 1337,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
-  led_structure: :tr33,
-  local_domain: "fritz.box"
-
-# led_structure: :keller
-# led_structure: :wand
-# led_structure: :dode
+  command_max_index: 8,
+  # targets: [:tr33, :wand, :wolken, :trommel],
+  targets: [:wand],
+  target_hosts: %{
+    wand: ["wand.fritz.box"],
+    wolken: [
+      "wolke1.lan.xhain.space",
+      "wolke2.lan.xhain.space",
+      "wolke3.lan.xhain.space",
+      "wolke4.lan.xhain.space",
+      "wolke5.lan.xhain.space",
+      "wolke6.lan.xhain.space",
+      "wolke7.lan.xhain.space",
+      "wolke8.lan.xhain.space"
+    ],
+    trommel: [
+      "trommel.lan.xhain.space"
+    ],
+    tr33: ["tr33_esp32.lan.xhain.space"]
+  },
+  target_strip_indices: %{
+    tr33: [
+      :all,
+      :all_trunks,
+      :all_branches,
+      :trunk_1,
+      :trunk_2,
+      :trunk_3,
+      :trunk_4,
+      :trunk_5,
+      :trunk_6,
+      :trunk_7,
+      :trunk_8,
+      :branch_1,
+      :branch_2,
+      :branch_3,
+      :branch_4,
+      :branch_5,
+      :branch_6,
+      :branch_7,
+      :branch_8,
+      :branch_9,
+      :branch_10,
+      :branch_11,
+      :branch_12
+    ],
+    wolken: [
+      :all,
+      :wolke_1,
+      :wolke_2,
+      :wolke_3,
+      :wolke_4,
+      :wolke_5,
+      :wolke_6,
+      :wolke_7,
+      :wolke_8
+    ]
+  }
 
 # Configures Elixir's Logger
 config :logger, :console,

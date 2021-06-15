@@ -1,14 +1,81 @@
 // $secondary: #003a3e;
 $primary: #003a3e;
+$warning: #ffc400;
 
-
-/* This file is for your main application css. */
 @import "../node_modules/bootswatch/dist/darkly/variables";
+
+$form-select-bg: $primary;
+$form-select-indicator-padding: 0;
+$form-select-color: $body-color;
+$form-select-indicator-color: $body-color;
+
 @import "../node_modules/bootstrap/scss/bootstrap";
 @import "../node_modules/bootswatch/dist/darkly/bootswatch";
 
 // @import "../node_modules/font-awesome/css/font-awesome.css";
 
+$range_height: 20rem;
+$range_width: 5rem;
+
 .alert:empty {
   display: none;
+}
+
+input[type=range] {
+  -webkit-appearance: none;
+}
+
+.custom-vertical-range-container {
+  height: $range_height; 
+  width: $range_width;  
+}
+
+.custom-vertical-range {  
+  width: $range_height;
+  transform: translateX(-1 * ($range_height / 2 - $range_width / 2)) translateY($range_height / 2 - 0.75rem) rotate(270deg);
+}
+
+.custom-vertical-range::-moz-range-thumb {
+  width: 1.75rem;
+  height: 5rem;
+  background: $primary; 
+  cursor: pointer;
+  border-radius: 0.2rem;
+}
+
+.custom-vertical-range::-webkit-slider-thumb {    
+  -webkit-appearance: none;
+  width: 1.75rem;
+  height: 5rem;
+  margin-top: -2.3rem;
+  background: $primary; 
+  cursor: pointer;
+  border-radius: 0.2rem;
+}
+
+.custom-vertical-range::-webkit-slider-runnable-track {    
+  height: 0.4rem;
+  background: $light;    
+  border-radius: 0.2rem;
+}
+
+.custom-vertical-range::-moz-range-track {    
+  height: 0.4rem;
+  background: $secondary;    
+  border-radius: 0.2rem;
+}
+
+.custom-select { 
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border: 0;
+  cursor: pointer;
+  width: initial;
+  height: 100%;
+}
+
+.custom-select:hover {
+  color: #fff;
+  background-color: #003135;
+  border-color: #002e32;
 }

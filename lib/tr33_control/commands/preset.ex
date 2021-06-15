@@ -1,25 +1,11 @@
 defmodule Tr33Control.Commands.Preset do
   use Ecto.Schema
-  alias Ecto.Changeset
-  alias Tr33Control.Commands.{Command, Event, Modifier}
+  alias Tr33Control.Commands.Command
 
-  schema "presets2" do
+  embedded_schema do
     field :name, :string
     field :default, :boolean, default: false
 
-    embeds_many :commands, Command, on_replace: :delete
-    embeds_many :events, Event, on_replace: :delete
-    embeds_many :modifiers, Modifier, on_replace: :delete
-
-    timestamps()
-  end
-
-  def changeset(preset, attrs) do
-    preset
-    |> Changeset.cast(attrs, [:name, :default])
-    |> Changeset.validate_required([:name])
-    |> Changeset.validate_length(:name, min: 2)
-    |> Changeset.validate_length(:name, max: 42)
-    |> Changeset.unique_constraint(:name)
+    embeds_many :commands, Command
   end
 end

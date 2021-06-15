@@ -1,120 +1,79 @@
 defmodule Tr33Control.Commands.Command do
   use Ecto.Schema
-  import EctoEnum
-  alias Ecto.Changeset
-  alias __MODULE__
-  alias Tr33Control.Commands.{Inputs, Modifier}
 
-  defenum CommandType,
-    disabled: 0,
-    single_color: 1,
-    white: 2,
-    rainbow_sine: 3,
-    ping_pong: 4,
-    gravity: 5,
-    sparkle: 6,
-    show_number: 7,
-    rain: 8,
-    mapped_slope: 10,
-    mapped_shape: 11,
-    mapped_triangle: 21,
-    mapped_particles: 22,
-    kaleidoscope: 12,
-    random_walk: 13,
-    fireworks: 15,
-    rotating_sectors: 16,
-    render: 17,
-    rotating_plane: 18,
-    twang: 19,
-    flicker_sparkle: 20
+  alias Protobuf.Field
+  alias Tr33Control.Commands.Schemas.{CommandParams, Modifier}
 
-  @command_type_map CommandType.__enum_map__() |> Enum.into(%{})
+  @max_index Application.compile_env!(:tr33_control, :command_max_index)
 
   @primary_key false
   embedded_schema do
-    field :index, :integer
-    field :type, CommandType
-    field :data, {:array, :integer}, default: []
-    field :enabled, :boolean, default: true
-    field :target, Tr33Control.Atom, default: :all
+    # internal
+    field :index, :integer, default: 0
+    field :targets, {:array, Tr33Control.Atom}, default: Application.compile_env!(:tr33_control, :targets)
+
+    # protobuf
+    field :params, :map
+    field :encoded, :binary
   end
 
-  def changeset(command, %{"type" => type} = params) when is_binary(type) do
-    case Integer.parse(type) do
-      {int, _} -> changeset(command, Map.put(params, "type", int))
-      _ -> changeset(command, params)
-    end
+  def new(index, type, common_values \\ []) when is_atom(type) and index < @max_index do
+    params = CommandParams.new([index: index] ++ common_values)
+
+    %__MODULE__{index: index, params: params}
+    |> new_type_params(type)
   end
 
-  def changeset(command, params) do
-    command
-    |> Changeset.cast(params, [:index, :type, :data, :enabled, :target])
-    |> Changeset.validate_required([:index, :type])
-    |> Changeset.validate_number(:index, less_than: 256)
-    |> Changeset.validate_length(:data, max: 10)
+  def new(protobuf) when is_binary(protobuf) do
+    params = %CommandParams{} = CommandParams.decode(protobuf)
+
+    %__MODULE__{
+      index: params.index,
+      params: params
+    }
   end
 
-  def from_binary(<<index::size(8), type::size(8), data_bin::binary>>) do
-    data = for <<element::size(8) <- data_bin>>, do: element
-
-    %Command{}
-    |> changeset(%{index: index, type: type, data: data})
-    |> Ecto.Changeset.apply_action(:insert)
+  def disabled(index) do
+    # todo: create this once at compile_time
+    new(index, :single_color, enabled: false)
   end
 
-  def from_binary(_), do: {:error, :invalid_binary_format}
+  def new_type_params(%__MODULE__{params: params} = command, type) do
+    %Protobuf.OneOfField{fields: fields} = CommandParams.defs(:field, :type_params)
+    %Field{type: {:msg, type_full}} = Enum.find(fields, &match?(%Field{name: ^type}, &1))
+    type_params = apply(type_full, :new, [])
 
-  def to_binary(%Command{enabled: false, index: index}) do
-    to_binary(%Command{type: :disabled, index: index})
+    %__MODULE__{command | params: %CommandParams{params | type_params: {type, type_params}}}
   end
 
-  def to_binary(%Command{index: index, type: type, data: data}) do
-    type_bin = Map.fetch!(@command_type_map, type)
-
-    data_bin =
-      data
-      |> Enum.map(fn
-        int when int < 256 -> <<int::size(8)>>
-        int -> <<int::size(16)>>
-      end)
-      |> Enum.join()
-
-    <<index::size(8), type_bin::size(8), data_bin::binary>>
+  def encode(%__MODULE__{params: %CommandParams{} = params} = command) do
+    %__MODULE__{command | encoded: CommandParams.encode(params)}
   end
 
-  def defaults(index) when is_number(index) do
-    defaults(%Command{type: :disabled, index: index})
+  def get_field_def(name) when is_atom(name) do
+    CommandParams.defs(:field, name)
   end
 
-  def defaults(%Command{} = command) do
-    data =
-      Inputs.input_def(command)
-      |> Enum.map(fn %{default: default} -> default end)
-
-    %Command{command | data: data}
+  def list_type_field_defs(%__MODULE__{params: %CommandParams{type_params: {_, type_params}}}) do
+    type_params
+    |> Map.from_struct()
+    |> Map.keys()
+    |> Enum.map(&apply(type_params.__struct__, :defs, [:field, &1]))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.sort_by(& &1.fnum)
   end
 
-  def inputs(%Command{data: data} = command, modifiers) do
-    Inputs.input_def(command)
-    |> case do
-      :disabled ->
-        []
-
-      inputs ->
-        inputs
-        |> Enum.map(fn input -> Map.put(input, :variable_name, "data[]") end)
-        |> Enum.map(fn
-          %{data_index: data_index, value: _} = input -> %{input | value: Enum.at(data, data_index, 0)}
-          input -> input
-        end)
-        |> Enum.map(fn %{data_index: data_index} = input ->
-          %{input | has_modifier?: Enum.any?(modifiers, &match?(%Modifier{data_index: ^data_index}, &1))}
-        end)
-    end
+  def list_modifier_field_defs() do
+    %Modifier{}
+    |> Map.from_struct()
+    |> Map.drop([:field_index])
+    |> Map.keys()
+    |> Enum.map(&Modifier.defs(:field, &1))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.sort_by(& &1.fnum)
   end
 
-  def types() do
-    Tr33Control.Commands.Command.CommandType.__enum_map__()
-    |> Enum.filter(fn {type, _} -> Inputs.input_def(%Command{type: type}) |> is_list() end)
-  end
+  def type(%__MODULE__{params: %CommandParams{type_params: {type, _}}}), do: type
+
+  def type_params(%__MODULE__{params: %CommandParams{type_params: {_, type_params}}}), do: type_params
 end

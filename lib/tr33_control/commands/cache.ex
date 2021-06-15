@@ -1,26 +1,15 @@
 defmodule Tr33Control.Commands.Cache do
   require Logger
   alias Tr33Control.Commands
-  alias Tr33Control.Commands.{Command, Event, Preset, Modifier}
+  alias Tr33Control.Commands.{Command, Preset}
 
-  @all_cache_keys [Command, Event, Preset, Modifier]
+  @all_cache_keys [Command, Preset]
 
   def init_all() do
     Enum.map(@all_cache_keys, &init/1)
   end
 
   def init(Command) do
-    0..Application.fetch_env!(:tr33_control, :command_max_index)
-    |> Enum.map(&Command.defaults/1)
-    |> Enum.map(&insert(&1, true))
-  end
-
-  def init(Event) do
-    [
-      %Event{type: :update_settings}
-    ]
-    |> Enum.map(&Event.defaults/1)
-    |> Enum.map(&insert(&1, true))
   end
 
   def init(Preset) do
@@ -34,9 +23,6 @@ defmodule Tr33Control.Commands.Cache do
     end
   end
 
-  def init(Modifier) do
-  end
-
   def clear_all() do
     Enum.map(@all_cache_keys, &clear/1)
   end
@@ -45,11 +31,16 @@ defmodule Tr33Control.Commands.Cache do
     Cachex.clear!(key)
   end
 
-  def insert(%{__struct__: cache} = struct, force) when cache in @all_cache_keys do
-    Cachex.put!(cache, cache_key(struct), struct)
-    maybe_persist_cache(struct)
-    Commands.notify_subscribers({cache, cache_key(struct)}, force)
-    struct
+  def insert(%Command{index: index} = command) do
+    command
+    |> Command.encode()
+    |> tap(&Cachex.put!(Command, index, &1))
+  end
+
+  def insert(%Preset{name: name} = preset) do
+    Cachex.put!(Preset, name, preset)
+    Cachex.dump!(Preset, presets_persist_file())
+    preset
   end
 
   def get(cache, key) when cache in @all_cache_keys do
@@ -64,22 +55,17 @@ defmodule Tr33Control.Commands.Cache do
     |> Enum.into([])
   end
 
+  def count(cache) when cache in @all_cache_keys do
+    Cachex.count!(cache)
+  end
+
   def delete(cache, key) when cache in @all_cache_keys do
     res = Cachex.take(cache, key)
-    Commands.notify_subscribers({cache, key}, true)
     res
   end
 
-  defp cache_key(%Command{index: index}), do: index
-  defp cache_key(%Event{type: type}), do: type
-  defp cache_key(%Preset{name: name}), do: name
-  defp cache_key(%Modifier{index: index, data_index: data_index}), do: {index, data_index}
-
-  defp maybe_persist_cache(%Preset{}), do: Cachex.dump!(Preset, presets_persist_file())
-  defp maybe_persist_cache(_), do: :noop
-
   defp presets_persist_file() do
-    Application.fetch_env!(:tr33_control, :cache_persist_dir) |> Path.join("presets.bin")
+    Application.fetch_env!(:tr33_control, :cache_persist_dir) |> Path.join("presets2.bin")
   end
 
   defp migrate(Preset = cache) do
@@ -88,17 +74,26 @@ defmodule Tr33Control.Commands.Cache do
     |> Enum.map(fn %Preset{commands: commands} = preset ->
       commands =
         commands
-        |> Enum.map(&struct!(Command, Map.drop(&1, [:__struct__, :modifiers])))
-        |> Enum.map(&migrate_target/1)
+        |> Enum.map(&struct!(Command, Map.drop(&1, [:__struct__])))
+        |> Enum.map(&migrate_command/1)
 
       %Preset{preset | commands: commands}
     end)
-    |> Enum.map(&insert(&1, false))
+    |> Enum.map(&insert/1)
   end
 
   defp migrate(_), do: :noop
 
-  defp migrate_target(%Command{target: "all"} = command), do: %Command{command | target: :all}
-  defp migrate_target(%Command{target: nil} = command), do: %Command{command | target: :all}
-  defp migrate_target(%Command{} = command), do: command
+  defp migrate_command(%Command{encoded: nil} = command) do
+    Logger.error("Error loading command. Nil encoding: #{inspect(command)}")
+    Commands.Command.new(command.index, :single_color)
+  end
+
+  defp migrate_command(%Command{encoded: encoded} = command) do
+    %Command{command | params: Commands.Schemas.CommandParams.decode(encoded)}
+  end
+
+  # defp migrate_target(%Command{target: "all"} = command), do: %Command{command | target: :all}
+  # defp migrate_target(%Command{target: nil} = command), do: %Command{command | target: :all}
+  # defp migrate_target(%Command{} = command), do: command
 end

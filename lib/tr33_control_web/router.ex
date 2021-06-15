@@ -19,7 +19,7 @@ defmodule Tr33ControlWeb.Router do
 
     live "/", ControlLive, :index
     # live "/twang", TwangLive
-    get "/docs", DocsController, :index
+    # get "/docs", DocsController, :index
     get "/preset/:preset_name", PresetController, :load
   end
 
