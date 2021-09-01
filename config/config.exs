@@ -21,7 +21,7 @@ config :tr33_control,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
   command_max_index: 8,
   # targets: [:tr33, :wand, :wolken, :trommel],
-  targets: [:wand],
+  targets: [:scubar],
   target_hosts: %{
     wand: ["wand.fritz.box"],
     wolken: [
@@ -37,7 +37,8 @@ config :tr33_control,
     trommel: [
       "trommel.lan.xhain.space"
     ],
-    tr33: ["tr33_esp32.lan.xhain.space"]
+    tr33: ["tr33_esp32.lan.xhain.space"],
+    scubar: ["scubar.lan.xhain.space"]
   },
   target_strip_indices: %{
     tr33: [
