@@ -6,7 +6,7 @@
   </div>
 
   <div class="my-2">
-    <%= live_component @socket, Tr33ControlWeb.SliderComponent, param: @brightness_param, target: @myself %>
+    <%= live_component @socket, Tr33ControlWeb.SliderComponent, param: @brightness_param, target: @myself, tabindex: 1 %>
   </div>
 
   <span class="badge bg-secondary my-2 align-self-stretch "><%= Command.type(@command) |> Display.humanize() %></span>

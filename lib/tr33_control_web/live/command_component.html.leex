@@ -8,12 +8,13 @@
       value: Command.type(@command),
       options: @command_types,
       name: :command,
-      style: :command %>
+      style: :command,
+      tabindex: 2 %>
   </div>
 
   <%# Color Palette %>
   <div class="m-3">
-    <%= live_component @socket, Tr33ControlWeb.SelectComponent, param: @color_palette_param, target: @myself, style: :command %>
+    <%= live_component @socket, Tr33ControlWeb.SelectComponent, param: @color_palette_param, target: @myself, style: :command, tabindex: 3 %>
   </div>
 
   <%# Target Toggles %>
@@ -61,7 +62,7 @@
 <div class="d-flex flex-wrap border border-top-0 border-secondary">
   <%= for param <- @value_params do %>
     <div class="d-flex flex-column align-items-center" style="width:6rem;margin:2rem">
-      <%= live_component @socket, Tr33ControlWeb.SliderComponent, param: param, target: @myself, secondary: true %>
+      <%= live_component @socket, Tr33ControlWeb.SliderComponent, param: param, target: @myself, tabindex: 5 %>
       <span class="badge bg-secondary my-2 align-self-stretch "><%= Display.name(param) %></span>
     </div>
   <% end %>

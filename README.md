@@ -5,11 +5,11 @@ A web interface to control effects on leds strips. It sends commands to an ESP32
 This app leverages phoenix channels to sync the state between all connected browsers, so everybody sees the same state. The dynamic forms are all rendered in the backend and pushed via a live_html channel to the clients. It is an attempt to create a dynamic web app with almost no javascript.
 
 # Bugs/features
+* fix UART in general
 * mapped shape/slope/... broken? (Tr33 only, strip index 0)
 * gravity not working
 * white color palette
 * mapped ping_pong
-* fix UART in general
 * tr33 UART not working for some reason, might be the cable
 * order branch and trunk indices/PINs
 * improve mobile support
@@ -30,7 +30,6 @@ This app leverages phoenix channels to sync the state between all connected brow
 * effects relative to strip height/prixel count
   * gravity height relative to strip length
 * fix add ball for gravity
-* modifier for palette 
 * random walk for tr33
 * diffusion (lava lamp) effect
 * move slope, or render in general: color shift effect (or similar) instead of solid color 
@@ -44,6 +43,7 @@ This app leverages phoenix channels to sync the state between all connected brow
 * softer sparkle
 
 ## done
+* modifier for palette 
 * select command when last is deleted 
 * multiple instances of rain/sparkle/etc
 * wolken index

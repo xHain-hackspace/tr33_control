@@ -12,6 +12,7 @@ defmodule Tr33Control.ESP.UART do
   @serial_clear_to_send "BB" |> Base.decode16!()
   @serial_request_resync "CC" |> Base.decode16!()
   @rts_max_wait_ms 100
+  @max_queue_len 5
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, [{:name, __MODULE__} | opts])
@@ -22,9 +23,9 @@ defmodule Tr33Control.ESP.UART do
     Application.put_env(:tr33_control, :uart_debug, not current)
   end
 
-  def send_rts() do
-    GenServer.cast(__MODULE__, :send_rts)
-  end
+  # def send_rts() do
+  #   GenServer.cast(__MODULE__, :send_rts)
+  # end
 
   # -- GenServer callbacks -----------------------------------------------------
 
@@ -43,37 +44,38 @@ defmodule Tr33Control.ESP.UART do
     state = %{
       uart_pid: uart_pid,
       queue: :queue.new(),
-      target: :tr33,
+      target: :uart,
       last_rts: 0
     }
 
-    Commands.subscribe()
+    Commands.subscribe_commands()
 
     {:ok, state}
   end
 
-  def handle_cast(:send_rts, state) do
-    send_rts(state, true)
-    {:noreply, state}
-  end
-
-  def handle_info({:command_update, %Command{} = command}, %{target: target} = state) do
-    binary = Commands.binary_for_target(command, target)
-
-    state =
-      state
-      |> Map.update!(:queue, &:queue.in(binary, &1))
-      |> send_rts(false)
+  def handle_info({:command_update, %Command{} = command}, state) do
+    state = maybe_enqueue(state, command)
 
     {:noreply, state}
   end
 
-  def handle_info({:circuits_uart, _, @serial_clear_to_send}, %{queue: queue} = state) do
+  def handle_info({:command_deleted, index}, state) do
+    command = Command.disabled(index)
+    state = maybe_enqueue(state, command)
+    {:noreply, state}
+  end
+
+  def handle_info({:circuits_uart, _, @serial_clear_to_send}, %{queue: queue, target: target} = state) do
     debug_log("RECEIVED CTS")
 
     state = %{state | last_rts: 0}
 
-    {{:value, binary}, queue_rest} = :queue.out(queue)
+    {{:value, %Command{} = command}, queue_rest} = :queue.out(queue)
+
+    binary =
+      command
+      |> Commands.command_binary(target, 23)
+
     binary_size = byte_size(binary)
     header = <<@serial_header::size(8), binary_size::size(8)>>
 
@@ -142,6 +144,22 @@ defmodule Tr33Control.ESP.UART do
     queue =
       Commands.list_commands()
       |> Enum.reduce(:queue.new(), fn %Command{encoded: encoded}, queue_acc -> :queue.in(encoded, queue_acc) end)
+
+    %{state | queue: queue}
+  end
+
+  # todo: deduplicate this
+  defp maybe_enqueue(%{queue: queue} = state, %Command{} = command) do
+    queue =
+      if :queue.len(queue) < @max_queue_len do
+        :queue.in(command, queue)
+      else
+        queue
+        |> :queue.drop()
+        |> then(&:queue.in(command, &1))
+      end
+
+    send_rts(state, false)
 
     %{state | queue: queue}
   end

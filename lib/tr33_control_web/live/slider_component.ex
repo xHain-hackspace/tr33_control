@@ -2,7 +2,7 @@ defmodule Tr33ControlWeb.SliderComponent do
   use Tr33ControlWeb, :live_component
   alias Tr33Control.Commands.ValueParam
 
-  def update(%{target: target, param: %ValueParam{} = param}, socket) do
+  def update(%{target: target, param: %ValueParam{} = param} = assigns, socket) do
     socket =
       socket
       |> assign(target: target)
@@ -11,6 +11,7 @@ defmodule Tr33ControlWeb.SliderComponent do
       |> assign(max: param.max)
       |> assign(step: param.step)
       |> assign(name: param.name)
+      |> assign(tabindex: Map.get(assigns, :tabindex))
 
     {:ok, socket}
   end
@@ -23,7 +24,9 @@ defmodule Tr33ControlWeb.SliderComponent do
           <input
             type="range"
             class="form-range custom-vertical-range"
-            phx-throttleX="30"            mix=<%= @min %>
+            phx-throttleX="30"
+            <%= if @tabindex != nil, do: "tabindex=#{to_string(@tabindex)}" %>
+            mix=<%= @min %>
             max=<%= @max %>
             value=<%= @value %>
             step=<%= @step %>

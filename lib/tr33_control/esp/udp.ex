@@ -21,7 +21,7 @@ defmodule Tr33Control.ESP.UDP do
 
   def init({target, host}) do
     case host |> String.to_charlist() |> :inet.gethostbyname(:inet) do
-      {:ok, {:hostent, _host, [], :inet, 4, [{192, _, _, _} = ip | _]}} ->
+      {:ok, {:hostent, _host, [], :inet, 4, [{_, _, _, _} = ip | _]}} ->
         "#{__MODULE__}: Resovled host #{host} for target #{inspect(target)} to #{inspect(ip)}. Sending UDP commands to port #{@target_port}"
         |> Logger.info()
 

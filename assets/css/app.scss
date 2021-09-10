@@ -43,6 +43,14 @@ input[type=range] {
   border-radius: 0.2rem;
 }
 
+.custom-vertical-range::-moz-range-thumb:focus {
+  background: $warning; 
+}
+
+.custom-vertical-range:focus::-moz-range-thumb {
+  background: $warning; 
+}
+
 .custom-vertical-range::-webkit-slider-thumb {    
   -webkit-appearance: none;
   width: 1.75rem;
@@ -78,4 +86,9 @@ input[type=range] {
   color: #fff;
   background-color: #003135;
   border-color: #002e32;
+}
+
+.custom-select:focus {
+  color: $primary;
+  background-color: $warning;
 }
