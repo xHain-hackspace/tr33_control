@@ -20,7 +20,6 @@ config :tr33_control,
   udp_listen_port: 1337,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
   command_max_index: 8,
-  # targets: [:tr33, :wand, :wolken, :trommel],
   targets: [:ranken],
   target_hosts: %{
     wand: ["wand.fritz.box"],
@@ -38,7 +37,8 @@ config :tr33_control,
       "trommel.lan.xhain.space"
     ],
     tr33: ["tr33_esp32.lan.xhain.space"],
-    ranken: ["10.42.0.55"]
+    ranken: ["ranken.lan.xhain.space"]
+    scubar: ["scubar.lan.xhain.space"]
   },
   target_strip_indices: %{
     tr33: [
