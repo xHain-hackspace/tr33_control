@@ -1,0 +1,22 @@
+
+<div class="mb-4 border border-secondary">
+  <%= live_component @socket, Tr33ControlWeb.PresetComponent, id: :presets %>
+</div>
+
+<ul class="nav nav-tabs">
+  <%= for index <- 0..@command_count-1 do %>
+    <div class={"nav-link " <> if index == @active_command, do: "active bg-dark", else: ""}>
+      <%= live_component @socket, Tr33ControlWeb.CommandHeaderComponent, id: index %>
+    </div>
+  <% end %>
+
+  <div class="d-flex flex-column px-1">
+    <button class="btn btn-dark btn-sm h-25 text-light my-1" phx-click="delete_command">-</button>
+    <button class="btn btn-dark btn-sm h-75 text-light my-1" phx-click="add_command">+</button>
+  </div>
+</ul>
+
+<div class="">
+  <%= live_component @socket, Tr33ControlWeb.CommandComponent, id: :active_command, index: @active_command %>
+</div>
+

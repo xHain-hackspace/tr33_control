@@ -10,8 +10,8 @@
             class="dropdown-item"
             style="cursor: pointer"
             phx-click="load"
-            phx-value-name="<%= preset.name %>"
-            phx-target="<%= @myself %>"
+            phx-value-name={preset.name}
+            phx-target={@myself}
             >
             <%= Display.preset_option(preset) %>
           </div>
@@ -20,13 +20,13 @@
     </div>
 
     <div class="btn-group ">
-      <button type="button" phx-target="<%= @myself %>" class="btn btn-secondary" phx-click="update">Update</button>
-      <button type="button" phx-target="<%= @myself %>" class="btn btn-secondary" phx-click="set_default">Set As Default</button>
-      <button type="button" phx-target="<%= @myself %>" class="btn btn-secondary" phx-click="delete">Delete</button>
+      <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="update">Update</button>
+      <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="set_default">Set As Default</button>
+      <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="delete">Delete</button>
     </div>
   </div>
 
-  <form class="input-group m-3" phx-submit="create" phx-target="<%= @myself %>" style="width: 15rem;">
+  <form class="input-group m-3" phx-submit="create" phx-target={@myself} style="width: 15rem;">
     <input type="text" class="form-control bg-dark text-body" name="name" placeholder="New Preset">
     <button class="btn btn-secondary" type="submit">Create</button>
   </form>

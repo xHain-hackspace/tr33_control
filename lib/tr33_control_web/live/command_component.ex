@@ -2,17 +2,15 @@ defmodule Tr33ControlWeb.CommandComponent do
   use Tr33ControlWeb, :live_component
   require Logger
   alias Phoenix.LiveView.Socket
-  alias Tr33Control.Commands
+  alias Tr33Control.{Commands, Targets}
   alias Tr33Control.Commands.{Command, EnumParam, ValueParam}
   alias Tr33ControlWeb.Display
-
-  @command_targets Application.compile_env!(:tr33_control, :targets)
 
   def mount(socket) do
     socket =
       socket
       |> assign(command_types: Commands.command_types())
-      |> assign(command_targets: @command_targets)
+      |> assign(command_targets: Targets.get_targets() |> Map.keys())
       |> assign(modifiers_active: false)
 
     {:ok, socket}

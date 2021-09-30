@@ -5,12 +5,13 @@ defmodule Tr33Control.Commands.Command do
   alias Tr33Control.Commands.Schemas.{CommandParams, Modifier}
 
   @max_index Application.compile_env!(:tr33_control, :command_max_index)
+  @active_targets Application.compile_env!(:tr33_control, :active_targets)
 
   @primary_key false
   embedded_schema do
     # internal
     field :index, :integer, default: 0
-    field :targets, {:array, Tr33Control.Atom}, default: Application.compile_env!(:tr33_control, :targets)
+    field :targets, {:array, Tr33Control.Atom}, default: @active_targets
 
     # protobuf
     field :params, :map

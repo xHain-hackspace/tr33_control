@@ -64,13 +64,9 @@ defmodule Tr33Control.ESP do
   end
 
   def udp_children() do
-    targets = Application.fetch_env!(:tr33_control, :targets)
-    hosts = Application.fetch_env!(:tr33_control, :target_hosts)
-
-    targets
-    |> Enum.flat_map(fn target ->
+    Tr33Control.Targets.get_targets()
+    |> Enum.flat_map(fn {target, %{hosts: hosts}} ->
       hosts
-      |> Map.get(target, [])
       |> Enum.map(fn host ->
         %{
           id: host,

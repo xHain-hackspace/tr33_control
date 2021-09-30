@@ -5,7 +5,7 @@ console:
 	iex -S mix phx.server
 
 deps-get:
-  asdf install
+	asdf install
 	mix deps.get
 
 deps-update:

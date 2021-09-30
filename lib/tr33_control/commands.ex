@@ -2,7 +2,7 @@ defmodule Tr33Control.Commands do
   alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset}
   alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync}
 
-  @command_targets Application.compile_env!(:tr33_control, :targets)
+  @command_type_blacklist Application.compile_env!(:tr33_control, :command_type_blacklist)
   @commands_topic "command_updates"
   @presets_topic "preset_updates"
   @common_params %CommandParams{} |> Map.from_struct() |> Map.delete(:type_params) |> Map.keys()
@@ -47,6 +47,7 @@ defmodule Tr33Control.Commands do
 
     fields
     |> Enum.map(fn %Protobuf.Field{name: name} -> name end)
+    |> Enum.reject(&(&1 in @command_type_blacklist))
   end
 
   def get_command(index) do
@@ -118,7 +119,7 @@ defmodule Tr33Control.Commands do
     |> insert_and_notify()
   end
 
-  def toggle_command_target(index, target) when target in @command_targets do
+  def toggle_command_target(index, target) do
     command = %Command{} = get_command(index)
 
     new_targets =
@@ -169,8 +170,9 @@ defmodule Tr33Control.Commands do
   end
 
   def get_strip_index_options(%Command{targets: [target]}) do
-    Application.fetch_env!(:tr33_control, :target_strip_indices)
-    |> Map.get(target, [])
+    Tr33Control.Targets.get_targets()
+    |> Map.get(target, %{})
+    |> Map.get(:strip_indices, [])
     |> Enum.with_index()
   end
 

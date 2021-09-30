@@ -92,8 +92,4 @@ defmodule Tr33Control.Commands.Cache do
   defp migrate_command(%Command{encoded: encoded} = command) do
     %Command{command | params: Commands.Schemas.CommandParams.decode(encoded)}
   end
-
-  # defp migrate_target(%Command{target: "all"} = command), do: %Command{command | target: :all}
-  # defp migrate_target(%Command{target: nil} = command), do: %Command{command | target: :all}
-  # defp migrate_target(%Command{} = command), do: command
 end

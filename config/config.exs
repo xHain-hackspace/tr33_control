@@ -20,76 +20,91 @@ config :tr33_control,
   udp_listen_port: 1337,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
   command_max_index: 8,
-  targets: [:ranken],
-  target_hosts: %{
-    wand: ["wand.fritz.box"],
-    wolken: [
-      "wolke1.lan.xhain.space",
-      "wolke2.lan.xhain.space",
-      "wolke3.lan.xhain.space",
-      "wolke4.lan.xhain.space",
-      "wolke5.lan.xhain.space",
-      "wolke6.lan.xhain.space",
-      "wolke7.lan.xhain.space",
-      "wolke8.lan.xhain.space"
-    ],
-    trommel: [
-      "trommel.lan.xhain.space"
-    ],
-    tr33: ["tr33_esp32.lan.xhain.space"],
-    ranken: ["ranken.lan.xhain.space"]
-    scubar: ["scubar.lan.xhain.space"]
-  },
-  target_strip_indices: %{
-    tr33: [
-      :all,
-      :all_trunks,
-      :all_branches,
-      :trunk_1,
-      :trunk_2,
-      :trunk_3,
-      :trunk_4,
-      :trunk_5,
-      :trunk_6,
-      :trunk_7,
-      :trunk_8,
-      :branch_1,
-      :branch_2,
-      :branch_3,
-      :branch_4,
-      :branch_5,
-      :branch_6,
-      :branch_7,
-      :branch_8,
-      :branch_9,
-      :branch_10,
-      :branch_11,
-      :branch_12
-    ],
-    wolken: [
-      :all,
-      :wolke_1,
-      :wolke_2,
-      :wolke_3,
-      :wolke_4,
-      :wolke_5,
-      :wolke_6,
-      :wolke_7,
-      :wolke_8
-    ],
-    ranken: [
-      :all,
-      :strip_1,
-      :strip_2,
-      :strip_3,
-      :strip_4,
-      :strip_5,
-      :strip_6,
-      :strip_7,
-      :strip_8,
-      :strip_9,
-      :strip_10
-    ]
+  command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :twang, :beat_equalizer],
+  active_targets: [:wand, :ranken],
+  targets: %{
+    wand: %{
+      area: :home,
+      hosts: ["wand.fritz.box"]
+    },
+    tr33: %{
+      area: :upstairs,
+      hosts: ["tr33_esp32.lan.xhain.space"],
+      strip_indices: [
+        :all,
+        :all_trunks,
+        :all_branches,
+        :trunk_1,
+        :trunk_2,
+        :trunk_3,
+        :trunk_4,
+        :trunk_5,
+        :trunk_6,
+        :trunk_7,
+        :trunk_8,
+        :branch_1,
+        :branch_2,
+        :branch_3,
+        :branch_4,
+        :branch_5,
+        :branch_6,
+        :branch_7,
+        :branch_8,
+        :branch_9,
+        :branch_10,
+        :branch_11,
+        :branch_12
+      ]
+    },
+    wolken: %{
+      area: :upstairs,
+      hosts: [
+        "wolke1.lan.xhain.space",
+        "wolke2.lan.xhain.space",
+        "wolke3.lan.xhain.space",
+        "wolke4.lan.xhain.space",
+        "wolke5.lan.xhain.space",
+        "wolke6.lan.xhain.space",
+        "wolke7.lan.xhain.space",
+        "wolke8.lan.xhain.space"
+      ],
+      strip_indices: [
+        :all,
+        :wolke_1,
+        :wolke_2,
+        :wolke_3,
+        :wolke_4,
+        :wolke_5,
+        :wolke_6,
+        :wolke_7,
+        :wolke_8
+      ]
+    },
+    trommel: %{
+      area: :upstairs,
+      hosts: ["trommel.lan.xhain.space"]
+    },
+    ranken: %{
+      area: :downstairs,
+      hosts: ["ranken.lan.xhain.space"],
+      strip_indices: [
+        :all,
+        :strip_1,
+        :strip_2,
+        :strip_3,
+        :strip_4,
+        :strip_5,
+        :strip_6,
+        :strip_7,
+        :strip_8,
+        :strip_9,
+        :strip_10
+      ]
+    },
+    scubar: %{
+      area: :downstairs,
+      hosts: ["scubar.lan.xhain.space"]
+    }
   }
 
 # Configures Elixir's Logger
