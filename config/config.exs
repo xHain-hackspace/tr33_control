@@ -24,11 +24,9 @@ config :tr33_control,
   active_targets: [:wand, :ranken],
   targets: %{
     wand: %{
-      area: :home,
       hosts: ["wand.fritz.box"]
     },
     tr33: %{
-      area: :upstairs,
       hosts: ["tr33_esp32.lan.xhain.space"],
       strip_indices: [
         :all,
@@ -57,7 +55,6 @@ config :tr33_control,
       ]
     },
     wolken: %{
-      area: :upstairs,
       hosts: [
         "wolke1.lan.xhain.space",
         "wolke2.lan.xhain.space",
@@ -81,11 +78,9 @@ config :tr33_control,
       ]
     },
     trommel: %{
-      area: :upstairs,
       hosts: ["trommel.lan.xhain.space"]
     },
     ranken: %{
-      area: :downstairs,
       hosts: ["ranken.lan.xhain.space"],
       strip_indices: [
         :all,
@@ -102,7 +97,6 @@ config :tr33_control,
       ]
     },
     scubar: %{
-      area: :downstairs,
       hosts: ["scubar.lan.xhain.space"]
     }
   }
