@@ -12,20 +12,18 @@ defmodule Tr33Control.UdpServer do
 
   def toggle_debug() do
     current = Application.get_env(:tr33_control, :udp_server_debug, false)
-    Application.put_env(:tr33_control, :udp_server_debug, not current)
+    new = not current
+    Application.put_env(:tr33_control, :udp_server_debug, new)
+    new
   end
 
   # -- GenServer callbacks -----------------------------------------------------
 
   def init(:ok) do
-    {:ok, socket} = :gen_udp.open(@listen_port, [:binary])
-    Logger.info("#{__MODULE__}: Listening on port #{@listen_port}")
+    {:ok, _} = :gen_udp.open(@listen_port, [:binary])
+    Logger.info("#{__MODULE__}: Listening on interface  port #{@listen_port}")
 
-    state = %{
-      socket: socket
-    }
-
-    {:ok, state}
+    {:ok, %{}}
   end
 
   def handle_info({:udp, _socket, address, port, <<@sequence_header, sequence::size(8)>>}, state) do

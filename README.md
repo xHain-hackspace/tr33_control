@@ -19,7 +19,6 @@ This app leverages phoenix channels to sync the state between all connected brow
 * twang + joystick
 * mapped position to 16bit
 * properly set max value for modifiers
-* measure FPS (looks good)
 * replace sequence with phash2 of all commands
 * movement_type: steps, steps_transition
 * disable button for Commands
@@ -36,13 +35,15 @@ This app leverages phoenix channels to sync the state between all connected brow
   * slope -> change/shift color effect 
 * bug in mapped slope: use perpendicular distance instead of y distance
 * gravity
-* beat detection
 * option to configure fade vs set in effects
 * generally more effects like kaleidoscope
 * mapped 2D bouncing ball
 * softer sparkle
+* send fps via UDP
 
 ## done
+* measure FPS (looks good)
+* beat detection
 * modifier for palette 
 * select command when last is deleted 
 * multiple instances of rain/sparkle/etc

@@ -11,5 +11,3 @@ config :tr33_control, Tr33ControlWeb.Endpoint,
   check_origin: false
 
 config :logger, level: :info
-
-import_config "prod.secret.exs"

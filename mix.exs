@@ -27,7 +27,7 @@ defmodule Tr33Control.MixProject do
   defp deps do
     [
       {:phoenix, "~> 1.6.0"},
-      {:phoenix_live_view, "~> 0.16.4"},
+      {:phoenix_live_view, "~> 0.16"},
       {:phoenix_ecto, "~> 4.0"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
@@ -40,8 +40,9 @@ defmodule Tr33Control.MixProject do
       {:ecto, "~> 3.0"},
       {:circuits_uart, "~> 1.2"},
       {:nerves_leds, "~> 0.8"},
-      {:input_event, "~> 0.4"},
+      {:input_event, "~> 1.0"},
       {:cachex, "~> 3.3"},
+      {:sentry, "~> 8.0", runtime: false},
       {:exprotobuf, github: "reimerei/exprotobuf"}
     ]
   end
