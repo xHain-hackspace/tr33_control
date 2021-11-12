@@ -1,12 +1,11 @@
-
 <div class="mb-4 border border-secondary">
-  <%= live_component @socket, Tr33ControlWeb.PresetComponent, id: :presets %>
+  <.live_component module={Tr33ControlWeb.PresetComponent} id="presets" />
 </div>
 
 <ul class="nav nav-tabs">
   <%= for index <- 0..@command_count-1 do %>
     <div class={"nav-link " <> if index == @active_command, do: "active bg-dark", else: ""}>
-      <%= live_component @socket, Tr33ControlWeb.CommandHeaderComponent, id: index %>
+      <.live_component module={Tr33ControlWeb.CommandHeaderComponent} id={index} />
     </div>
   <% end %>
 
@@ -17,6 +16,6 @@
 </ul>
 
 <div class="">
-  <%= live_component @socket, Tr33ControlWeb.CommandComponent, id: :active_command, index: @active_command %>
+  <.live_component module={Tr33ControlWeb.CommandComponent} id="active_command" index={@active_command} />
 </div>
 

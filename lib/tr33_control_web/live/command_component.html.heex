@@ -4,18 +4,24 @@
 
     <%# Command Select %>
     <div class="btn-group border border-secondary rounded m-3">
-      <%= live_component @socket, Tr33ControlWeb.SelectComponent,
-        target: @myself,
-        value: Command.type(@command),
-        options: @command_types,
-        name: :command,
-        style: :command,
-        tabindex: 2 %>
+      <Inputs.select
+        target={ @myself }
+        value={ Command.type(@command) }
+        options={ @command_types }
+        name={ :command }
+        style={ :command }
+        tabindex={ 2 }
+      />
     </div>
 
     <%# Color Palette %>
     <div class="m-3">
-      <%= live_component @socket, Tr33ControlWeb.SelectComponent, param: @color_palette_param, target: @myself, style: :command, tabindex: 3 %>
+      <Inputs.select 
+        target={ @myself } 
+        param={ @color_palette_param }
+        style={ :command }
+        tabindex={ 3 }
+      />
     </div>
 
     <%# Target Toggles %>
@@ -37,12 +43,13 @@
     <%# Strip Index %>
     <%= if length(@strip_index_options) > 0  do %>
       <div class="m-3">
-        <%= live_component @socket, Tr33ControlWeb.SelectComponent,
-          target: @myself,
-          value: Display.strip_index_name(@command, @strip_index_options),
-          options: @strip_index_options,
-          name: :strip_select,
-          style: :command %>
+        <Inputs.select         
+          target={ @myself }
+          value={ Display.strip_index_name(@command, @strip_index_options) }
+          options={ @strip_index_options }
+          name={ :strip_select }
+          style={ :command }          
+        />
       </div>
     <% end %>
 
@@ -63,14 +70,14 @@
   <div class="d-flex flex-wrap border border-top-0 border-secondary">
     <%= for param <- @value_params do %>
       <div class="d-flex flex-column align-items-center" style="width:6rem; margin:2rem">
-        <%= live_component @socket, Tr33ControlWeb.SliderComponent, param: param, target: @myself, tabindex: 5 %>        
+        <Inputs.slider param={ param } target={ @myself } tabindex={ 5 } />        
       </div>
     <% end %>
 
     <div class="d-flex flex-column" style="margin:2rem">
       <%= for param <- @enum_params do %>
         <div class="mb-3">
-          <%= live_component @socket, Tr33ControlWeb.SelectComponent, param: param, target: @myself %>
+          <Inputs.select param={ param } target={ @myself } />        
         </div>
       <% end %>
     </div>
@@ -113,7 +120,7 @@
                   <button type="button" class="btn btn-secondary ms-2"><%= Display.humanize(param_name) %></button>
                   <select class="form-select custom-select bg-dark" name={ param_name } style="min-width:12rem;">
                     <%= for option <- options do %>
-                      <option value={ option } {if option == value, do: "selected"} >
+                      <option value={ Atom.to_string(option) } selected={ option == value } >
                         <%= Display.humanize(option) %>
                       </option>
                     <% end %>

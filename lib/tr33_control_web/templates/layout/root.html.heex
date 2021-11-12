@@ -6,13 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <%= csrf_meta_tag() %>
     <title><%= title()%></title>
-    <link phx-track-static rel="stylesheet" href="<%= Routes.static_path(@conn, "/css/app.css") %>"/>
-    <script defer phx-track-static type="text/javascript" src="<%= Routes.static_path(@conn, "/js/app.js") %>"></script>
+    <link phx-track-static rel="stylesheet" href={ Routes.static_path(@conn, "/css/app.css") } />
+    <script defer phx-track-static type="text/javascript" src={ Routes.static_path(@conn, "/js/app.js") }></script>
   </head>
   <body>
     <div class="main p-3 container" style="max-width: 100%">
       <div class="text-center mb-4">
-        <img class="" src="<%= Routes.static_path(@conn, "/images/xhain_logo_small.png") %>" alt="" width="256" height="256">
+        <img class="" src={ Routes.static_path(@conn, "/images/xhain_logo_small.png") } alt="" width="256" height="256">
         <h2><%= title() %></h2>
       </div>
       <%= @inner_content %>

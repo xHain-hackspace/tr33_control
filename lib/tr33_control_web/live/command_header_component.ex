@@ -4,7 +4,7 @@ defmodule Tr33ControlWeb.CommandHeaderComponent do
   alias Phoenix.LiveView.Socket
   alias Tr33Control.Commands
   alias Tr33Control.Commands.Command
-  alias Tr33ControlWeb.Display
+  alias Tr33ControlWeb.{Display, Inputs}
 
   # update with new command state
   def update(%{command: command}, %Socket{} = socket) do

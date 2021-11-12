@@ -18,6 +18,7 @@ defmodule Tr33ControlWeb.Router do
     pipe_through :browser
 
     live "/", ControlLive, :index
+    # get "/test", PresetController, :test
     # live "/twang", TwangLive
     # get "/docs", DocsController, :index
     get "/preset/:preset_name", PresetController, :load

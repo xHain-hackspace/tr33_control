@@ -4,7 +4,7 @@ defmodule Tr33ControlWeb.CommandComponent do
   alias Phoenix.LiveView.Socket
   alias Tr33Control.{Commands, Targets}
   alias Tr33Control.Commands.{Command, EnumParam, ValueParam}
-  alias Tr33ControlWeb.Display
+  alias Tr33ControlWeb.{Display, Inputs}
 
   def mount(socket) do
     socket =

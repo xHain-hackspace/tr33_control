@@ -56,7 +56,7 @@ defmodule Tr33ControlWeb.ControlLive do
 
   def handle_info({:command_update, command = %Command{}}, %Socket{} = socket) do
     send_update(CommandHeaderComponent, id: command.index, command: command)
-    send_update(CommandComponent, id: :active_command, command: command)
+    send_update(CommandComponent, id: "active_command", command: command)
 
     {:noreply, fetch(socket)}
   end
@@ -73,13 +73,13 @@ defmodule Tr33ControlWeb.ControlLive do
   end
 
   def handle_info({:preset_update, _name}, socket) do
-    send_update(PresetComponent, id: :presets)
+    send_update(PresetComponent, id: "presets")
 
     {:noreply, socket}
   end
 
   def handle_info({:preset_deleted, _name}, socket) do
-    send_update(PresetComponent, id: :presets)
+    send_update(PresetComponent, id: "presets")
 
     {:noreply, socket}
   end
