@@ -2,7 +2,7 @@ defmodule Tr33Control.Joystick.Poller do
   use GenServer
   require Logger
 
-  @poll_interval 10_000
+  @poll_interval 5_000
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, [])

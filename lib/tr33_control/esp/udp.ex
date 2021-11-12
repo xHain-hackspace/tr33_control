@@ -1,9 +1,8 @@
 defmodule Tr33Control.ESP.UDP do
   use GenServer
   require Logger
-  alias Tr33Control.Commands
+  alias Tr33Control.{Commands, ESP, Joystick}
   alias Tr33Control.Commands.Command
-  alias Tr33Control.ESP
 
   @tick_interval_ms 30
   @max_queue_len 5
@@ -43,6 +42,7 @@ defmodule Tr33Control.ESP.UDP do
 
         Commands.subscribe_commands()
         ESP.subscribe()
+        Joystick.subscribe()
 
         {:ok, state}
 
@@ -73,6 +73,11 @@ defmodule Tr33Control.ESP.UDP do
     {:noreply, state}
   end
 
+  def handle_info({:joystick_update, %Joystick{} = joystick}, state) do
+    state = maybe_enqueue(state, joystick)
+    {:noreply, state}
+  end
+
   def handle_info(:time_sync, state) do
     binary = Commands.time_sync_binary()
     transmit_binary(binary, state)
@@ -85,12 +90,16 @@ defmodule Tr33Control.ESP.UDP do
         {:empty, _} ->
           state
 
-        {{:value, %Command{} = command}, rest} ->
+        {{:value, item}, rest} ->
           next_sequence = rem(sequence + 1, 256)
 
-          command
-          |> Commands.command_binary(target, next_sequence)
-          |> transmit_binary(state)
+          binary =
+            case item do
+              command = %Command{} -> Commands.command_binary(command, target, next_sequence)
+              joystick = %Joystick{} -> Commands.joystick_event_binary(joystick, next_sequence)
+            end
+
+          transmit_binary(binary, state)
 
           %{state | queue: rest, sequence: next_sequence}
       end
@@ -98,14 +107,19 @@ defmodule Tr33Control.ESP.UDP do
     {:noreply, state}
   end
 
-  defp maybe_enqueue(%{queue: queue} = state, %Command{} = command) do
+  def handle_info(data, socket) do
+    Logger.warn("#{__MODULE__}: Unhandled info #{inspect(data)}")
+    {:noreply, socket}
+  end
+
+  defp maybe_enqueue(%{queue: queue} = state, item) do
     queue =
       if :queue.len(queue) < @max_queue_len do
-        :queue.in(command, queue)
+        :queue.in(item, queue)
       else
         queue
         |> :queue.drop()
-        |> then(&:queue.in(command, &1))
+        |> then(&:queue.in(item, &1))
       end
 
     %{state | queue: queue}

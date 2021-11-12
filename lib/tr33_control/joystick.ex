@@ -4,45 +4,66 @@ defmodule Tr33Control.Joystick do
   alias Tr33Control.Commands.{Event, Command, Inputs}
   alias Tr33Control.Commands
 
-  # @joystick_name "Mega World USB Game Controllers"
-  @joystick_name "Saitek PLC Cyborg Force Rumble Pad"
+  @joystick_silver "Mega World USB Game Controllers"
+  @joystick_black "Saitek PLC Cyborg Force Rumble Pad"
+  @joysticks [@joystick_silver, @joystick_black]
+
+  defstruct name: "", device: "", x: 128, y: 128, button1: false, button2: false, button3: false, button4: false
+
+  def start_link(opts) do
+    GenServer.start_link(__MODULE__, :ok, [{:name, __MODULE__} | opts])
+  end
+
+  def state() do
+    case Process.whereis(__MODULE__) do
+      pid when is_pid(pid) -> GenServer.call(__MODULE__, :state)
+      _ -> nil
+    end
+  end
+
+  def subscribe(), do: Phoenix.PubSub.subscribe(Tr33Control.PubSub, "joystick")
+
+  def notify_subscribers(state) do
+    Phoenix.PubSub.broadcast!(Tr33Control.PubSub, "joystick", {:joystick_update, state})
+  end
 
   def toggle_debug() do
     current = Application.get_env(:tr33_control, :joystick_debug, false)
     Application.put_env(:tr33_control, :joystick_debug, not current)
   end
 
-  def start_link(opts) do
-    GenServer.start_link(__MODULE__, :ok, [{:name, __MODULE__} | opts])
-  end
-
   def init(_) do
     InputEvent.enumerate()
-    |> Enum.find(&match?({_, %InputEvent.Info{name: @joystick_name}}, &1))
+    |> Enum.find(fn {_, %InputEvent.Info{name: name}} -> name in @joysticks end)
     |> case do
       nil ->
-        debug_log("Joystick #{inspect(@joystick_name)} not found")
+        debug_log("No joystick found")
+        notify_subscribers(nil)
         :ignore
 
-      {input_device, _} ->
-        Logger.info("#{__MODULE__}: Found joystick on device #{inspect(input_device)}")
-        result = InputEvent.start_link(input_device)
-
-        Logger.info(
-          "#{__MODULE__}: Trying to listen on #{input_device} for joystick commands, result: #{inspect(result)}"
-        )
-
-        {:ok, %{}}
+      {device, %InputEvent.Info{name: name}} ->
+        Logger.info("#{__MODULE__}: Found joystick on device #{inspect(device)}")
+        {:ok, _pid} = InputEvent.start_link(device)
+        Logger.info("#{__MODULE__}: Listening on #{device} for joystick commands")
+        state = %__MODULE__{device: device, name: name}
+        notify_subscribers(state)
+        {:ok, state}
     end
   end
 
-  def handle_info({:input_event, _, joystick_events}, state) when is_list(joystick_events) do
-    joystick_events
-    |> Enum.map(fn event ->
-      debug_log("Received joystick event #{inspect(event)}")
-      event
-    end)
-    |> Enum.each(&handle_joystick_event/1)
+  def handle_call(:state, _from, state) do
+    {:reply, state, state}
+  end
+
+  def handle_info({:input_event, _, joystick_events}, state = %__MODULE__{}) when is_list(joystick_events) do
+    state =
+      joystick_events
+      |> Enum.map(fn event ->
+        debug_log("Received joystick event #{inspect(event)}")
+        event
+      end)
+      |> Enum.reduce(state, &handle_joystick_event/2)
+      |> tap(&notify_subscribers/1)
 
     {:noreply, state}
   end
@@ -56,121 +77,45 @@ defmodule Tr33Control.Joystick do
     reason
   end
 
-  # command
-  defp handle_joystick_event({:ev_key, :btn_trigger, 1}) do
-    if Commands.get_current_preset_name() == "twang" do
-      Commands.new_event!(%{type: :joystick, data: [0, 160]})
-      |> Commands.send_to_esp()
-    else
-      Commands.get_event(:update_settings)
-      |> Map.update(:data, [], &iterate(&1, 0, Inputs.ColorPalette))
-      |> Commands.send_to_esp()
-    end
+  # Joystick events
+  defp handle_joystick_event({:ev_abs, :abs_x, value}, %__MODULE__{name: @joystick_silver} = state) do
+    %__MODULE__{state | x: value + 128}
   end
 
-  defp handle_joystick_event({:ev_key, :btn_trigger, 0}) do
-    if Commands.get_current_preset_name() == "twang" do
-      Commands.new_event!(%{type: :joystick, data: [0, 0]})
-      |> Commands.send_to_esp()
-    end
+  defp handle_joystick_event({:ev_abs, :abs_y, value}, %__MODULE__{name: @joystick_silver} = state) do
+    %__MODULE__{state | y: 127 - value}
   end
 
-  defp handle_joystick_event({:ev_abs, name, value})
-       when name in [:abs_x, :abs_y, :abs_hat0x, :abs_hat0y] do
-    # todo
-    # if Commands.get_current_preset_name() == "joystick" do
-    #   case Commands.list_commands() |> Enum.find(fn %Command{type: type} -> type == :mapped_shape end) do
-    #     nil ->
-    #       :noop
-
-    #     command ->
-    #       Map.update(command, :data, [], &update_mapped_shape_data(&1, name, value))
-    #       |> Commands.send_to_esp()
-    #   end
-    # end
-
-    # if Commands.get_current_preset_name() == "twang" do
-    #   twang_event(name, value)
-    #   |> Commands.send_to_esp()
-    # end
+  defp handle_joystick_event({:ev_key, :btn_trigger, value}, %__MODULE__{name: @joystick_silver} = state) do
+    %__MODULE__{state | button1: int_to_boolean(value)}
   end
 
-  @change_preset_commands [{:ev_key, :btn_base5, 1}, {:ev_key, :btn_top, 1}]
-  defp handle_joystick_event(event) when event in @change_preset_commands do
-    if Commands.get_current_preset_name() == "twang" do
-      Commands.load_preset("joystick")
-    else
-      if Commands.get_current_preset_name() == "joystick" do
-        Application.get_env(:tr33_control, :preset_before_joystick, "twang")
-        |> Commands.load_preset()
-      else
-        Application.put_env(:tr33_control, :preset_before_joystick, Commands.get_current_preset_name())
-        Commands.load_preset("twang")
-      end
-    end
+  defp handle_joystick_event({:ev_key, :btn_thumb, value}, %__MODULE__{name: @joystick_silver} = state) do
+    %__MODULE__{state | button2: int_to_boolean(value)}
   end
 
-  defp handle_joystick_event(event), do: debug_log("Unhandled joystick event #{inspect(event)}")
+  defp handle_joystick_event({:ev_key, :btn_thumb2, value}, %__MODULE__{name: @joystick_silver} = state) do
+    %__MODULE__{state | button3: int_to_boolean(value)}
+  end
+
+  defp handle_joystick_event({:ev_key, :btn_top, value}, %__MODULE__{name: @joystick_silver} = state) do
+    %__MODULE__{state | button4: int_to_boolean(value)}
+  end
+
+  defp send_to_esp() do
+  end
+
+  defp handle_joystick_event(event, state) do
+    debug_log("Unhandled joystick event #{inspect(event)}")
+    state
+  end
+
+  defp int_to_boolean(0), do: false
+  defp int_to_boolean(1), do: true
 
   defp debug_log(message) do
     if Application.get_env(:tr33_control, :joystick_debug, false) do
       Logger.debug("#{__MODULE__}: #{message}")
     end
   end
-
-  defp iterate(data, index, enum) do
-    List.update_at(data, index, fn value ->
-      next = value + 1
-
-      case enum.__enum_map__() |> Keyword.values() |> Enum.member?(next) do
-        true -> next
-        false -> 0
-      end
-    end)
-  end
-
-  defp interate_num(data, index, incr) when incr > 0 do
-    List.update_at(data, index, fn
-      v when v > 255 - incr -> 0
-      v -> v + incr
-    end)
-  end
-
-  defp interate_num(data, index, incr) when incr < 0 do
-    List.update_at(data, index, fn
-      v when v < 0 - incr -> 255
-      v -> v + incr
-    end)
-  end
-
-  defp interate_num(data, _, _), do: data
-
-  defp update_mapped_shape_data(data, :abs_hat0x, joystick_value) do
-    interate_num(data, 1, joystick_value * 15)
-  end
-
-  defp update_mapped_shape_data(data, :abs_x, joystick_value) do
-    List.update_at(data, 2, &smooth_jitter(&1, joystick_value))
-  end
-
-  defp update_mapped_shape_data(data, :abs_y, joystick_value) do
-    List.update_at(data, 3, &smooth_jitter(&1, joystick_value))
-  end
-
-  defp update_mapped_shape_data(data, :abs_hat0y, joystick_value) do
-    interate_num(data, 4, joystick_value * -10)
-  end
-
-  defp twang_event(:abs_y, value) do
-    Commands.new_event!(%{type: :joystick, data: [255 - value, 0]})
-  end
-
-  # defp twang_event(:abs_hat0y, value) do
-  #   Commands.new_event!(%{type: :joystick, data: [max(value * -1, -126)]})
-  # end
-
-  # defp twang_event(_, _), do: %Event{type: :beat}
-
-  defp smooth_jitter(current, new) when abs(new - current) > 1, do: new
-  defp smooth_jitter(current, _), do: current
 end

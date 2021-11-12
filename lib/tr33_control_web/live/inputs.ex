@@ -25,7 +25,7 @@ defmodule Tr33ControlWeb.Inputs do
     <div class="btn-group">
       <button type="button" class={ "btn btn-#{label_class(@style)} text-start" }><%= Display.humanize(@name) %></button>
       <form phx-change="select_change" phx-target={ @target } phx-auto-recover="ignore">
-        <select class="form-select custom-select" name={ @name } {if @tabindex != nil, do: [tabindex: to_string(@tabindex)]} >
+        <select class="form-select custom-select" name={ @name } {if @tabindex != nil, do: [tabindex: to_string(@tabindex)], else: []} >
           <%= for {option_name, option_value} <- @options do %>
             <option value={ option_value } selected={ option_value == @value }  >
               <%= Display.humanize(option_name) %>

@@ -3,7 +3,7 @@ defmodule Tr33ControlWeb.PresetComponent do
   require Logger
   alias Phoenix.LiveView.Socket
   alias Tr33Control.Commands
-  alias Tr33Control.Commands.{Command, Preset}
+  alias Tr33Control.Commands.{Preset}
   alias Tr33ControlWeb.Display
 
   def mount(socket) do

@@ -1,6 +1,6 @@
 defmodule Tr33Control.Commands do
   alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset}
-  alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync}
+  alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent}
 
   @command_type_blacklist Application.compile_env!(:tr33_control, :command_type_blacklist)
   @commands_topic "command_updates"
@@ -335,6 +335,21 @@ defmodule Tr33Control.Commands do
       end
 
     WireMessage.new(sequence: sequence, message: {:command_params, params})
+    |> WireMessage.encode()
+  end
+
+  def joystick_event_binary(%Tr33Control.Joystick{} = joystick, sequence) do
+    joystick_event =
+      JoystickEvent.new(
+        x: joystick.x,
+        y: joystick.y,
+        button1: joystick.button1,
+        button2: joystick.button2,
+        button3: joystick.button3,
+        button4: joystick.button4
+      )
+
+    WireMessage.new(sequence: sequence, message: {:joystick_event, joystick_event})
     |> WireMessage.encode()
   end
 

@@ -20,7 +20,7 @@ config :tr33_control,
   udp_listen_port: 1337,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
   command_max_index: 8,
-  command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :twang, :beat_equalizer],
+  command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :beat_equalizer],
   active_targets: [:wand, :ranken],
   targets: %{
     wand: %{
