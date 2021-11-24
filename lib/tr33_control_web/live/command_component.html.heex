@@ -1,11 +1,12 @@
 <div>
   <%# Header %>
-  <div class="d-flex flex-wrap justify-content-start border border-top-0 border-bottom-0 border-secondary">
+  <div class="d-flex justify-content-start">
 
     <%# Command Select %>
-    <div class="btn-group border border-secondary rounded m-3">
+    <div class="btn-group border border-secondary rounded my-3 me-3">
       <Inputs.select
         target={ @myself }
+        display_name="Command Type"
         value={ Command.type(@command) }
         options={ @command_types }
         name={ :command }
@@ -30,7 +31,7 @@
       <%= for target <- @command_targets do %>
         <button
           type="button"
-          class={"btn btn-" <> if Display.target_active?(@command, target), do: "primary", else: "secondary"}
+          class={"btn btn-" <> if Display.target_active?(@command, target), do: "primary", else: "outline-primary text-secondary"}
           phx-click="toggle_target"
           phx-value-target={target}
           phx-target={@myself}
@@ -53,23 +54,19 @@
       </div>
     <% end %>
 
-    <%# Modifiers %>
-    <div class="btn-group m-3">
-      <button
-        type="button"
-        class={"btn btn-" <> if @modifiers_active, do: "primary", else: "secondary"}
-        phx-click="toggle_modifiers"
-        phx-value-target={ @myself }
-        phx-target={ @myself }
-        >∿ Modifiers
-      </button>
-    </div>
+    <%# Controls %>
+    <%# <div class="btn-group m-3">       %>
+      <%# todo %>
+      <%# <button type="button" class="btn btn-secondary" phx-click="increment_command_index">Move Left</button> %>
+      <%# <button type="button" class="btn btn-secondary" phx-click="decrement_command_index">Move Right</button> %>
+      <%# <button type="button" class="btn btn-secondary" phx-click="decrement_command_index">Clone</button> %>      
+    <%# </div> %>
   </div>
 
   <%# Controls %>
-  <div class="d-flex flex-wrap border border-top-0 border-secondary">
+  <div class="d-flex">
     <%= for param <- @value_params do %>
-      <div class="d-flex flex-column align-items-center" style="width:6rem; margin:2rem">
+      <div class="d-flex flex-column align-items-center m-4" style="width:6rem;">
         <Inputs.slider param={ param } target={ @myself } tabindex={ 5 } />        
       </div>
     <% end %>
@@ -85,12 +82,12 @@
 
   <%# Modifier %>
   <%= if @modifiers_active do %>
-    <div class="d-flex flex-column border border-secondary border-top-0 pb-2">
+    <h4>Modifiers</h4>
+    <div class="d-flex flex-column">
 
       <%# Activation bar %>
-      <div class="d-flex flex-wrap justify-content-start">
-        <div class="btn-group m-3">
-          <button type="button" class="btn btn-dark fw-bold">∿ Modifiers</button>
+      <div class="d-flex justify-content-start">
+        <div class="btn-group my-3">          
           <%= for name <- @modifier_names do %>
             <button
               type="button"
@@ -107,8 +104,8 @@
 
       <%# Inputs %>
       <%= for {name, enums, values} <- @modifier_params do %>
-        <div class="d-flex flex-wrap justify-content-start">
-          <div class="mx-3 my-1">
+        <div class="d-flex justify-content-start">
+          <div class="mx-1 my-1">
               <form class="d-flex input-group" phx-submit="update_modifier" phx-target={@myself}>
                 <input name="name" type="hidden" value={ name }>
 

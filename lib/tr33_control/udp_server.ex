@@ -21,14 +21,19 @@ defmodule Tr33Control.UdpServer do
 
   def init(:ok) do
     {:ok, _} = :gen_udp.open(@listen_port, [:binary])
-    Logger.info("#{__MODULE__}: Listening on interface  port #{@listen_port}")
+    Logger.info("#{__MODULE__}: Listening port #{@listen_port}")
 
     {:ok, %{}}
   end
 
   def handle_info({:udp, _socket, address, port, <<@sequence_header, sequence::size(8)>>}, state) do
     debug_log("Incoming sequence \"#{sequence}\" from #{inspect(address)}:#{inspect(port)}")
-    ESP.handle_udp_sequence(address, port, sequence)
+    ESP.handle_sequence(address, sequence)
+    {:noreply, state}
+  end
+
+  def handle_info({:udp, _socket, address, port, <<@sequence_header, _::binary>> = message}, state) do
+    debug_log("Invalid sequence message \"#{message}\" from #{inspect(address)}:#{inspect(port)}")
     {:noreply, state}
   end
 

@@ -8,7 +8,7 @@ defmodule Tr33Control.Joystick do
   @joystick_black "Saitek PLC Cyborg Force Rumble Pad"
   @joysticks [@joystick_silver, @joystick_black]
 
-  defstruct name: "", device: "", x: 128, y: 128, button1: false, button2: false, button3: false, button4: false
+  defstruct name: "", device: "", x: 0, y: 0, button1: false, button2: false, button3: false, button4: false
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, [{:name, __MODULE__} | opts])
@@ -77,7 +77,7 @@ defmodule Tr33Control.Joystick do
     reason
   end
 
-  # Joystick events
+  # Silver Joystick
   defp handle_joystick_event({:ev_abs, :abs_x, value}, %__MODULE__{name: @joystick_silver} = state) do
     %__MODULE__{state | x: value + 128}
   end
@@ -102,7 +102,37 @@ defmodule Tr33Control.Joystick do
     %__MODULE__{state | button4: int_to_boolean(value)}
   end
 
-  defp send_to_esp() do
+  # Black Joystick
+  defp handle_joystick_event({:ev_abs, :abs_x, value}, %__MODULE__{name: @joystick_black, x: x} = state) do
+    if abs(value - x) > 1 do
+      %__MODULE__{state | x: value}
+    else
+      state
+    end
+  end
+
+  defp handle_joystick_event({:ev_abs, :abs_y, value}, %__MODULE__{name: @joystick_black, y: y} = state) do
+    if abs(value - y) > 1 do
+      %__MODULE__{state | y: 255 - value}
+    else
+      state
+    end
+  end
+
+  defp handle_joystick_event({:ev_key, :btn_trigger, value}, %__MODULE__{name: @joystick_black} = state) do
+    %__MODULE__{state | button1: int_to_boolean(value)}
+  end
+
+  defp handle_joystick_event({:ev_key, :btn_thumb, value}, %__MODULE__{name: @joystick_black} = state) do
+    %__MODULE__{state | button2: int_to_boolean(value)}
+  end
+
+  defp handle_joystick_event({:ev_key, :btn_thumb2, value}, %__MODULE__{name: @joystick_black} = state) do
+    %__MODULE__{state | button3: int_to_boolean(value)}
+  end
+
+  defp handle_joystick_event({:ev_key, :btn_top, value}, %__MODULE__{name: @joystick_black} = state) do
+    %__MODULE__{state | button4: int_to_boolean(value)}
   end
 
   defp handle_joystick_event(event, state) do

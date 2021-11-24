@@ -6,6 +6,7 @@ defmodule Tr33Control.Commands do
   @commands_topic "command_updates"
   @presets_topic "preset_updates"
   @common_params %CommandParams{} |> Map.from_struct() |> Map.delete(:type_params) |> Map.keys()
+  @max_index Application.compile_env!(:tr33_control, :command_max_index)
 
   def init() do
     Cache.init_all()
@@ -63,8 +64,12 @@ defmodule Tr33Control.Commands do
   end
 
   def create_command(index, type, params \\ []) when is_atom(type) and is_number(index) and is_list(params) do
-    Command.new(index, type, params)
-    |> insert_and_notify()
+    if(index < @max_index) do
+      Command.new(index, type, params)
+      |> insert_and_notify()
+    else
+      :noop
+    end
   end
 
   def create_command(protobuf) when is_binary(protobuf) do
@@ -72,26 +77,31 @@ defmodule Tr33Control.Commands do
     |> insert_and_notify()
   end
 
-  def delete_command(index) do
-    count = Cache.count(Command)
+  def delete_commands(indices) when is_list(indices) do
+    old_count = count_commands()
+    new_count = old_count - length(indices)
 
-    if count > 1 do
-      {_before_delete, after_deleted} =
-        Cache.all(Command)
-        |> Enum.split(index)
+    if new_count > 0 do
+      for index <- indices do
+        Cache.delete(Command, index)
+      end
 
-      after_deleted
-      |> tl()
-      |> Enum.with_index(index)
-      |> Enum.map(fn {%Command{} = command, new_index} ->
-        %Command{command | index: new_index}
+      list_commands()
+      |> Enum.with_index()
+      |> Enum.map(fn {command, index} ->
+        %Command{command | index: index} |> insert_and_notify()
       end)
-      |> Enum.map(&insert_and_notify/1)
 
-      Cache.delete(Command, count - 1)
-      notify_subscribers(:command_deleted, index)
+      for index <- new_count..(old_count - 1) do
+        Cache.delete(Command, index)
+        notify_subscribers(:command_deleted, index)
+      end
+    else
+      :noop
     end
   end
+
+  def delete_command(index), do: delete_commands([index])
 
   def update_command_type(index, type) when is_atom(type) do
     get_command(index)
@@ -135,6 +145,23 @@ defmodule Tr33Control.Commands do
 
   def count_commands() do
     Cache.count(Command)
+  end
+
+  def swap_commands(index1, index2) when index1 >= 0 and index2 >= 0 do
+    count = count_commands()
+
+    if index1 < count and index2 < count do
+      command1 = get_command(index1)
+      command2 = get_command(index2)
+
+      %Command{command1 | index: index2} |> insert_and_notify()
+      %Command{command2 | index: index1} |> insert_and_notify()
+    end
+  end
+
+  def swap_commands(index1, index2) do
+    IO.inspect({index1, index2})
+    :noop
   end
 
   ### Command Params: EnumParam + ValueParam ###############################################################################
@@ -286,7 +313,8 @@ defmodule Tr33Control.Commands do
 
     if previous_count > new_count do
       (previous_count - 1)..new_count
-      |> Enum.map(&delete_command/1)
+      |> Enum.into([])
+      |> delete_commands()
     end
 
     commands

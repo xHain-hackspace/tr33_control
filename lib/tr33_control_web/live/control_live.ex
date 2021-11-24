@@ -3,9 +3,9 @@ defmodule Tr33ControlWeb.ControlLive do
   require Logger
 
   alias Phoenix.LiveView.Socket
-  alias Tr33Control.Commands
+  alias Tr33Control.{Commands}
   alias Tr33Control.Commands.Command
-  alias Tr33ControlWeb.{CommandComponent, PresetComponent, CommandHeaderComponent}
+  alias Tr33ControlWeb.{CommandComponent, PresetComponent, CommandHeaderComponent, Components}
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
@@ -30,9 +30,9 @@ defmodule Tr33ControlWeb.ControlLive do
   end
 
   def handle_event("add_command", _, socket) do
-    %Command{index: index} =
-      Commands.count_commands()
-      |> Commands.create_command(:single_color, brightness: 0)
+    IO.inspect("ADDD!")
+    index = Commands.count_commands()
+    Commands.create_command(index, :single_color, brightness: 150)
 
     socket =
       socket
@@ -45,6 +45,39 @@ defmodule Tr33ControlWeb.ControlLive do
   def handle_event("delete_command", _, %Socket{} = socket) do
     socket.assigns.active_command
     |> Commands.delete_command()
+
+    {:noreply, socket}
+  end
+
+  def handle_event("reset_commands", _, socket) do
+    1..(Commands.count_commands() - 1)
+    |> Enum.into([])
+    |> Commands.delete_commands()
+
+    Commands.create_command(0, :rainbow)
+
+    socket =
+      socket
+      |> assign(active_command: 0)
+      |> fetch()
+
+    {:noreply, socket}
+  end
+
+  def handle_event("increment_command_index", _, %Socket{} = socket) do
+    old = socket.assigns.active_command
+    new = old + 1
+
+    Commands.swap_commands(old, new)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("decrement_command_index", _, %Socket{} = socket) do
+    old = socket.assigns.active_command
+    new = old - 1
+
+    Commands.swap_commands(old, new)
 
     {:noreply, socket}
   end
@@ -64,7 +97,7 @@ defmodule Tr33ControlWeb.ControlLive do
   def handle_info({:command_deleted, index}, %Socket{} = socket) do
     socket =
       if socket.assigns.active_command == index do
-        assign(socket, :active_command, 0)
+        assign(socket, :active_command, Commands.count_commands() - 1)
       else
         socket
       end

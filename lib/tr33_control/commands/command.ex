@@ -47,8 +47,9 @@ defmodule Tr33Control.Commands.Command do
     %__MODULE__{command | params: %CommandParams{params | type_params: {type, type_params}}}
   end
 
-  def encode(%__MODULE__{params: %CommandParams{} = params} = command) do
-    %__MODULE__{command | encoded: CommandParams.encode(params)}
+  def encode(%__MODULE__{index: index, params: %CommandParams{} = params} = command) do
+    corrected = %CommandParams{params | index: index}
+    %__MODULE__{command | params: corrected, encoded: CommandParams.encode(corrected)}
   end
 
   def get_field_def(name) when is_atom(name) do

@@ -3,7 +3,7 @@ defmodule Tr33ControlWeb.JoystickLive do
   require Logger
   alias Tr33Control.Joystick
 
-  def mount(_params, _session, socket) do
+  def mount(_, _, socket) do
     if connected?(socket) do
       Joystick.subscribe()
     end

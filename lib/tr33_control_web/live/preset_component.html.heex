@@ -1,9 +1,8 @@
 <div class="d-flex flex-wrap">
-  <div class="btn-group m-3">
-    <button type="button" class="btn btn-dark text-start fw-bold">Presets</button>
-
+  <div class="btn-group my-3 me-3">
     <div class="btn-group">
-      <button type="button" class="btn btn-primary text-start dropdown-toggle" data-bs-toggle="dropdown"><%= if is_nil(@current_preset), do: "Load Preset", else: Display.preset_option(@current_preset) %></button>
+      <button type="button" class="btn btn-secondary">Load </button>
+      <button type="button" class="btn btn-primary dropdown-toggle" data-bs-toggle="dropdown"><%= if is_nil(@current_preset), do: "select", else: Display.preset_option(@current_preset) %></button>
       <div class="dropdown-menu">
         <%= for preset <- @presets do %>
           <div
@@ -18,17 +17,20 @@
         <% end %>
       </div>
     </div>
-
-    <div class="btn-group ">
-      <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="update">Update</button>
-      <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="set_default">Set As Default</button>
-      <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="delete">Delete</button>
-    </div>
   </div>
 
   <form class="input-group m-3" phx-submit="create" phx-target={@myself} style="width: 15rem;">
-    <input type="text" class="form-control bg-dark text-body" name="name" placeholder="New Preset">
-    <button class="btn btn-secondary" type="submit">Create</button>
+    <input type="text" class="form-control bg-dark text-body" name="name" placeholder="Name">
+    <button class="btn btn-secondary" type="submit">Save as Preset</button>
   </form>
 
+  <div class="btn-group my-3">
+    <button type="button" class="btn btn-dark disabled">Edit selected preset</button>
+    <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="update" disabled={@current_preset == nil}>Update</button>
+    <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="set_default" disabled={@current_preset == nil}> Set As Default</button>
+    <button type="button" phx-target={@myself} class="btn btn-secondary" phx-click="delete" disabled={@current_preset == nil}>Delete</button>
+  </div>
+
 </div>
+
+

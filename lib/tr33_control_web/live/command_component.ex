@@ -11,7 +11,7 @@ defmodule Tr33ControlWeb.CommandComponent do
       socket
       |> assign(command_types: Commands.command_types())
       |> assign(command_targets: Targets.get_targets() |> Map.keys())
-      |> assign(modifiers_active: false)
+      |> assign(modifiers_active: true)
 
     {:ok, socket}
   end
@@ -21,7 +21,7 @@ defmodule Tr33ControlWeb.CommandComponent do
     {:ok, socket}
   end
 
-  # index update, current command is differnt or does there is none at all. Fetch it
+  # index update, current command is differnt or there is none at all. Fetch it
   def update(%{index: index}, %Socket{} = socket) do
     command = Commands.get_command(index)
     {:ok, update_command(socket, command)}

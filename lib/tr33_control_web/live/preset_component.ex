@@ -80,4 +80,7 @@ defmodule Tr33ControlWeb.PresetComponent do
     Logger.warn("#{__MODULE__}: Unhandled info #{inspect(data)}")
     {:noreply, socket}
   end
+
+  defp preset_name(nil), do: ""
+  defp preset_name(%Preset{name: name}), do: name
 end

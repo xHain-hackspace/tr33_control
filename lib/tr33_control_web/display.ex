@@ -48,4 +48,7 @@ defmodule Tr33ControlWeb.Display do
     Commands.modifier_name(command, modifier)
     |> humanize()
   end
+
+  def ip(nil), do: "-"
+  def ip({a, b, c, d}), do: "#{a}.#{b}.#{c}.#{d}"
 end

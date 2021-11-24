@@ -1,0 +1,13 @@
+<button type="button" class="btn btn-primary" phx-click="resync">Resync</button> 
+<button type="button" class="btn btn-primary" phx-click="reconnect">Reconnect</button> 
+<table class={"table"}>
+  <tbody>
+    <%= for %UDP{host: host, ip: ip, connection: connection} = target<- @sorted_targets do %>
+      <tr class={"text-#{class_for_target(target)}"}>
+        <th style="width: 25%"><%= host %></th>
+        <td style="width: 25%"><%= Display.ip(ip) %></td>
+        <td style="width: 25%"><%= Display.humanize(connection) %></td>
+      </tr>
+    <% end %>
+  </tbody>   
+</table>

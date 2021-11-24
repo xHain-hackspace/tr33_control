@@ -14,16 +14,17 @@ defmodule Tr33ControlWeb.Inputs do
     |> select()
   end
 
-  def select(%{target: _, value: _, options: options, name: _} = assigns) do
+  def select(%{target: _, value: _, options: options, name: name} = assigns) do
     assigns =
       assigns
       |> assign_new(:style, fn -> :command end)
       |> assign_new(:tabindex, fn -> nil end)
+      |> assign_new(:display_name, fn -> name end)
       |> assign(:options, Enum.map(options, &sanetize_option/1))
 
     ~H"""
     <div class="btn-group">
-      <button type="button" class={ "btn btn-#{label_class(@style)} text-start" }><%= Display.humanize(@name) %></button>
+      <button type="button" class={ "btn btn-#{label_class(@style)} text-start" }><%= Display.humanize(@display_name) %></button>
       <form phx-change="select_change" phx-target={ @target } phx-auto-recover="ignore">
         <select class="form-select custom-select" name={ @name } {if @tabindex != nil, do: [tabindex: to_string(@tabindex)], else: []} >
           <%= for {option_name, option_value} <- @options do %>

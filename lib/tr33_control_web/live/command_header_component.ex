@@ -6,26 +6,23 @@ defmodule Tr33ControlWeb.CommandHeaderComponent do
   alias Tr33Control.Commands.Command
   alias Tr33ControlWeb.{Display, Inputs}
 
+  def mount(_params, _session, socket) do
+    socket
+    |> assign(active?: false)
+
+    {:ok, socket}
+  end
+
   # update with new command state
-  def update(%{command: command}, %Socket{} = socket) do
+  def update(assigns, %Socket{} = socket) do
     socket =
       socket
-      |> assign(:command, command)
-      |> assign(:brightness_param, Commands.get_common_value_param(command, :brightness))
+      |> assign(assigns)
+      |> maybe_assign_active(Map.get(assigns, :active?))
+      |> ensure_command()
+      |> assign_brightness()
 
     {:ok, socket}
-  end
-
-  # update without new command state, command already in session. Don't do anything
-  def update(_, %Socket{assigns: %{command: _}} = socket) do
-    {:ok, socket}
-  end
-
-  # update without command in session, fetch it
-  def update(%{id: index} = assigns, socket) do
-    assigns
-    |> Map.put(:command, Commands.get_command(index))
-    |> update(socket)
   end
 
   def handle_event("slider_change", %{"brightness" => brightness}, %Socket{} = socket) do
@@ -37,4 +34,19 @@ defmodule Tr33ControlWeb.CommandHeaderComponent do
     Logger.warn("#{__MODULE__}: Unhandled event #{inspect(event)} Data: #{inspect(data)}")
     {:noreply, socket}
   end
+
+  defp ensure_command(%Socket{assigns: %{command: _}} = socket), do: socket
+
+  defp ensure_command(%Socket{assigns: %{id: id}} = socket) do
+    socket
+    |> assign(command: Commands.get_command(id))
+  end
+
+  def assign_brightness(%Socket{assigns: %{command: command}} = socket) do
+    socket
+    |> assign(:brightness_param, Commands.get_common_value_param(command, :brightness))
+  end
+
+  defp maybe_assign_active(%Socket{} = socket, nil), do: socket
+  defp maybe_assign_active(%Socket{} = socket, value), do: assign(socket, active?: value)
 end

@@ -1,16 +1,13 @@
-<div class="d-flex flex-column align-items-center" style="width:6rem;">
-  <div class="h4">
-    <span class="badge bg-secondary" phx-click="set_active_command" phx-value-index={@command.index}>
-      <%= Command.type(@command) |> Display.humanize() %>
+<div class="d-flex flex-column align-items-center" style="width:6rem;" phx-click="set_active_command" phx-value-index={@command.index}>
+  <div class="h4 ">
+    <span class={"badge bg-secondary border border-#{if @active?, do: "warning", else: "secondary"}"}>
+      Command <%= @command.index %>
     </span>
   </div>
-  
-  <Inputs.slider param={ @brightness_param } target={ @myself } tabindex={ 1 } />
-  
-  <button
-    class="btn btn-primary text-body mb-2 align-self-stretch"
-    phx-click="set_active_command"
-    phx-value-index={@command.index}
-    >▼</button>
 
+  <span class="badge bg-secondary mb-3">
+    <%= Command.type(@command) |> Display.humanize() %>
+  </span>
+  
+  <Inputs.slider param={@brightness_param} target={@myself} tabindex={1} />  
 </div>

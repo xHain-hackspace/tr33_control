@@ -1,19 +1,19 @@
-<div class={"card border-#{@class} mb-3 mx-auto"} style="max-width: 40rem;">
-  <div class="card-header">Joystick</div>
-  <div class="card-body">
+<%# <div class={"card border-#{@class} mb-3 mx-auto"} style="max-width: 40rem;"> %>
+  <%# <div class="card-header">Joystick</div> %>
+  <%# <div class="card-body"> %>
     <%# <h4 class="card-title">Data</h4> %>
     <%# <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p> %>
 
-    <table class="table table-hover">
+    <table class={"table table-hover text-#{@class}"}>
       <tbody>
         <%= for key <- [:name, :device, :x, :y, :button1, :button2, :button3, :button4] do %>
           <tr>
             <th style="width: 25%"><%= key |> to_string |> String.capitalize() %></th>
-            <td><%= Map.get(@joystick_state, key) %></td>
+            <td style="width: 25%"><%= Map.get(@joystick_state, key) %></td>
           </tr>
         <% end %>
       </tbody>      
     </table>
     
-  </div>
-</div>
+  <%# </div>
+</div> %>

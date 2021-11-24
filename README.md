@@ -41,6 +41,10 @@ This app leverages phoenix channels to sync the state between all connected brow
 * softer sparkle
 * send fps via UDP
 
+## UI
+* remove command name
+* add target filter to overview
+
 ## done
 * measure FPS (looks good)
 * beat detection
