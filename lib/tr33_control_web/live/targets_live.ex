@@ -58,7 +58,7 @@ defmodule Tr33ControlWeb.TargetsLive do
     assign(socket, sorted_targets: sorted)
   end
 
-  defp class_for_target(%UDP{connection: conn}) when conn in [:ok, :waiting_for_response], do: "success"
-  defp class_for_target(%UDP{connection: conn}) when conn in [:not_responding], do: "warning"
+  defp class_for_target(%UDP{connection: conn}) when conn in [:ok], do: "success"
+  defp class_for_target(%UDP{connection: conn}) when conn in [:not_responding, :resync_send, :started], do: "warning"
   defp class_for_target(%UDP{}), do: "danger"
 end

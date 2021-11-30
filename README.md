@@ -42,10 +42,16 @@ This app leverages phoenix channels to sync the state between all connected brow
 * send fps via UDP
 
 ## UI
-* remove command name
 * add target filter to overview
+* remove hover from label
+* tabs
+* Remove command type -> select it on new caommand
+* preset list
+* color previews
+* 
 
 ## done
+* remove command name
 * measure FPS (looks good)
 * beat detection
 * modifier for palette 

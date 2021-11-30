@@ -44,7 +44,7 @@ defmodule Tr33Control.ESP.UDP do
 
         state =
           %__MODULE__{state | socket: socket, ip: ip}
-          |> set_connection_state(:waiting_for_response)
+          |> set_connection_state(:started)
 
         info_log(
           state,
@@ -80,9 +80,9 @@ defmodule Tr33Control.ESP.UDP do
     {:noreply, resync_queue(state)}
   end
 
-  # def handle_info({:sequence, _, _}, state) do
-  #   {:noreply, state}
-  # end
+  def handle_info({:sequence, _other_ip, _received}, state) do
+    {:noreply, state}
+  end
 
   def handle_info({:command_update, %Command{} = command}, state) do
     state = maybe_enqueue(state, command)
@@ -147,7 +147,7 @@ defmodule Tr33Control.ESP.UDP do
   end
 
   def handle_info(data, socket) do
-    Logger.warn("#{__MODULE__}: Unhandled info #{inspect(data)}")
+    warn_log(socket, "#{__MODULE__}: Unhandled info #{inspect(data)}")
     {:noreply, socket}
   end
 
@@ -172,7 +172,7 @@ defmodule Tr33Control.ESP.UDP do
       |> Enum.reduce(:queue.new(), fn %Command{} = command, queue_acc -> :queue.in(command, queue_acc) end)
 
     %__MODULE__{state | queue: queue, last_sequence: System.os_time(:millisecond)}
-    |> set_connection_state(:waiting_for_response)
+    |> set_connection_state(:resync_send)
   end
 
   defp transmit_binary(binary, %__MODULE__{socket: socket, host: host} = state) when is_binary(binary) do
@@ -205,5 +205,9 @@ defmodule Tr33Control.ESP.UDP do
 
   def info_log(%__MODULE__{host: host}, message) do
     Logger.info("#{__MODULE__} #{inspect(host)}: #{message}")
+  end
+
+  def warn_log(%__MODULE__{host: host}, message) do
+    Logger.warn("#{__MODULE__} #{inspect(host)}: #{message}")
   end
 end

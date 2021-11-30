@@ -23,6 +23,9 @@ defmodule Tr33Control.Joystick do
 
   def subscribe(), do: Phoenix.PubSub.subscribe(Tr33Control.PubSub, "joystick")
 
+  def maybe_notify_subscribers(state, state), do: :noop
+  def maybe_notify_subscribers(new_state, _old_state), do: notify_subscribers(new_state)
+
   def notify_subscribers(state) do
     Phoenix.PubSub.broadcast!(Tr33Control.PubSub, "joystick", {:joystick_update, state})
   end
@@ -58,12 +61,9 @@ defmodule Tr33Control.Joystick do
   def handle_info({:input_event, _, joystick_events}, state = %__MODULE__{}) when is_list(joystick_events) do
     state =
       joystick_events
-      |> Enum.map(fn event ->
-        debug_log("Received joystick event #{inspect(event)}")
-        event
-      end)
+      |> tap(fn event -> debug_log("Received joystick event #{inspect(event)}") end)
       |> Enum.reduce(state, &handle_joystick_event/2)
-      |> tap(&notify_subscribers/1)
+      |> tap(&maybe_notify_subscribers(&1, state))
 
     {:noreply, state}
   end
