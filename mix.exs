@@ -43,11 +43,19 @@ defmodule Tr33Control.MixProject do
       {:input_event, "~> 1.0"},
       {:cachex, "~> 3.3"},
       {:sentry, "~> 8.0", runtime: false},
-      {:exprotobuf, github: "reimerei/exprotobuf"}
+      {:exprotobuf, github: "reimerei/exprotobuf"},
+      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
+      {:dart_sass, "~> 0.3", runtime: Mix.env() == :dev}
     ]
   end
 
   defp aliases do
-    []
+    [
+      "assets.deploy": [
+        "esbuild default --minify",
+        "sass default --no-source-map --style=compressed",
+        "phx.digest"
+      ]
+    ]
   end
 end

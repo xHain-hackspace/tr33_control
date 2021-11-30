@@ -2,6 +2,32 @@
 $primary: #003a3e;
 $warning: #ffc400;
 
+
+// original: $web-font-path: "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&display=swap";
+// loaded by bootswatch
+$web-font-path: "";
+@font-face {
+  font-family: 'Lato';
+  font-style: italic;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/S6u8w4BMUTPHjxswWw.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(/fonts/S6uyw4BMUTPHvxk.ttf) format('truetype');
+}
+@font-face {
+  font-family: 'Lato';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url(/fonts/S6u9w4BMUTPHh6UVew8.ttf) format('truetype');
+}
+
 @import "../node_modules/bootswatch/dist/darkly/variables";
 
 $form-select-bg: $primary;

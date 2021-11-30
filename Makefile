@@ -8,11 +8,10 @@ deps-get:
 	asdf install
 	mix deps.get
 
-deps-update:
+deps-update: assets-update
 	mix deps.update --all
 
-assets-install:
-  # rm -rf assets/node_modules
+assets-install:  
 	npm install --prefix assets
 
 assets-outdated:
@@ -21,8 +20,6 @@ assets-outdated:
 # https://www.carlrippon.com/upgrading-npm-dependencies/
 assets-update:
 	npm update --prefix assets
-	cd assets && npm install --force phoenix_live_view 	
 
-assets-build:
-	npm --prefix assets install --force phoenix_live_view
-	npm --prefix assets run deploy && mix phx.digest
+assets-build:	
+	mix assets.deploy

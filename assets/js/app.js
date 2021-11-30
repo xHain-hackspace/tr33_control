@@ -1,4 +1,3 @@
-import "../css/app.scss"
 import "phoenix_html"
 import { Socket } from "phoenix"
 import topbar from "topbar"
@@ -9,7 +8,7 @@ let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("
 let liveSocket = new LiveSocket("/live", Socket, { params: { _csrf_token: csrfToken } })
 
 // Show progress bar on live navigation and form submits
-topbar.config({ barColors: { 0: "#29d" }, shadowColor: "rgba(0, 0, 0, .3)" })
+topbar.config({ barColors: { 0: "#003a3e" }, shadowColor: "rgba(0, 0, 0, .3)" })
 window.addEventListener("phx:page-loading-start", info => topbar.show())
 window.addEventListener("phx:page-loading-stop", info => topbar.hide())
 
@@ -19,4 +18,4 @@ liveSocket.connect()
 // expose liveSocket on window for web console debug logs and latency simulation:
 // >> liveSocket.enableDebug()
 // >> liveSocket.enableLatencySim(1000)
-window.liveSocket = liveSocket
+// window.liveSocket = liveSocket
