@@ -5,16 +5,43 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <%= csrf_meta_tag() %>
-    <title><%= title()%></title>
+    <title><Components.title/></title>
     <link phx-track-static rel="stylesheet" href={ Routes.static_path(@conn, "/assets/app.css") } />
     <script defer phx-track-static type="text/javascript" src={ Routes.static_path(@conn, "/assets/app.js") }></script>
   </head>
   <body>
     <div class="main p-3 container" style="max-width: 100%">
-      <div class="text-center mb-4">
+
+      <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container-fluid">
+          <a class="navbar-brand" href="#">
+            <img class="d-inline-block align-text-center me-3" src={ Routes.static_path(@conn, "/images/xhain_logo_small.png") } alt="" width="100" height="100">
+            <Components.title />
+          </a>
+
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarColor01">
+            <ul class="navbar-nav me-auto">
+
+              <Components.nav_item conn={@conn} to="/presets" text="Presets" />
+              <%= for {name, _} <- Tr33Control.Targets.get_targets() do %>
+                <Components.nav_item conn={@conn} to={"/target/#{name}"} text={name |> to_string |> String.capitalize()} />
+              <% end %>
+              <Components.nav_item conn={@conn} to="/status" text="Status" />              
+
+            </ul>            
+          </div>
+        </div>
+      </nav>
+
+
+      <%# <div class="text-center mb-4">
         <img class="" src={ Routes.static_path(@conn, "/images/xhain_logo_small.png") } alt="" width="256" height="256">
-        <h2><%= title() %></h2>
-      </div>
+        <h2><Components.title/></h2>
+      </div> %>
       <%= @inner_content %>
     </div>
   </body>

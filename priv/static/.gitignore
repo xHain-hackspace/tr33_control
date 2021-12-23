@@ -1,0 +1,9 @@
+# Ignore assets that are produced by build tools.
+assets/
+
+# Ignore digested assets cache.
+cache_manifest.json
+
+*-*
+!*logo.*
+!*logo_small.*

@@ -5,24 +5,16 @@ A web interface to control effects on leds strips. It sends commands to an ESP32
 This app leverages phoenix channels to sync the state between all connected browsers, so everybody sees the same state. The dynamic forms are all rendered in the backend and pushed via a live_html channel to the clients. It is an attempt to create a dynamic web app with almost no javascript.
 
 # Bugs/features
-* fix UART in general
-* mapped shape/slope/... broken? (Tr33 only, strip index 0)
 * gravity not working
 * white color palette
 * mapped ping_pong
-* tr33 UART not working for some reason, might be the cable
 * order branch and trunk indices/PINs
-* improve mobile support
 * Idea for testing: create some sequence that uses all features
-* create header button style
 * movement_type (or render option) circle (for trommel and others)
-* twang + joystick
 * mapped position to 16bit
 * properly set max value for modifiers
 * replace sequence with phash2 of all commands
 * movement_type: steps, steps_transition
-* disable button for Commands
-* resync button
 * Sync time between ESPs
 * Sync random seed betwenn ESPs
 * use some effects from WLED
@@ -48,9 +40,17 @@ This app leverages phoenix channels to sync the state between all connected brow
 * Remove command type -> select it on new caommand
 * preset list
 * color previews
-* 
+ 
 
 ## done
+* disable button for Commands
+* resync button
+* twang + joystick
+* create header button style
+* improve mobile support
+* tr33 UART not working for some reason, might be the cable
+* fix UART in general
+* mapped shape/slope/... broken? (Tr33 only, strip index 0)
 * remove command name
 * measure FPS (looks good)
 * beat detection

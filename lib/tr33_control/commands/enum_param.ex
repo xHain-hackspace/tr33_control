@@ -16,14 +16,14 @@ defmodule Tr33Control.Commands.EnumParam do
 
   def new(_, _), do: nil
 
-  defp override(%__MODULE__{} = param, Schemas.ColorPalette) do
-    blacklist =
-      ~w(LAVA CLOUD OCEAN_BREEZE RGI RETRO2 ANALOGOUS ANOTHER_SUNSET LANDSCAPE LANDSCAPE2 IB15 COLORFULL BLACK_BLUE_MAGENTA_WHITE BLACK_MAGENTA_RED BLACK_RED_MAGENTA_YELLOW )a
+  # defp override(%__MODULE__{} = param, Schemas.ColorPalette) do
+  #   blacklist =
+  #     ~w(HEAT LAVA CLOUD OCEAN_BREEZE RGI RETRO2 ANALOGOUS ANOTHER_SUNSET LANDSCAPE LANDSCAPE2 IB15 COLORFULL BLACK_BLUE_MAGENTA_WHITE BLACK_MAGENTA_RED BLACK_RED_MAGENTA_YELLOW )a
 
-    options = Schemas.ColorPalette.atoms() |> Enum.reject(&(&1 in blacklist))
+  #   options = Schemas.ColorPalette.atoms() |> Enum.reject(&(&1 in blacklist))
 
-    %__MODULE__{param | options: options}
-  end
+  #   %__MODULE__{param | options: options}
+  # end
 
   defp override(param, _), do: param
 end

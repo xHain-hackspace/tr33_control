@@ -1,3 +1,5 @@
+@use 'sass:math';
+
 // $secondary: #003a3e;
 $primary: #003a3e;
 $warning: #ffc400;
@@ -58,7 +60,7 @@ input[type=range] {
 
 .custom-vertical-range {  
   width: $range_height;
-  transform: translateX(-1 * ($range_height / 2 - $range_width / 2)) translateY($range_height / 2 - 0.75rem) rotate(270deg);
+  transform: translateX(-1 * (math.div($range_height, 2) - math.div($range_width, 2))) translateY(math.div($range_height, 2) - 0.75rem) rotate(270deg);
 }
 
 .custom-vertical-range::-moz-range-thumb {
