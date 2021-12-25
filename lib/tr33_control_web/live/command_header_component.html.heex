@@ -1,13 +1,24 @@
-<div class="d-flex flex-column align-items-center" style="width:6rem;" phx-click="set_active_command" phx-value-index={@command.index}>
+<div class={"d-flex flex-column align-items-center p-2"} style="width:9rem; border: 1px" phx-click="set_active_command" phx-value-index={@command.index}>
   <div class="h4 ">
-    <span class={"badge bg-secondary border border-#{if @active?, do: "warning", else: "secondary"}"}>
-      Command <%= @command.index %>
+    <span class={"badge bg-secondary border rounded border-#{if @active?, do: "warning", else: "dark"}"}>
+      <%= Command.type(@command) |> Display.humanize() %>      
     </span>
   </div>
-
-  <span class="badge bg-secondary mb-3">
-    <%= Command.type(@command) |> Display.humanize() %>
-  </span>
-  
+ 
   <Inputs.slider param={@brightness_param} target={@myself} tabindex={1} />  
+  
+  <div class="list-group">    
+    <%= for target <- @command_targets do %>
+      <button
+        type="button" 
+        class={"text-center list-group-item list-group-item-action #{if Display.target_active?(@command, target), do: "active", else: "" }"}        
+        style="line-height: 0.7;"
+        phx-click="toggle_target"
+        phx-value-target={target}
+        phx-target={@myself}
+        >
+        <small><%= Display.command_target(target) %></small>
+      </button>
+    <% end %>
+  </div>
 </div>

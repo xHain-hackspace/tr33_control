@@ -17,12 +17,22 @@ defmodule Tr33ControlWeb.Router do
   scope "/", Tr33ControlWeb do
     pipe_through :browser
 
-    live "/", ControlLive, :index
-    live "/joystick", JoystickLive, :index
-    # get "/test", PresetController, :test
-    # live "/twang", TwangLive
-    # get "/docs", DocsController, :index
-    get "/preset/:preset_name", PresetController, :load
+    get "/", RedirectController, :presets
+
+    live_session :live, on_mount: Tr33ControlWeb.Navbar do
+      live "/presets", PresetsLive, :index
+      live "/presets/new", PresetsLive, :new
+      live "/presets/update", PresetsLive, :update
+      live "/presets/delete", PresetsLive, :delete
+
+      live "/commands/:index", CommandsLive, :show
+      live "/commands/:index/new", CommandsLive, :new
+
+      live "/status", StatusLive, :index
+    end
+
+    get "/presets/:preset_name", PresetController, :load
+    get "/commands", RedirectController, :commands
   end
 
   if Mix.env() in [:dev, :test, :prod] do

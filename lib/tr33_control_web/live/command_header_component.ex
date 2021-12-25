@@ -2,13 +2,15 @@ defmodule Tr33ControlWeb.CommandHeaderComponent do
   use Tr33ControlWeb, :live_component
   require Logger
   alias Phoenix.LiveView.Socket
-  alias Tr33Control.Commands
+  alias Tr33Control.{Commands, Targets}
   alias Tr33Control.Commands.Command
   alias Tr33ControlWeb.{Display, Inputs}
 
-  def mount(_params, _session, socket) do
-    socket
-    |> assign(active?: false)
+  def mount(socket) do
+    socket =
+      socket
+      |> assign(active?: false)
+      |> assign(command_targets: Targets.get_targets() |> Map.keys())
 
     {:ok, socket}
   end
@@ -27,6 +29,14 @@ defmodule Tr33ControlWeb.CommandHeaderComponent do
 
   def handle_event("slider_change", %{"brightness" => brightness}, %Socket{} = socket) do
     Commands.update_command_param(socket.assigns.command.index, :brightness, String.to_integer(brightness))
+    {:noreply, socket}
+  end
+
+  def handle_event("toggle_target", %{"target" => target_str}, %Socket{} = socket) do
+    %{command: %Command{index: index}} = socket.assigns
+    target = String.to_existing_atom(target_str)
+    Commands.toggle_command_target(index, target)
+
     {:noreply, socket}
   end
 

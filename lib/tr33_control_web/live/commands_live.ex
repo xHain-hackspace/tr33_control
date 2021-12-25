@@ -1,50 +1,64 @@
-defmodule Tr33ControlWeb.ControlLive do
+defmodule Tr33ControlWeb.CommandsLive do
   use Tr33ControlWeb, :live_view
   require Logger
 
   alias Phoenix.LiveView.Socket
   alias Tr33Control.{Commands}
   alias Tr33Control.Commands.Command
-  alias Tr33ControlWeb.{CommandComponent, PresetComponent, CommandHeaderComponent, Components}
+  alias Tr33ControlWeb.{CommandComponent, CommandHeaderComponent, Components, Inputs}
+  alias Tr33ControlWeb.Router.Helpers, as: Routes
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
       Commands.subscribe_commands()
-      Commands.subscribe_presets()
     end
 
     socket =
       socket
-      |> assign(active_command: 0)
-      |> fetch()
+      |> assign(command_types: Commands.command_types())
 
     {:ok, socket}
+  end
+
+  def handle_params(%{"index" => index}, _uri, socket) do
+    socket =
+      socket
+      |> assign(active_command: String.to_integer(index))
+      |> fetch()
+
+    {:noreply, socket}
   end
 
   def handle_event("set_active_command", %{"index" => index}, socket) do
     socket =
       socket
-      |> assign(active_command: String.to_integer(index))
+      |> push_patch(to: Routes.commands_path(socket, :show, index))
 
     {:noreply, socket}
   end
 
   def handle_event("add_command", _, socket) do
-    IO.inspect("ADDD!")
-    index = Commands.count_commands()
-    Commands.create_command(index, :single_color, brightness: 150)
+    on_add_command(socket)
+  end
 
-    socket =
-      socket
-      |> assign(active_command: index)
-      |> fetch()
+  def handle_event("modal_close", _, %Socket{assigns: %{active_command: active_command}} = socket) do
+    {:noreply, push_patch(socket, to: Routes.commands_path(socket, :show, active_command))}
+  end
 
+  def handle_event("modal_validate", _, socket) do
+    # noop
     {:noreply, socket}
   end
 
-  def handle_event("delete_command", _, %Socket{} = socket) do
-    socket.assigns.active_command
-    |> Commands.delete_command()
+  def handle_event("modal_submit", %{"command_type" => type}, %Socket{assigns: %{live_action: :new}} = socket) do
+    index = Commands.count_commands()
+    type = String.to_existing_atom(type)
+    Commands.create_command(index, type, brightness: 100)
+
+    socket =
+      socket
+      |> push_patch(to: Routes.commands_path(socket, :show, index))
+      |> fetch()
 
     {:noreply, socket}
   end
@@ -58,27 +72,17 @@ defmodule Tr33ControlWeb.ControlLive do
 
     socket =
       socket
-      |> assign(active_command: 0)
+      |> push_patch(to: Routes.commands_path(socket, :show, 0))
       |> fetch()
 
     {:noreply, socket}
   end
 
-  def handle_event("increment_command_index", _, %Socket{} = socket) do
-    old = socket.assigns.active_command
-    new = old + 1
-
-    Commands.swap_commands(old, new)
-
-    {:noreply, socket}
+  def handle_event("keyup", %{"key" => "a"}, socket) do
+    on_add_command(socket)
   end
 
-  def handle_event("decrement_command_index", _, %Socket{} = socket) do
-    old = socket.assigns.active_command
-    new = old - 1
-
-    Commands.swap_commands(old, new)
-
+  def handle_event("keyup", _, socket) do
     {:noreply, socket}
   end
 
@@ -97,24 +101,13 @@ defmodule Tr33ControlWeb.ControlLive do
   def handle_info({:command_deleted, index}, %Socket{} = socket) do
     socket =
       if socket.assigns.active_command == index do
-        assign(socket, :active_command, Commands.count_commands() - 1)
+        socket
+        |> push_patch(to: Routes.commands_path(socket, :show, Commands.count_commands() - 1))
       else
         socket
       end
 
     {:noreply, fetch(socket)}
-  end
-
-  def handle_info({:preset_update, _name}, socket) do
-    send_update(PresetComponent, id: "presets")
-
-    {:noreply, socket}
-  end
-
-  def handle_info({:preset_deleted, _name}, socket) do
-    send_update(PresetComponent, id: "presets")
-
-    {:noreply, socket}
   end
 
   def handle_info(data, socket) do
@@ -125,5 +118,9 @@ defmodule Tr33ControlWeb.ControlLive do
   defp fetch(socket) do
     socket
     |> assign(command_count: Commands.count_commands())
+  end
+
+  defp on_add_command(%Socket{assigns: %{active_command: active_command}} = socket) do
+    {:noreply, push_patch(socket, to: Routes.commands_path(socket, :new, active_command))}
   end
 end

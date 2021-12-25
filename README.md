@@ -4,15 +4,38 @@ A web interface to control effects on leds strips. It sends commands to an ESP32
 
 This app leverages phoenix channels to sync the state between all connected browsers, so everybody sees the same state. The dynamic forms are all rendered in the backend and pushed via a live_html channel to the clients. It is an attempt to create a dynamic web app with almost no javascript.
 
+# Before deploy
+x presets
+x modifiers
+x target toggles in mixer
+x put active command index in url
+x push_redirect? to nav
+x add form to color palette select
+x start from scratch button
+x update preset list after delete/create
+x fix color palette assignment when chaning command
+
+# JS
+x Presets always stay selected in navbar
+x trigger autofocus of presets list
+x modal without form -> trigger on Enter
+
+# nice to have
+* properly set max value for modifiers
+* close all modals on Enter
+* display loaded preset somewhere more prominent
+* Commands should stay selected when path == /commands/1
+
 # Bugs/features
+* regular preset backups
 * gravity not working
+* add random toggle to each slider (or some)
 * white color palette
 * mapped ping_pong
 * order branch and trunk indices/PINs
 * Idea for testing: create some sequence that uses all features
 * movement_type (or render option) circle (for trommel and others)
 * mapped position to 16bit
-* properly set max value for modifiers
 * replace sequence with phash2 of all commands
 * movement_type: steps, steps_transition
 * Sync time between ESPs
@@ -31,18 +54,15 @@ This app leverages phoenix channels to sync the state between all connected brow
 * generally more effects like kaleidoscope
 * mapped 2D bouncing ball
 * softer sparkle
-* send fps via UDP
+* send fps via UDP 
 
-## UI
+## done
 * add target filter to overview
 * remove hover from label
 * tabs
 * Remove command type -> select it on new caommand
 * preset list
 * color previews
- 
-
-## done
 * disable button for Commands
 * resync button
 * twang + joystick

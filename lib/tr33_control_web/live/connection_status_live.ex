@@ -1,4 +1,4 @@
-defmodule Tr33ControlWeb.TargetsLive do
+defmodule Tr33ControlWeb.ConnectionStatusLive do
   use Tr33ControlWeb, :live_view
   require Logger
   alias Phoenix.LiveView.Socket

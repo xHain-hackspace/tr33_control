@@ -1,10 +1,11 @@
 import Config
 
 config :tr33_control,
-  udp_debug: true,
+  udp_debug: false,
   uart_debug: false,
   joystick_debug: false,
-  udp_server_debug: false
+  udp_server_debug: false,
+  title: "Led Control"
 
 # For development, we disable any cache and enable
 # debugging and code reloading.

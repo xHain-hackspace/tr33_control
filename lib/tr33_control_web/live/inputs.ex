@@ -14,27 +14,54 @@ defmodule Tr33ControlWeb.Inputs do
     |> select()
   end
 
-  def select(%{target: _, value: _, options: options, name: name} = assigns) do
+  def select(%{value: _, options: options, name: name} = assigns) do
     assigns =
       assigns
       |> assign_new(:style, fn -> :command end)
       |> assign_new(:tabindex, fn -> nil end)
       |> assign_new(:display_name, fn -> name end)
+      |> assign_new(:size, fn -> nil end)
+      |> assign_new(:target, fn -> nil end)
+      |> assign_new(:width, fn -> 10 end)
+      |> assign_new(:background, fn -> "dark" end)
+      |> assign_new(:with_form, fn -> true end)
+      |> assign_new(:humanize, fn -> true end)
+      |> assign_new(:hook, fn -> nil end)
+      |> assign_new(:id, fn -> name end)
       |> assign(:options, Enum.map(options, &sanetize_option/1))
 
+    # <button type="button" class={ "btn btn-#{label_class(@style)} text-start" }><%= Display.humanize(@display_name) %></button>
+    # <%= if @with_form do %>
+    #   <form phx-change="select_change" phx-target={ @target } phx-auto-recover="ignore">
+    # <% end %>
     ~H"""
-    <div class="btn-group">
-      <button type="button" class={ "btn btn-#{label_class(@style)} text-start" }><%= Display.humanize(@display_name) %></button>
-      <form phx-change="select_change" phx-target={ @target } phx-auto-recover="ignore">
-        <select class="form-select custom-select" name={ @name } {if @tabindex != nil, do: [tabindex: to_string(@tabindex)], else: []} >
-          <%= for {option_name, option_value} <- @options do %>
-            <option value={ option_value } selected={ option_value == @value }  >
-              <%= Display.humanize(option_name) %>
-            </option>
-          <% end %>
-        </select>
-      </form>
-    </div>
+      <div class="row flex-nowrap">
+
+        <%= if @display_name != nil do %>
+          <div class="col-auto">
+            <label for={@id} class="col-form-label"><%= Display.humanize(@display_name) %></label>
+          </div>
+        <% end %>
+
+        <div class="col-auto">
+          <select
+            class={"form-select bg-#{@background}"}
+            style={"width: #{@width}rem;"}
+            size={@size}
+            name={@name}
+            id={@id}
+            data-pending-value={@value}
+            {if @hook != nil, do: ['phx-hook': @hook], else: []}
+            {if @tabindex != nil, do: [tabindex: to_string(@tabindex)], else: []}
+            >
+            <%= for {option_name, option_value} <- @options do %>
+              <option value={ option_value } selected={ option_value == @value }  >
+                <%= if @humanize, do: Display.humanize(option_name), else: option_name %>
+              </option>
+            <% end %>
+          </select>
+        </div>
+      </div>
     """
   end
 

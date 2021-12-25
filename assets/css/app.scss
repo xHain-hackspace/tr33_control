@@ -101,22 +101,40 @@ input[type=range] {
   border-radius: 0.2rem;
 }
 
-.custom-select { 
-  border-top-left-radius: 0;
-  border-bottom-left-radius: 0;
-  border: 0;
-  cursor: pointer;
-  width: initial;
-  height: 100%;
+// .custom-select { 
+//   border-top-left-radius: 0;
+//   border-bottom-left-radius: 0;
+//   border: 0;
+//   cursor: pointer;
+//   width: initial;
+//   height: 100%;
+// }
+
+// .custom-select:hover {
+//   color: #fff;
+//   background-color: #003135;
+//   border-color: #002e32;
+// }
+
+// .custom-select:focus {
+//   color: $primary;
+//   background-color: $warning;
+// }
+
+.modal {
+  display:block;
 }
 
-.custom-select:hover {
-  color: #fff;
-  background-color: #003135;
-  border-color: #002e32;
+.modal-backdrop {
+  opacity:0.7;
 }
 
-.custom-select:focus {
-  color: $primary;
-  background-color: $warning;
-}
+// .modal-dialog{
+//   max-width: 1000px;
+//   overflow-y: initial
+// }
+
+// .modal-body{
+//     height: 80vh;
+//     overflow-y: auto;
+// }

@@ -1,5 +1,3 @@
-<button type="button" class="btn btn-primary" phx-click="resync">Resync</button> 
-<button type="button" class="btn btn-primary" phx-click="reconnect">Reconnect</button> 
 <table class={"table"}>
   <tbody>
     <%= for %UDP{host: host, ip: ip, connection: connection} = target<- @sorted_targets do %>
@@ -11,3 +9,6 @@
     <% end %>
   </tbody>   
 </table>
+
+<button type="button" class="btn btn-primary" phx-click="resync">Resync</button> 
+<button type="button" class="btn btn-primary" phx-click="reconnect">Reconnect</button> 

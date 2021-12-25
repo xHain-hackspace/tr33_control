@@ -159,8 +159,7 @@ defmodule Tr33Control.Commands do
     end
   end
 
-  def swap_commands(index1, index2) do
-    IO.inspect({index1, index2})
+  def swap_commands(_index1, _index2) do
     :noop
   end
 
@@ -288,6 +287,9 @@ defmodule Tr33Control.Commands do
 
   ### Presets ###############################################################################
 
+  # topo: better error handling
+  def create_preset(""), do: :noop
+
   def create_preset(name) when is_binary(name) do
     preset =
       case Cache.get(Preset, name) do
@@ -321,6 +323,26 @@ defmodule Tr33Control.Commands do
     |> Enum.map(&insert_and_notify/1)
 
     preset
+  end
+
+  def clone_preset(name) do
+    preset = Cache.get(Preset, name)
+
+    new_name =
+      case String.split(name, "_") |> Enum.reverse() do
+        [_] ->
+          "#{name}_2"
+
+        [maybe_int | rest] ->
+          case Integer.parse(maybe_int) do
+            {int, ""} -> "#{rest |> Enum.reverse() |> Enum.join("_")}_#{int + 1}"
+            _ -> "#{name}_2"
+          end
+      end
+
+    %Preset{preset | name: new_name}
+    |> Cache.insert()
+    |> tap(&notify_subscribers/1)
   end
 
   def list_presets() do
