@@ -60,20 +60,20 @@ defmodule Tr33ControlWeb.Components do
           phx-target={ @target }
           >
           <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title"><%= @title %></h5>
-                <button type="button" class="btn btn-close" phx-click="modal_close"></button>
-              </div>
+            <div class="modal-header">
+              <h5 class="modal-title"><%= @title %></h5>
+              <button type="button" class="btn btn-close" phx-click="modal_close"></button>
+            </div>
 
-              <form phx-submit="modal_submit" phx-change="modal_validate">
-                <div class="modal-body">
-                  <%= render_slot(@inner_block) %>
-                </div>
-                <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" phx-click="modal_close">Cancel</button>
-                  <button type="submit" class={"btn btn-#{@button_class}"}><%= @button_text %></button>
-                </div>
-              </form>
+            <form phx-submit="modal_submit" phx-change="modal_validate">
+              <div class="modal-body">
+                <%= render_slot(@inner_block) %>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" phx-click="modal_close">Cancel</button>
+                <button type="submit" class={"btn btn-#{@button_class}"}><%= @button_text %></button>
+              </div>
+            </form>
           </div>
         </div>
       </div>

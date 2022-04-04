@@ -27,7 +27,7 @@ config :tr33_control,
       hosts: ["wand.fritz.box"]
     },
     tr33: %{
-      hosts: ["tr33_esp32.lan.xhain.space"],
+      hosts: ["tr33esp32.lan.xhain.space"],
       strip_indices: [
         :all,
         :all_trunks,

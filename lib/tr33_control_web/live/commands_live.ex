@@ -53,7 +53,7 @@ defmodule Tr33ControlWeb.CommandsLive do
   def handle_event("modal_submit", %{"command_type" => type}, %Socket{assigns: %{live_action: :new}} = socket) do
     index = Commands.count_commands()
     type = String.to_existing_atom(type)
-    Commands.create_command(index, type, brightness: 100)
+    Commands.create_command(index, type, brightness: 200)
 
     socket =
       socket

@@ -26,6 +26,12 @@ x modal without form -> trigger on Enter
 * display loaded preset somewhere more prominent
 * Commands should stay selected when path == /commands/1
 
+# Tr33J
+* ping pong period, don't jump on change
+* clone command
+* sawtooth reverse not working
+* 
+
 # Bugs/features
 * regular preset backups
 * gravity not working

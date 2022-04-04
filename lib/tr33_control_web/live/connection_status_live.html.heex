@@ -1,10 +1,22 @@
 <table class={"table"}>
-  <tbody>
-    <%= for %UDP{host: host, ip: ip, connection: connection} = target<- @sorted_targets do %>
+  <thead>
+    <tr>
+      <th scope="col">Hostname</th>
+      <th scope="col" style="width: 20%">IP</th>
+      <th scope="col" style="width: 20%">FPS</th>
+      <th scope="col" style="width: 20%">WifiStrength</th>
+      <th scope="col" style="width: 20%">Status</th>
+    </tr>
+  </thead>
+
+  <tbody>  
+    <%= for %UDP{} = target<- @sorted_targets do %>
       <tr class={"text-#{class_for_target(target)}"}>
-        <th style="width: 25%"><%= host %></th>
-        <td style="width: 25%"><%= Display.ip(ip) %></td>
-        <td style="width: 25%"><%= Display.humanize(connection) %></td>
+        <th><%= target.host %></th>
+        <td><%= Display.ip(target.ip) %></td>
+        <td><%= Display.humanize(target.fps) %></td>
+        <td><%= Display.humanize(target.wifi_strength) %></td>
+        <td><%= Display.humanize(target.connection) %></td>
       </tr>
     <% end %>
   </tbody>   

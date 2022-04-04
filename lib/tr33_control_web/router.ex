@@ -17,7 +17,7 @@ defmodule Tr33ControlWeb.Router do
   scope "/", Tr33ControlWeb do
     pipe_through :browser
 
-    get "/", RedirectController, :presets
+    get "/", RedirectController, :commands
 
     live_session :live, on_mount: Tr33ControlWeb.Navbar do
       live "/presets", PresetsLive, :index

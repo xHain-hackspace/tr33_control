@@ -2,9 +2,9 @@ defmodule Tr33Control.UdpServer do
   use GenServer
   require Logger
   alias Tr33Control.{Commands, ESP}
+  alias Tr33Control.Commands.Schemas.{WireMessage, TargetMetrics}
 
   @listen_port Application.fetch_env!(:tr33_control, :udp_listen_port)
-  @sequence_header "SEQ"
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, [{:name, __MODULE__} | opts])
@@ -26,25 +26,22 @@ defmodule Tr33Control.UdpServer do
     {:ok, %{}}
   end
 
-  def handle_info({:udp, _socket, address, port, <<@sequence_header, sequence::size(8)>>}, state) do
-    debug_log("Incoming sequence \"#{sequence}\" from #{inspect(address)}:#{inspect(port)}")
-    ESP.handle_sequence(address, sequence)
-    {:noreply, state}
-  end
-
-  def handle_info({:udp, _socket, address, port, <<@sequence_header, _::binary>> = message}, state) do
-    debug_log("Invalid sequence message \"#{message}\" from #{inspect(address)}:#{inspect(port)}")
-    {:noreply, state}
-  end
-
   def handle_info({:udp, socket, address, port, protobuf}, state) do
     debug_log("Incoming command: #{inspect(protobuf)}, from: #{inspect(address)}:#{inspect(port)}")
 
-    command = Commands.create_command(protobuf)
+    case WireMessage.decode(protobuf) do
+      %WireMessage{message: {:target_metrics, %TargetMetrics{} = metrics}, sequence: sequence} ->
+        ESP.handle_metrics(address, sequence, metrics)
+        debug_log("Received target metrics #{inspect(metrics)}")
 
-    debug_log("Valid command: #{inspect(command)}")
+      %WireMessage{message: {:command_params, _}} ->
+        debug_log("Received command params")
+        Commands.create_command(protobuf)
+        send_ack(socket, address, port)
 
-    send_ack(socket, address, port)
+      other ->
+        Logger.warn("Received unexpected UDP data. Decoded as #{inspect(other)}")
+    end
 
     {:noreply, state}
   end

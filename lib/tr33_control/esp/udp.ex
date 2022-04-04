@@ -3,8 +3,9 @@ defmodule Tr33Control.ESP.UDP do
   require Logger
   alias Tr33Control.{Commands, ESP, Joystick}
   alias Tr33Control.Commands.Command
+  alias Tr33Control.Commands.Schemas.TargetMetrics
 
-  defstruct [:socket, :queue, :target, :host, :ip, :sequence, :last_sequence, :connection]
+  defstruct [:socket, :queue, :target, :host, :ip, :sequence, :last_sequence, :connection, :fps, :wifi_strength]
 
   @tick_interval_ms 30
   @max_queue_len 5
@@ -69,18 +70,29 @@ defmodule Tr33Control.ESP.UDP do
     end
   end
 
-  def handle_info({:sequence, ip, expected}, %__MODULE__{sequence: expected, ip: ip} = state) do
-    state = set_connection_state(state, :ok)
-    debug_log(state, "Expected sequence: #{expected}, doing nothing")
+  def handle_info({:metrics, ip, seq, metrics}, %__MODULE__{sequence: seq, ip: ip} = state) do
+    state =
+      state
+      |> set_connection_state(:ok)
+      |> update_metrics(metrics)
+
+    debug_log(state, "Expected sequence: #{seq}, doing nothing")
+
     {:noreply, %__MODULE__{state | last_sequence: System.os_time(:millisecond)}}
   end
 
-  def handle_info({:sequence, ip, received}, %__MODULE__{sequence: expected, ip: ip} = state) do
+  def handle_info({:metrics, ip, received, metrics}, %__MODULE__{sequence: expected, ip: ip} = state) do
+    state =
+      state
+      |> update_metrics(metrics)
+      |> resync_queue()
+
     info_log(state, "Unexpected sequence, got: #{received} expected: #{expected}")
-    {:noreply, resync_queue(state)}
+
+    {:noreply, state}
   end
 
-  def handle_info({:sequence, _other_ip, _received}, state) do
+  def handle_info({:metrics, _other_ip, _received, _metrics}, state) do
     {:noreply, state}
   end
 
@@ -195,6 +207,10 @@ defmodule Tr33Control.ESP.UDP do
 
     %__MODULE__{state | connection: new}
     |> notify_subscribers()
+  end
+
+  defp update_metrics(%__MODULE__{} = state, %TargetMetrics{fps: fps, wifi_strength: wifi_strength}) do
+    %__MODULE__{state | fps: fps, wifi_strength: wifi_strength}
   end
 
   def debug_log(%__MODULE__{host: host}, message) do

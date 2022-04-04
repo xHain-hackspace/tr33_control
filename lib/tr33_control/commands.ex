@@ -163,6 +163,10 @@ defmodule Tr33Control.Commands do
     :noop
   end
 
+  def clone_command(index) when is_number(index) do
+    :noop
+  end
+
   ### Command Params: EnumParam + ValueParam ###############################################################################
 
   def list_value_params(%Command{} = command) do

@@ -45,6 +45,14 @@ defmodule Tr33ControlWeb.CommandComponent do
     {:noreply, socket}
   end
 
+  def handle_event("strip_index_change", %{"strip_index" => strip_index}, %Socket{} = socket) do
+    %Command{index: index} = socket.assigns.command
+
+    Commands.update_command_param(index, :strip_index, String.to_integer(strip_index))
+
+    {:noreply, socket}
+  end
+
   def handle_event("param_select_change", %{"_target" => [name_str]} = data, %Socket{} = socket) do
     %Command{index: index} = socket.assigns.command
 
@@ -90,8 +98,15 @@ defmodule Tr33ControlWeb.CommandComponent do
   end
 
   def handle_event("delete_command", _, %Socket{} = socket) do
-    socket.assigns.command
+    socket.assigns.command.index
     |> Commands.delete_command()
+
+    {:noreply, socket}
+  end
+
+  def handle_event("clone_command", _, %Socket{} = socket) do
+    socket.assigns.command.index
+    |> Commands.clone_command()
 
     {:noreply, socket}
   end

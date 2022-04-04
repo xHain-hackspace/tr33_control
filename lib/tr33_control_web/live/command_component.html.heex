@@ -12,7 +12,7 @@
             param={ @color_palette_param }
             style={ :command }
             tabindex={ 3 }
-            id={"command_#{@command.index}"}
+            id={"palette_#{@command.index}"}
           />
         </form>
       </div>
@@ -20,13 +20,16 @@
       <%# Strip Index %>
       <%= if length(@strip_index_options) > 0  do %>
         <div class="me-3">
-          <Inputs.select         
-            target={ @myself }
-            value={ Display.strip_index_name(@command, @strip_index_options) }
-            options={ @strip_index_options }
-            name={ :strip_select }
-            style={ :command }          
-          />
+          <form phx-change="strip_index_change" phx-target={@myself} phx-auto-recover="ignore">
+            <Inputs.select         
+              target={ @myself }
+              value={ Display.strip_index_name(@command, @strip_index_options) }
+              options={ @strip_index_options }
+              name={ :strip_index }
+              style={ :command }  
+              id={"strip_index_#{@command.index}"}
+            />
+          </form>
         </div>
       <% end %>
         
@@ -36,6 +39,11 @@
           <button class="btn btn-dark" phx-click="increment_command_index" phx-target={@myself} >Move right</button>
         </div>
 
+        <%# clone %>
+        <div class="btn-group me-3">                           
+          <button class="btn btn-dark" phx-click="clone_command" phx-target={@myself} >Clone</button>
+        </div>
+      
         <%# delete %>
         <div class="btn-group me-3">                           
           <button class="btn btn-dark" phx-click="delete_command" phx-target={@myself} >Delete</button>

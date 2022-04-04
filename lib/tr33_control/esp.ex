@@ -50,13 +50,13 @@ defmodule Tr33Control.ESP do
 
   def resync(), do: notify_subscribers(:resync)
 
-  def handle_sequence(from_ip, sequence) do
+  def handle_metrics(from_ip, sequence, metrics) do
     case Registry.lookup(@udp_registry, from_ip) do
       [{_pid, _target}] -> :noop
       _ -> reconnect()
     end
 
-    notify_subscribers({:sequence, from_ip, sequence})
+    notify_subscribers({:metrics, from_ip, sequence, metrics})
   end
 
   ### Helper ##########################################
