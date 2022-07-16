@@ -6,7 +6,7 @@ This app leverages phoenix channels to sync the state between all connected brow
 
 ## Installation
 
-The main dependency is `elixir`. There are many ways to install it. See the [installation instructrions](https://elixir-lang.org/install.html). Any installation should also caontain the elixir build environment `mix`. 
+The main dependency is `elixir`. There are many ways to install it. See the [elixir install instructions](https://elixir-lang.org/install.html). 
 You also need a version of `npm` installed to get the frontend assets. 
 
 There is `Makefile` with the most common commands. 
