@@ -1,6 +1,8 @@
 export SERIAL_PORT = ttyUSB0
 export CACHE_PERSIST_DIR = $(HOME)/.tr33_cache
 
+init: deps-get assets-install
+
 console:
 	iex -S mix phx.server
 

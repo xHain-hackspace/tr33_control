@@ -7,14 +7,6 @@
 # General application configuration
 import Config
 
-# Configures the endpoint
-config :tr33_control, Tr33ControlWeb.Endpoint,
-  url: [host: "localhost"],
-  secret_key_base: "OjMmejtWRlJsOaBulT2hTUpx06835YTLQzx3H95MPV2X+M93hXrtJdxKASr/w5Mk",
-  render_errors: [view: Tr33ControlWeb.ErrorView, accepts: ~w(html json), layout: false],
-  pubsub_server: Tr33Control.PubSub,
-  live_view: [signing_salt: "HC+iC2aJ"]
-
 config :tr33_control,
   serial_port: System.get_env("SERIAL_PORT") || "ttyAMA0",
   udp_listen_port: 1337,
@@ -110,6 +102,14 @@ config :tr33_control,
       hosts: ["scubar.lan.xhain.space"]
     }
   }
+
+# Configures the endpoint
+config :tr33_control, Tr33ControlWeb.Endpoint,
+  url: [host: "localhost"],
+  secret_key_base: "OjMmejtWRlJsOaBulT2hTUpx06835YTLQzx3H95MPV2X+M93hXrtJdxKASr/w5Mk",
+  render_errors: [view: Tr33ControlWeb.ErrorView, accepts: ~w(html json), layout: false],
+  pubsub_server: Tr33Control.PubSub,
+  live_view: [signing_salt: "HC+iC2aJ"]
 
 # Configures Elixir's Logger
 config :logger, :console,
