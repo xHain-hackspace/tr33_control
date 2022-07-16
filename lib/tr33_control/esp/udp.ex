@@ -72,18 +72,18 @@ defmodule Tr33Control.ESP.UDP do
 
   def handle_info({:metrics, ip, seq, metrics}, %__MODULE__{sequence: seq, ip: ip} = state) do
     state =
-      state
+      %__MODULE__{state | last_sequence: System.os_time(:millisecond)}
       |> set_connection_state(:ok)
       |> update_metrics(metrics)
 
     debug_log(state, "Expected sequence: #{seq}, doing nothing")
 
-    {:noreply, %__MODULE__{state | last_sequence: System.os_time(:millisecond)}}
+    {:noreply, state}
   end
 
   def handle_info({:metrics, ip, received, metrics}, %__MODULE__{sequence: expected, ip: ip} = state) do
     state =
-      state
+      %__MODULE__{state | last_sequence: System.os_time(:millisecond)}
       |> update_metrics(metrics)
       |> resync_queue()
 
@@ -183,7 +183,7 @@ defmodule Tr33Control.ESP.UDP do
       Commands.list_commands(include_empty: true)
       |> Enum.reduce(:queue.new(), fn %Command{} = command, queue_acc -> :queue.in(command, queue_acc) end)
 
-    %__MODULE__{state | queue: queue, last_sequence: System.os_time(:millisecond)}
+    %__MODULE__{state | queue: queue}
     |> set_connection_state(:resync_send)
   end
 
@@ -200,7 +200,7 @@ defmodule Tr33Control.ESP.UDP do
     end
   end
 
-  def set_connection_state(%__MODULE__{connection: connection} = state, connection), do: state
+  # def set_connection_state(%__MODULE__{connection: connection} = state, connection), do: state
 
   def set_connection_state(%__MODULE__{connection: old} = state, new) do
     debug_log(state, "Changed connection from #{old} to #{new}")

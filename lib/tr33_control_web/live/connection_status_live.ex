@@ -6,6 +6,8 @@ defmodule Tr33ControlWeb.ConnectionStatusLive do
   alias Tr33Control.ESP.UDP
   alias Tr33ControlWeb.Display
 
+  @tick_interval_ms 1000
+
   def mount(_, _, socket) do
     if connected?(socket) do
       UDP.subscribe()
@@ -14,8 +16,11 @@ defmodule Tr33ControlWeb.ConnectionStatusLive do
 
     socket =
       socket
+      |> assign(:now, System.os_time(:second))
       |> assign(targets: %{})
       |> sort_targets()
+
+    :timer.send_interval(@tick_interval_ms, :tick)
 
     {:ok, socket}
   end
@@ -40,6 +45,14 @@ defmodule Tr33ControlWeb.ConnectionStatusLive do
       socket
       |> update(:targets, fn targets -> Map.put(targets, host, target) end)
       |> sort_targets()
+
+    {:noreply, socket}
+  end
+
+  def handle_info(:tick, socket) do
+    socket =
+      socket
+      |> assign(:now, System.os_time(:second))
 
     {:noreply, socket}
   end

@@ -63,7 +63,12 @@ config :tr33_control,
         "wolke5.lan.xhain.space",
         "wolke6.lan.xhain.space",
         "wolke7.lan.xhain.space",
-        "wolke8.lan.xhain.space"
+        "wolke8.lan.xhain.space",
+        "wolke9.lan.xhain.space",
+        "wolke10.lan.xhain.space",
+        "wolke11.lan.xhain.space",
+        "wolke12.lan.xhain.space",
+        "wolke13.lan.xhain.space"
       ],
       strip_indices: [
         :all,
@@ -74,7 +79,12 @@ config :tr33_control,
         :wolke_5,
         :wolke_6,
         :wolke_7,
-        :wolke_8
+        :wolke_8,
+        :wolke_9,
+        :wolke_10,
+        :wolke_11,
+        :wolke_12,
+        :wolke_13
       ]
     },
     trommel: %{
