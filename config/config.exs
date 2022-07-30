@@ -13,7 +13,7 @@ config :tr33_control,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
   command_max_index: 8,
   command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :beat_equalizer],
-  active_targets: [:wand, :ranken],
+  active_targets: [:ranken],
   targets: %{
     wand: %{
       hosts: ["wand.fritz.box"]
@@ -83,7 +83,7 @@ config :tr33_control,
       hosts: ["trommel.lan.xhain.space"]
     },
     ranken: %{
-      hosts: ["ranken.lan.xhain.space"],
+      hosts: ["192.168.0.42"],
       strip_indices: [
         :all,
         :strip_1,
