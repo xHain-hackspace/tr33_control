@@ -20,10 +20,16 @@ Will install all required dependencies.
 
 ## Configuration
 
-The file `dev/tr33_control/config/config.exs` contains some configuration you might want to change. 
+The file `tr33_control/config/config.exs` contains some configuration you might want to change. 
 
 * The `targets` contain all supported led_structures. The `host` of a target reprepsents one ESP32 that is reachable via network. It can be a domain or IP Address.
 * The `active_targets` is a white list of targets that should be active in this installation.
+* If not using/not having joysticks comment out the joystick lines in lib/tr33_control/application.ex or else the application will crash when running 'make console':
+    ```
+    #Tr33Control.Joystick,
+    #Tr33Control.Joystick.Poller
+    ```
+
 
 ## Running the UI
 
