@@ -29,6 +29,7 @@ The file `tr33_control/config/config.exs` contains some configuration you might 
     #Tr33Control.Joystick,
     #Tr33Control.Joystick.Poller
     ```
+* On raspberry pi with Ubuntu 22.04 Server 64 bit additionally run `sudo apt install erlang-eunit erlang-dev erlang-os-mon`
 
 
 ## Running the UI
