@@ -74,7 +74,7 @@ defmodule Tr33Control.ESP.UART do
 
     binary =
       command
-      |> Commands.command_binary(target, 23)
+      |> Commands.command_binary(target)
 
     binary_size = byte_size(binary)
     header = <<@serial_header::size(8), binary_size::size(8)>>

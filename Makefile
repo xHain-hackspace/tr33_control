@@ -22,5 +22,5 @@ assets-outdated:
 assets-update:
 	npm update --prefix assets
 
-assets-build:	
-	mix assets.deploy
+assets-release:
+	MIX_ENV=prod mix assets.deploy

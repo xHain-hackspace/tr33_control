@@ -13,4 +13,18 @@ defmodule Tr33ControlWeb.PresetController do
     conn
     |> send_resp(200, "")
   end
+
+  def rotate(conn, _params) do
+    Tr33Control.Commands.rotate_preset()
+
+    conn
+    |> send_resp(200, "")
+  end
+
+  def off(conn, _params) do
+    Tr33Control.Commands.all_off()
+
+    conn
+    |> send_resp(200, "")
+  end
 end

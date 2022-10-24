@@ -5,14 +5,27 @@ defmodule Tr33Control.ESP.UDP do
   alias Tr33Control.Commands.Command
   alias Tr33Control.Commands.Schemas.TargetMetrics
 
-  defstruct [:socket, :queue, :target, :host, :ip, :sequence, :last_sequence, :connection, :fps, :wifi_strength]
+  defstruct [
+    :socket,
+    :queue,
+    :target,
+    :host,
+    :ip,
+    :last_metrics,
+    :connection,
+    :fps,
+    :wifi_strength,
+    :name,
+    :version
+  ]
 
   @tick_interval_ms 30
   @max_queue_len 5
   @udp_registry :udp_targets
   @target_port 1337
   @pubsub_topic "udp_clients"
-  @sequence_timeout 21_000
+  @metrics_timeout 11_000
+  @command_max_count Application.compile_env!(:tr33_control, :command_max_count)
 
   def subscribe(), do: Phoenix.PubSub.subscribe(Tr33Control.PubSub, @pubsub_topic)
 
@@ -32,11 +45,10 @@ defmodule Tr33Control.ESP.UDP do
 
   def init({target, host}) do
     state = %__MODULE__{
-      last_sequence: System.os_time(:millisecond),
+      last_metrics: System.os_time(:millisecond),
       queue: :queue.new(),
       target: target,
-      host: host,
-      sequence: 1
+      host: host
     }
 
     case host |> String.to_charlist() |> :inet.gethostbyname(:inet) do
@@ -70,29 +82,45 @@ defmodule Tr33Control.ESP.UDP do
     end
   end
 
-  def handle_info({:metrics, ip, seq, metrics}, %__MODULE__{sequence: seq, ip: ip} = state) do
+  def handle_info({:metrics, ip, %TargetMetrics{hashes: hashes} = metrics}, %__MODULE__{ip: ip, target: target} = state) do
+    debug_log(state, "Metrics received. IP: #{inspect(ip)}, Hashes: #{inspect(hashes)}")
+
+    if(length(hashes) > @command_max_count) do
+      info_log(state, "Received more hashes than expected: #{hashes}")
+    end
+
+    resync_commands =
+      hashes
+      |> Enum.with_index()
+      |> Enum.map(fn {received_hash, index} ->
+        {received_hash, Commands.get_command_hash(index, target), index}
+      end)
+      |> Enum.filter(fn {received_hash, expected_hash, _index} -> received_hash != expected_hash end)
+      |> Enum.map(fn {received_hash, expected_hash, index} = item ->
+        info_log(
+          state,
+          "Hash mismatch for index #{index}. Received: #{inspect(received_hash)} Expected: #{inspect(expected_hash)}. Requeuing command"
+        )
+
+        item
+      end)
+      |> Enum.map(fn {_, _, index} ->
+        Commands.get_command(index)
+      end)
+
+    new_connection_state = if Enum.empty?(resync_commands), do: :ok, else: :resync_send
+
     state =
-      %__MODULE__{state | last_sequence: System.os_time(:millisecond)}
-      |> set_connection_state(:ok)
+      %__MODULE__{state | last_metrics: System.os_time(:millisecond)}
+      |> set_connection_state(new_connection_state)
       |> update_metrics(metrics)
 
-    debug_log(state, "Expected sequence: #{seq}, doing nothing")
+    state = Enum.reduce(resync_commands, state, fn command, state_acc -> maybe_enqueue(state_acc, command) end)
 
     {:noreply, state}
   end
 
-  def handle_info({:metrics, ip, received, metrics}, %__MODULE__{sequence: expected, ip: ip} = state) do
-    state =
-      %__MODULE__{state | last_sequence: System.os_time(:millisecond)}
-      |> update_metrics(metrics)
-      |> resync_queue()
-
-    info_log(state, "Unexpected sequence, got: #{received} expected: #{expected}")
-
-    {:noreply, state}
-  end
-
-  def handle_info({:metrics, _other_ip, _received, _metrics}, state) do
+  def handle_info({:metrics, _other_ip, _metrics}, state) do
     {:noreply, state}
   end
 
@@ -133,24 +161,22 @@ defmodule Tr33Control.ESP.UDP do
     {:noreply, state}
   end
 
-  def handle_info(:tick, %__MODULE__{queue: queue, target: target, sequence: sequence} = state) do
+  def handle_info(:tick, %__MODULE__{queue: queue, target: target} = state) do
     state =
       case :queue.out(queue) do
         {:empty, _} ->
           state
 
         {{:value, item}, rest} ->
-          next_sequence = rem(sequence + 1, 256)
-
           binary =
             case item do
-              command = %Command{} -> Commands.command_binary(command, target, next_sequence)
-              joystick = %Joystick{} -> Commands.joystick_event_binary(joystick, next_sequence)
+              command = %Command{} -> Commands.command_binary(command, target)
+              joystick = %Joystick{} -> Commands.joystick_event_binary(joystick)
             end
 
           transmit_binary(binary, state)
 
-          %{state | queue: rest, sequence: next_sequence}
+          %{state | queue: rest}
       end
 
     state = check_connection(state)
@@ -192,15 +218,15 @@ defmodule Tr33Control.ESP.UDP do
     :ok = :gen_udp.send(socket, String.to_charlist(host), @target_port, binary)
   end
 
-  defp check_connection(%__MODULE__{last_sequence: last_sequence} = state) do
-    if System.os_time(:millisecond) - last_sequence > @sequence_timeout do
+  defp check_connection(%__MODULE__{last_metrics: last_metrics} = state) do
+    if System.os_time(:millisecond) - last_metrics > @metrics_timeout do
       set_connection_state(state, :not_responding)
     else
       state
     end
   end
 
-  # def set_connection_state(%__MODULE__{connection: connection} = state, connection), do: state
+  def set_connection_state(%__MODULE__{connection: connection} = state, connection), do: notify_subscribers(state)
 
   def set_connection_state(%__MODULE__{connection: old} = state, new) do
     debug_log(state, "Changed connection from #{old} to #{new}")
@@ -209,8 +235,8 @@ defmodule Tr33Control.ESP.UDP do
     |> notify_subscribers()
   end
 
-  defp update_metrics(%__MODULE__{} = state, %TargetMetrics{fps: fps, wifi_strength: wifi_strength}) do
-    %__MODULE__{state | fps: fps, wifi_strength: wifi_strength}
+  defp update_metrics(%__MODULE__{} = state, %TargetMetrics{} = m) do
+    %__MODULE__{state | fps: m.fps, wifi_strength: m.wifi_strength, name: m.name, version: m.version}
   end
 
   def debug_log(%__MODULE__{host: host}, message) do

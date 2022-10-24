@@ -4,8 +4,8 @@ defmodule Tr33Control.Commands.Command do
   alias Protobuf.Field
   alias Tr33Control.Commands.Schemas.{CommandParams, Modifier}
 
-  @max_index Application.compile_env!(:tr33_control, :command_max_index)
   @active_targets Application.compile_env!(:tr33_control, :active_targets)
+  @hash_size 32
 
   @primary_key false
   embedded_schema do
@@ -18,7 +18,7 @@ defmodule Tr33Control.Commands.Command do
     field :encoded, :binary
   end
 
-  def new(index, type, common_values \\ []) when is_atom(type) and index < @max_index do
+  def new(index, type, common_values \\ []) when is_atom(type) do
     params = CommandParams.new([index: index] ++ common_values)
 
     %__MODULE__{index: index, params: params}
@@ -49,7 +49,9 @@ defmodule Tr33Control.Commands.Command do
 
   def encode(%__MODULE__{index: index, params: %CommandParams{} = params} = command) do
     corrected = %CommandParams{params | index: index}
-    %__MODULE__{command | params: corrected, encoded: CommandParams.encode(corrected)}
+    hash = <<:erlang.phash2(corrected, :math.pow(2, @hash_size) |> trunc)::@hash_size>>
+    with_hash = %CommandParams{corrected | hash: hash}
+    %__MODULE__{command | params: with_hash, encoded: CommandParams.encode(with_hash)}
   end
 
   def get_field_def(name) when is_atom(name) do

@@ -16,7 +16,7 @@
     <%= for command <- @commands do %>
 
       <tr>
-        <td class="table-success">0-<%= Application.fetch_env!(:tr33_control, :command_max_index) %></td>
+        <td class="table-success">0-<%= Application.fetch_env!(:tr33_control, :command_max_count) %></td>
         <td class="table-warning"><%= type_text(command) %> </td>
 
         <%= for data_text <- data_texts(command) do %>

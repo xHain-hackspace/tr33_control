@@ -6,7 +6,7 @@ defmodule Tr33Control.Commands do
   @commands_topic "command_updates"
   @presets_topic "preset_updates"
   @common_params %CommandParams{} |> Map.from_struct() |> Map.delete(:type_params) |> Map.keys()
-  @max_index Application.compile_env!(:tr33_control, :command_max_index)
+  @command_max_count Application.compile_env!(:tr33_control, :command_max_count)
 
   def init() do
     Cache.init_all()
@@ -52,7 +52,10 @@ defmodule Tr33Control.Commands do
   end
 
   def get_command(index) do
-    Cache.get(Command, index)
+    case Cache.get(Command, index) do
+      nil -> Command.disabled(index)
+      %Command{} = command -> command
+    end
   end
 
   def list_commands(opts \\ []) do
@@ -64,7 +67,7 @@ defmodule Tr33Control.Commands do
   end
 
   def create_command(index, type, params \\ []) when is_atom(type) and is_number(index) and is_list(params) do
-    if(index < @max_index) do
+    if(index < @command_max_count) do
       Command.new(index, type, params)
       |> insert_and_notify()
     else
@@ -102,6 +105,12 @@ defmodule Tr33Control.Commands do
   end
 
   def delete_command(index), do: delete_commands([index])
+
+  def all_off() do
+    indices = 0..(count_commands() - 2) |> Enum.to_list()
+    delete_commands(indices)
+    update_command_param(0, :enabled, false)
+  end
 
   def update_command_type(index, type) when is_atom(type) do
     get_command(index)
@@ -165,6 +174,13 @@ defmodule Tr33Control.Commands do
 
   def clone_command(index) when is_number(index) do
     :noop
+  end
+
+  def get_command_hash(index, target) do
+    case get_command(index) do
+      %Command{params: %CommandParams{enabled: false}} -> ""
+      %Command{targets: targets, params: %CommandParams{hash: hash}} -> if target in targets, do: hash, else: ""
+    end
   end
 
   ### Command Params: EnumParam + ValueParam ###############################################################################
@@ -353,6 +369,15 @@ defmodule Tr33Control.Commands do
     Cache.all(Preset)
   end
 
+  def rotate_preset() do
+    presets = list_presets()
+    current_index = Application.get_env(:tr33_control, :preset_rotate_index, 0)
+    next_index = rem(current_index + 1, Enum.count(presets))
+    %Preset{name: next_name} = Enum.at(presets, next_index)
+    Application.put_env(:tr33_control, :preset_rotate_index, next_index)
+    load_preset(next_name)
+  end
+
   def get_default_preset() do
     Cache.all(Preset)
     |> Enum.find(fn %Preset{} = preset -> preset.default end)
@@ -376,11 +401,11 @@ defmodule Tr33Control.Commands do
   def time_sync_binary() do
     time_sync = TimeSync.new(millis: System.os_time(:millisecond))
 
-    WireMessage.new(message: {:time_sync, time_sync}, sequence: 0)
+    WireMessage.new(message: {:time_sync, time_sync})
     |> WireMessage.encode()
   end
 
-  def command_binary(%Command{index: index, targets: targets} = command, target, sequence) do
+  def command_binary(%Command{index: index, targets: targets} = command, target) do
     %Command{params: %CommandParams{} = params} =
       if target in targets do
         command
@@ -388,11 +413,11 @@ defmodule Tr33Control.Commands do
         Command.disabled(index)
       end
 
-    WireMessage.new(sequence: sequence, message: {:command_params, params})
+    WireMessage.new(message: {:command_params, params})
     |> WireMessage.encode()
   end
 
-  def joystick_event_binary(%Tr33Control.Joystick{} = joystick, sequence) do
+  def joystick_event_binary(%Tr33Control.Joystick{} = joystick) do
     joystick_event =
       JoystickEvent.new(
         x: joystick.x,
@@ -403,7 +428,7 @@ defmodule Tr33Control.Commands do
         button4: joystick.button4
       )
 
-    WireMessage.new(sequence: sequence, message: {:joystick_event, joystick_event})
+    WireMessage.new(message: {:joystick_event, joystick_event})
     |> WireMessage.encode()
   end
 
@@ -428,11 +453,9 @@ defmodule Tr33Control.Commands do
   defp maybe_fill_commands(commands, false), do: commands
 
   defp maybe_fill_commands(commands, true) do
-    max = Application.fetch_env!(:tr33_control, :command_max_index)
-
     case Enum.count(commands) do
-      ^max -> commands
-      count -> commands ++ Enum.map(count..(max - 1), &Command.disabled/1)
+      @command_max_count -> commands
+      count -> commands ++ Enum.map(count..(@command_max_count - 1), &Command.disabled/1)
     end
   end
 end

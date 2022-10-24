@@ -5,7 +5,7 @@ defmodule Tr33ControlWeb.PresetsLive do
   alias Phoenix.LiveView.Socket
   alias Tr33Control.Commands
   alias Tr33Control.Commands.Preset
-  alias Tr33ControlWeb.{Components, Inputs}
+  alias Tr33ControlWeb.{Components}
 
   def mount(_params, _session, socket) do
     if connected?(socket) do

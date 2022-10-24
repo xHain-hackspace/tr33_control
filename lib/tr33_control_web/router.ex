@@ -32,6 +32,8 @@ defmodule Tr33ControlWeb.Router do
     end
 
     get "/presets/:preset_name", PresetController, :load
+    get "/rotate_presets", PresetController, :rotate
+    get "/off", PresetController, :off
     get "/commands", RedirectController, :commands
   end
 

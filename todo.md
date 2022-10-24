@@ -1,31 +1,22 @@
 
-# Before deploy
-x presets
-x modifiers
-x target toggles in mixer
-x put active command index in url
-x push_redirect? to nav
-x add form to color palette select
-x start from scratch button
-x update preset list after delete/create
-x fix color palette assignment when chaning command
-
-# JS
-x Presets always stay selected in navbar
-x trigger autofocus of presets list
-x modal without form -> trigger on Enter
-
 # nice to have
 * properly set max value for modifiers
 * close all modals on Enter
 * display loaded preset somewhere more prominent
 * Commands should stay selected when path == /commands/1
 
-# Tr33J
+# Tr33
 * ping pong period, don't jump on change
 * clone command
 * sawtooth reverse not working
 * 
+
+# Interaction with Firmware
+* Add buildnumber to firmware and show in status
+* [Big] Auto detect new Led Structures
+* Use hash/fingerprint of all commands to detect desyncs. (instead of sequence number)
+* Send all commands at once
+* send metrics independent of receiving commands
 
 # Bugs/features
 * regular preset backups

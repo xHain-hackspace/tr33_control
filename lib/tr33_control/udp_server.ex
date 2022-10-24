@@ -4,7 +4,7 @@ defmodule Tr33Control.UdpServer do
   alias Tr33Control.{Commands, ESP}
   alias Tr33Control.Commands.Schemas.{WireMessage, TargetMetrics}
 
-  @listen_port Application.fetch_env!(:tr33_control, :udp_listen_port)
+  @listen_port Application.compile_env!(:tr33_control, :udp_listen_port)
 
   def start_link(opts) do
     GenServer.start_link(__MODULE__, :ok, [{:name, __MODULE__} | opts])
@@ -30,8 +30,8 @@ defmodule Tr33Control.UdpServer do
     debug_log("Incoming command: #{inspect(protobuf)}, from: #{inspect(address)}:#{inspect(port)}")
 
     case WireMessage.decode(protobuf) do
-      %WireMessage{message: {:target_metrics, %TargetMetrics{} = metrics}, sequence: sequence} ->
-        ESP.handle_metrics(address, sequence, metrics)
+      %WireMessage{message: {:target_metrics, %TargetMetrics{} = metrics}} ->
+        ESP.handle_metrics(address, metrics)
         debug_log("Received target metrics #{inspect(metrics)}")
 
       %WireMessage{message: {:command_params, _}} ->

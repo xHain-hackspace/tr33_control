@@ -44,6 +44,7 @@ defmodule Tr33ControlWeb.ConnectionStatusLive do
     socket =
       socket
       |> update(:targets, fn targets -> Map.put(targets, host, target) end)
+      |> assign(:now, System.os_time(:second))
       |> sort_targets()
 
     {:noreply, socket}
@@ -72,6 +73,8 @@ defmodule Tr33ControlWeb.ConnectionStatusLive do
   end
 
   defp class_for_target(%UDP{connection: conn}) when conn in [:ok], do: "success"
-  defp class_for_target(%UDP{connection: conn}) when conn in [:not_responding, :resync_send, :started], do: "warning"
+
+  defp class_for_target(%UDP{connection: conn}) when conn in [:not_responding, :started, :desync], do: "warning"
+
   defp class_for_target(%UDP{}), do: "danger"
 end

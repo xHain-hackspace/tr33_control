@@ -1,28 +1,32 @@
-<table class={"table"}>
+<table class="table">
   <thead>
     <tr>
       <th scope="col">Hostname</th>
-      <th scope="col" style="width: 15%">IP</th>
-      <th scope="col" style="width: 15%">FPS</th>
-      <th scope="col" style="width: 15%">WifiStrength</th>
-      <th scope="col" style="width: 15%">Last Message</th>
-      <th scope="col" style="width: 15%">Status</th>
+      <th scope="col">Name</th>
+      <th scope="col">Version</th>
+      <th scope="col">IP</th>
+      <th scope="col">FPS</th>
+      <th scope="col">WifiStrength</th>
+      <th scope="col">Last Message</th>
+      <th scope="col">Status</th>
     </tr>
   </thead>
 
-  <tbody>  
+  <tbody>
     <%= for %UDP{} = target<- @sorted_targets do %>
       <tr class={"text-#{class_for_target(target)}"}>
         <th><%= target.host %></th>
+        <th><%= target.name %></th>
+        <th><%= target.version %></th>
         <td><%= Display.ip(target.ip) %></td>
         <td><%= Display.humanize(target.fps) %></td>
         <td><%= Display.humanize(target.wifi_strength) %></td>
-        <td><%= Display.humanize(@now - div(target.last_sequence, 1000)) %> s</td>
+        <td><%= Display.humanize(@now - div(target.last_metrics, 1000)) %> s</td>
         <td><%= Display.humanize(target.connection) %></td>
       </tr>
     <% end %>
-  </tbody>   
+  </tbody>
 </table>
 
-<button type="button" class="btn btn-primary" phx-click="resync">Resync</button> 
-<button type="button" class="btn btn-primary" phx-click="reconnect">Reconnect</button> 
+<button type="button" class="btn btn-primary" phx-click="resync">Resync</button>
+<button type="button" class="btn btn-primary" phx-click="reconnect">Reconnect</button>

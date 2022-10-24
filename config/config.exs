@@ -11,9 +11,9 @@ config :tr33_control,
   serial_port: System.get_env("SERIAL_PORT") || "ttyAMA0",
   udp_listen_port: 1337,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
-  command_max_index: 8,
+  command_max_count: 8,
   command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :beat_equalizer],
-  active_targets: [:wand, :ranken],
+  active_targets: [:wand],
   targets: %{
     wand: %{
       hosts: ["wand.fritz.box"]
@@ -122,7 +122,7 @@ config :phoenix, :json_library, Jason
 config :nerves_leds, names: [green: "led0", red: "led1"]
 
 config :dart_sass,
-  version: "1.43.4",
+  version: "1.55.0",
   default: [
     args: ~w(css/app.scss ../priv/static/assets/app.css),
     cd: Path.expand("../assets", __DIR__)
