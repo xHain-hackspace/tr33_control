@@ -26,18 +26,18 @@ defmodule Tr33Control.UdpServer do
     {:ok, %{}}
   end
 
-  def handle_info({:udp, socket, address, port, protobuf}, state) do
-    debug_log("Incoming command: #{inspect(protobuf)}, from: #{inspect(address)}:#{inspect(port)}")
+  def handle_info({:udp, socket, ip, port, protobuf}, state) do
+    debug_log("Incoming Packaet: #{inspect(protobuf)}, from: #{inspect(ip)}:#{inspect(port)}")
 
     case WireMessage.decode(protobuf) do
       %WireMessage{message: {:target_metrics, %TargetMetrics{} = metrics}} ->
-        ESP.handle_metrics(address, metrics)
+        ESP.handle_metrics(ip, metrics)
         debug_log("Received target metrics #{inspect(metrics)}")
 
       %WireMessage{message: {:command_params, _}} ->
         debug_log("Received command params")
         Commands.create_command(protobuf)
-        send_ack(socket, address, port)
+        send_ack(socket, ip, port)
 
       other ->
         Logger.warn("Received unexpected UDP data. Decoded as #{inspect(other)}")

@@ -1,10 +1,10 @@
 <table class="table">
   <thead>
     <tr>
-      <th scope="col">Hostname</th>
       <th scope="col">Name</th>
-      <th scope="col">Version</th>
+      <th scope="col">Target</th>
       <th scope="col">IP</th>
+      <th scope="col">Build Time</th>
       <th scope="col">FPS</th>
       <th scope="col">WifiStrength</th>
       <th scope="col">Last Message</th>
@@ -13,20 +13,19 @@
   </thead>
 
   <tbody>
-    <%= for %UDP{} = target<- @sorted_targets do %>
+    <%= for %UDP{target_metrics: %TargetMetrics{} = tm} = target<- @sorted_targets do %>
       <tr class={"text-#{class_for_target(target)}"}>
-        <th><%= target.host %></th>
-        <th><%= target.name %></th>
-        <th><%= target.version %></th>
+        <th><%= tm.name %></th>
+        <td><%= target.target %></td>
         <td><%= Display.ip(target.ip) %></td>
-        <td><%= Display.humanize(target.fps) %></td>
-        <td><%= Display.humanize(target.wifi_strength) %></td>
+        <th><%= Display.unix_timestamp(tm.version) %></th>
+        <td><%= Display.humanize(tm.fps) %></td>
+        <td><%= Display.humanize(tm.wifi_strength) %></td>
         <td><%= Display.humanize(@now - div(target.last_metrics, 1000)) %> s</td>
-        <td><%= Display.humanize(target.connection) %></td>
+        <td><%= Display.humanize(target.connection_status) %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
 
 <button type="button" class="btn btn-primary" phx-click="resync">Resync</button>
-<button type="button" class="btn btn-primary" phx-click="reconnect">Reconnect</button>

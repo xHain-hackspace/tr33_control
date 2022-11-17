@@ -216,9 +216,7 @@ defmodule Tr33Control.Commands do
   end
 
   def get_strip_index_options(%Command{targets: [target]}) do
-    Tr33Control.Targets.get_targets()
-    |> Map.get(target, %{})
-    |> Map.get(:strip_indices, [])
+    Tr33Control.Targets.get_strip_indices_for_target(target)
     |> Enum.with_index()
   end
 

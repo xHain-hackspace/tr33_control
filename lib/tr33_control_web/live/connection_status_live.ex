@@ -4,6 +4,7 @@ defmodule Tr33ControlWeb.ConnectionStatusLive do
   alias Phoenix.LiveView.Socket
   alias Tr33Control.ESP
   alias Tr33Control.ESP.UDP
+  alias Tr33Control.Commands.Schemas.TargetMetrics
   alias Tr33ControlWeb.Display
 
   @tick_interval_ms 1000
@@ -30,20 +31,15 @@ defmodule Tr33ControlWeb.ConnectionStatusLive do
     {:noreply, socket}
   end
 
-  def handle_event("reconnect", _, socket) do
-    ESP.reconnect()
-    {:noreply, socket}
-  end
-
   def handle_event(event, data, socket) do
     Logger.warn("#{__MODULE__}: Unhandled event #{inspect(event)} Data: #{inspect(data)}")
     {:noreply, socket}
   end
 
-  def handle_info({:target_update, %UDP{host: host} = target}, socket) do
+  def handle_info({:target_update, %UDP{ip: ip} = target}, socket) do
     socket =
       socket
-      |> update(:targets, fn targets -> Map.put(targets, host, target) end)
+      |> update(:targets, fn targets -> Map.put(targets, ip, target) end)
       |> assign(:now, System.os_time(:second))
       |> sort_targets()
 
@@ -67,14 +63,12 @@ defmodule Tr33ControlWeb.ConnectionStatusLive do
     sorted =
       targets
       |> Map.values()
-      |> Enum.sort_by(fn %UDP{host: host} -> host end)
+      |> Enum.sort_by(fn %UDP{target_metrics: %TargetMetrics{name: name}} -> name end)
 
     assign(socket, sorted_targets: sorted)
   end
 
-  defp class_for_target(%UDP{connection: conn}) when conn in [:ok], do: "success"
-
-  defp class_for_target(%UDP{connection: conn}) when conn in [:not_responding, :started, :desync], do: "warning"
-
+  defp class_for_target(%UDP{connection_status: status}) when status in [:ok, :started], do: "success"
+  defp class_for_target(%UDP{connection_status: status}) when status in [:not_responding, :resync_sent], do: "warning"
   defp class_for_target(%UDP{}), do: "danger"
 end

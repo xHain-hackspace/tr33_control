@@ -10,7 +10,7 @@ defmodule Tr33ControlWeb.CommandComponent do
   def mount(socket) do
     socket =
       socket
-      |> assign(command_targets: Targets.get_targets() |> Map.keys())
+      |> assign(command_targets: Targets.active_targets())
       |> assign(modifiers_active: true)
 
     {:ok, socket}

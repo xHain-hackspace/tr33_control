@@ -49,6 +49,15 @@ defmodule Tr33ControlWeb.Display do
     |> humanize()
   end
 
+  def unix_timestamp(timestamp_str) when is_binary(timestamp_str) do
+    {timestamp_int, _} = Integer.parse(timestamp_str)
+
+    DateTime.from_unix!(timestamp_int)
+    |> Calendar.strftime("%Y-%m-%d %H:%M:%S")
+  end
+
+  def unix_timestamp(nil), do: "-"
+
   def ip(nil), do: "-"
   def ip({a, b, c, d}), do: "#{a}.#{b}.#{c}.#{d}"
 end

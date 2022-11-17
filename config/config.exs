@@ -13,13 +13,9 @@ config :tr33_control,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
   command_max_count: 8,
   command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :beat_equalizer],
-  active_targets: [:wand],
-  targets: %{
-    wand: %{
-      hosts: ["wand.fritz.box"]
-    },
+  active_targets: [:wand, :wolken],
+  target_configs: %{
     tr33: %{
-      hosts: ["tr33esp32.lan.xhain.space"],
       strip_indices: [
         :all,
         :all_trunks,
@@ -47,21 +43,7 @@ config :tr33_control,
       ]
     },
     wolken: %{
-      hosts: [
-        "wolke1.lan.xhain.space",
-        "wolke2.lan.xhain.space",
-        "wolke3.lan.xhain.space",
-        "wolke4.lan.xhain.space",
-        "wolke5.lan.xhain.space",
-        "wolke6.lan.xhain.space",
-        "wolke7.lan.xhain.space",
-        "wolke8.lan.xhain.space",
-        "wolke9.lan.xhain.space",
-        "wolke10.lan.xhain.space",
-        "wolke11.lan.xhain.space",
-        "wolke12.lan.xhain.space",
-        "wolke13.lan.xhain.space"
-      ],
+      name_regex: ~r/Wolke/,
       strip_indices: [
         :all,
         :wolke_1,
@@ -79,11 +61,7 @@ config :tr33_control,
         :wolke_13
       ]
     },
-    trommel: %{
-      hosts: ["trommel.lan.xhain.space"]
-    },
     ranken: %{
-      hosts: ["ranken.lan.xhain.space"],
       strip_indices: [
         :all,
         :strip_1,
@@ -98,8 +76,8 @@ config :tr33_control,
         :strip_10
       ]
     },
-    scubar: %{
-      hosts: ["scubar.lan.xhain.space"]
+    dev: %{
+      name_regex: ~r/dev/
     }
   }
 

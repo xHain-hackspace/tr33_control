@@ -1,7 +1,7 @@
 defmodule Tr33Control.ESP.UDP do
   use GenServer
   require Logger
-  alias Tr33Control.{Commands, ESP, Joystick}
+  alias Tr33Control.{Commands, ESP, Joystick, Targets}
   alias Tr33Control.Commands.Command
   alias Tr33Control.Commands.Schemas.TargetMetrics
 
@@ -9,19 +9,16 @@ defmodule Tr33Control.ESP.UDP do
     :socket,
     :queue,
     :target,
-    :host,
     :ip,
     :last_metrics,
-    :connection,
-    :fps,
-    :wifi_strength,
-    :name,
-    :version
+    :connection_status,
+    :target_metrics
   ]
+
+  # todo: implement shutdown after some timeout
 
   @tick_interval_ms 30
   @max_queue_len 5
-  @udp_registry :udp_targets
   @target_port 1337
   @pubsub_topic "udp_clients"
   @metrics_timeout 11_000
@@ -34,8 +31,12 @@ defmodule Tr33Control.ESP.UDP do
     state
   end
 
-  def start_link({target, host, process_name}) when is_atom(target) do
-    GenServer.start_link(__MODULE__, {target, host}, name: process_name)
+  def handle_metrics(pid, %TargetMetrics{} = tm) when is_pid(pid) do
+    GenServer.cast(pid, {:metrics, tm})
+  end
+
+  def start_link({_ip, %TargetMetrics{} = _target_metrics} = args) do
+    GenServer.start_link(__MODULE__, args)
   end
 
   def toggle_debug() do
@@ -43,54 +44,46 @@ defmodule Tr33Control.ESP.UDP do
     Application.put_env(:tr33_control, :udp_debug, not current)
   end
 
-  def init({target, host}) do
-    state = %__MODULE__{
-      last_metrics: System.os_time(:millisecond),
-      queue: :queue.new(),
-      target: target,
-      host: host
-    }
+  def init({ip, target_metrics = %TargetMetrics{}}) do
+    ESP.register_target(ip)
 
-    case host |> String.to_charlist() |> :inet.gethostbyname(:inet) do
-      {:ok, {:hostent, _host, [], :inet, 4, [{_, _, _, _} = ip | _]}} ->
-        {:ok, socket} = :gen_udp.open(Enum.random(5000..65535), [:binary])
+    local_port = Enum.random(5000..65535)
+    {:ok, socket} = :gen_udp.open(local_port, [:binary])
 
-        state =
-          %__MODULE__{state | socket: socket, ip: ip}
-          |> set_connection_state(:started)
+    state =
+      %__MODULE__{
+        last_metrics: System.os_time(:millisecond),
+        queue: :queue.new(),
+        ip: ip,
+        socket: socket
+      }
+      |> update_target_metrics(target_metrics)
+      |> set_connection_state(:started)
 
-        info_log(
-          state,
-          "Resovled host #{host} for target #{inspect(target)} to #{inspect(ip)}. Sending UDP commands to port #{@target_port}"
-        )
+    info_log(
+      state,
+      "Started process for device named #{inspect(target_metrics.name)}. Target: #{inspect(state.target)}. IP: #{inspect(state.ip)}. Sending UDP commands to port #{@target_port} using local port #{local_port}"
+    )
 
-        :timer.send_interval(@tick_interval_ms, :tick)
+    :timer.send_interval(@tick_interval_ms, :tick)
 
-        {:ok, _} = Registry.register(@udp_registry, ip, target)
+    ESP.subscribe()
+    Commands.subscribe_commands()
+    Joystick.subscribe()
 
-        ESP.subscribe()
-        Commands.subscribe_commands()
-        Joystick.subscribe()
-
-        {:ok, state}
-
-      other ->
-        set_connection_state(state, :nx_domain)
-        debug_log(state, "Could not resolve host. Not sending UDP commands. Reason: #{inspect(other)}")
-
-        :ignore
-    end
+    {:ok, state}
   end
 
-  def handle_info({:metrics, ip, %TargetMetrics{hashes: hashes} = metrics}, %__MODULE__{ip: ip, target: target} = state) do
-    debug_log(state, "Metrics received. IP: #{inspect(ip)}, Hashes: #{inspect(hashes)}")
+  def handle_cast({:metrics, %TargetMetrics{} = tm}, %__MODULE__{target: target} = state) do
+    debug_log(state, "Metrics received. Name: #{inspect(tm.name)}, Hashes: #{inspect(tm.hashes)}")
 
-    if(length(hashes) > @command_max_count) do
-      info_log(state, "Received more hashes than expected: #{hashes}")
+    if(length(tm.hashes) > @command_max_count) do
+      warn_log(state, "Received more hashes than expected: #{inspect(tm.hashes)}")
     end
 
     resync_commands =
-      hashes
+      tm.hashes
+      |> Enum.take(@command_max_count)
       |> Enum.with_index()
       |> Enum.map(fn {received_hash, index} ->
         {received_hash, Commands.get_command_hash(index, target), index}
@@ -108,19 +101,15 @@ defmodule Tr33Control.ESP.UDP do
         Commands.get_command(index)
       end)
 
-    new_connection_state = if Enum.empty?(resync_commands), do: :ok, else: :resync_send
+    new_connection_state = if Enum.empty?(resync_commands), do: :ok, else: :resync_sent
 
     state =
       %__MODULE__{state | last_metrics: System.os_time(:millisecond)}
       |> set_connection_state(new_connection_state)
-      |> update_metrics(metrics)
+      |> update_target_metrics(tm)
 
     state = Enum.reduce(resync_commands, state, fn command, state_acc -> maybe_enqueue(state_acc, command) end)
 
-    {:noreply, state}
-  end
-
-  def handle_info({:metrics, _other_ip, _metrics}, state) do
     {:noreply, state}
   end
 
@@ -210,12 +199,12 @@ defmodule Tr33Control.ESP.UDP do
       |> Enum.reduce(:queue.new(), fn %Command{} = command, queue_acc -> :queue.in(command, queue_acc) end)
 
     %__MODULE__{state | queue: queue}
-    |> set_connection_state(:resync_send)
+    |> set_connection_state(:resync_sent)
   end
 
-  defp transmit_binary(binary, %__MODULE__{socket: socket, host: host} = state) when is_binary(binary) do
+  defp transmit_binary(binary, %__MODULE__{socket: socket, ip: ip} = state) when is_binary(binary) do
     debug_log(state, "Sending packet: #{inspect(binary)}")
-    :ok = :gen_udp.send(socket, String.to_charlist(host), @target_port, binary)
+    :ok = :gen_udp.send(socket, {ip, @target_port}, binary)
   end
 
   defp check_connection(%__MODULE__{last_metrics: last_metrics} = state) do
@@ -226,30 +215,30 @@ defmodule Tr33Control.ESP.UDP do
     end
   end
 
-  def set_connection_state(%__MODULE__{connection: connection} = state, connection), do: notify_subscribers(state)
+  def set_connection_state(%__MODULE__{connection_status: status} = state, status), do: notify_subscribers(state)
 
-  def set_connection_state(%__MODULE__{connection: old} = state, new) do
+  def set_connection_state(%__MODULE__{connection_status: old} = state, new) do
     debug_log(state, "Changed connection from #{old} to #{new}")
 
-    %__MODULE__{state | connection: new}
+    %__MODULE__{state | connection_status: new}
     |> notify_subscribers()
   end
 
-  defp update_metrics(%__MODULE__{} = state, %TargetMetrics{} = m) do
-    %__MODULE__{state | fps: m.fps, wifi_strength: m.wifi_strength, name: m.name, version: m.version}
+  defp update_target_metrics(%__MODULE__{} = state, %TargetMetrics{} = tm) do
+    %__MODULE__{state | target_metrics: tm, target: Targets.get_target_from_metrics(tm)}
   end
 
-  def debug_log(%__MODULE__{host: host}, message) do
+  defp debug_log(%__MODULE__{target_metrics: %TargetMetrics{} = tm}, message) do
     if Application.get_env(:tr33_control, :udp_debug, false) do
-      Logger.debug("#{__MODULE__} #{inspect(host)}: #{message}")
+      Logger.debug("#{__MODULE__} #{inspect(tm.name)}: #{message}")
     end
   end
 
-  def info_log(%__MODULE__{host: host}, message) do
-    Logger.info("#{__MODULE__} #{inspect(host)}: #{message}")
+  defp info_log(%__MODULE__{target_metrics: %TargetMetrics{} = tm}, message) do
+    Logger.info("#{__MODULE__} #{inspect(tm.name)}: #{message}")
   end
 
-  def warn_log(%__MODULE__{host: host}, message) do
-    Logger.warn("#{__MODULE__} #{inspect(host)}: #{message}")
+  defp warn_log(%__MODULE__{target_metrics: %TargetMetrics{} = tm}, message) do
+    Logger.warn("#{__MODULE__} #{inspect(tm.name)}: #{message}")
   end
 end

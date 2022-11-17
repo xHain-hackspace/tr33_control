@@ -1,3 +1,6 @@
+# current
+* timeout UDP when no metrics are received
+
 
 # nice to have
 * properly set max value for modifiers
@@ -12,11 +15,7 @@
 * 
 
 # Interaction with Firmware
-* Add buildnumber to firmware and show in status
-* [Big] Auto detect new Led Structures
-* Use hash/fingerprint of all commands to detect desyncs. (instead of sequence number)
 * Send all commands at once
-* send metrics independent of receiving commands
 
 # Bugs/features
 * regular preset backups
@@ -48,67 +47,6 @@
 * softer sparkle
 * send fps via UDP 
 
-## done
-* add target filter to overview
-* remove hover from label
-* tabs
-* Remove command type -> select it on new caommand
-* preset list
-* color previews
-* disable button for Commands
-* resync button
-* twang + joystick
-* create header button style
-* improve mobile support
-* tr33 UART not working for some reason, might be the cable
-* fix UART in general
-* mapped shape/slope/... broken? (Tr33 only, strip index 0)
-* remove command name
-* measure FPS (looks good)
-* beat detection
-* modifier for palette 
-* select command when last is deleted 
-* multiple instances of rain/sparkle/etc
-* wolken index
-* rainbow_width and size @ 0 (Tr33 only, strip index 0)
-* Wolken -> one structure, multiple strip indexes
-* color palettes (steal some from wled)
-* using cursors for UI selects
-* ping pong period @ 0 crashes
-* ping pong count
-* initial preset load fails completely
-* delete all modifiers when toggled off
-* add pb option to define max value
-* resync should reset all target commands? (wont do)
-* remember targets on command change
-* render position max to 65... (custom params on sliders)
-* debounce issues when slider is at the bottom
-  * move rate limiting to listeners
-* modifier
-* Tr33 rainbow broken at trunk/branches crossing
-* regularly send squence number from ESPs for eventual consistency
-* Tr33: fix extended LedStructure functions
-* single color always overwrites (Tr33 only, strip index 0)
-* fix wifi status overlay
-* Strip index -> 0 == all
-* per command palettes
-* fix max validations => inputs/data as proper data structures?
-* render effect: position 2 bytes
-* add more palettes
-* strip index select does not work
-* send sync request on boot
-* discard live view sessions on restart/reconnect
-* Move modifiers to ESP
-  * reverse sawtooth in firmware
-* twang
-* joystick plug and play
-* move up/down -> no update
-* bug: change type when moving command
-* type select not working with enabled modifier
-* performance with modifiers
-  * x/per minute relative to pixel count
-* double check modifier migration
-* fix strip_index
 
 
 ## Wont do

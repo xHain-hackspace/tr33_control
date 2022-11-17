@@ -10,7 +10,7 @@ defmodule Tr33ControlWeb.CommandHeaderComponent do
     socket =
       socket
       |> assign(active?: false)
-      |> assign(command_targets: Targets.get_targets() |> Map.keys())
+      |> assign(command_targets: Targets.active_targets())
 
     {:ok, socket}
   end
