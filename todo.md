@@ -14,6 +14,9 @@
 * sawtooth reverse not working
 * 
 
+# Random/noise effect
+* Fade with random speed black -> color -> white
+
 # Interaction with Firmware
 * Send all commands at once
 
