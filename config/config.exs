@@ -85,7 +85,10 @@ config :tr33_control,
 config :tr33_control, Tr33ControlWeb.Endpoint,
   url: [host: "localhost"],
   secret_key_base: "OjMmejtWRlJsOaBulT2hTUpx06835YTLQzx3H95MPV2X+M93hXrtJdxKASr/w5Mk",
-  render_errors: [view: Tr33ControlWeb.ErrorView, accepts: ~w(html json), layout: false],
+  render_errors: [
+    formats: [html: SampleAppWeb.ErrorHTML, json: SampleAppWeb.ErrorJSON],
+    layout: false
+  ],
   pubsub_server: Tr33Control.PubSub,
   live_view: [signing_salt: "HC+iC2aJ"]
 
@@ -107,7 +110,7 @@ config :dart_sass,
   ]
 
 config :esbuild,
-  version: "0.14.1",
+  version: "0.14.41",
   default: [
     args:
       ~w(js/app.js --bundle --target=es2016 --outdir=../priv/static/assets --external:/fonts/* --external:/images/*),

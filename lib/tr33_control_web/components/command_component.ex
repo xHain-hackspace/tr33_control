@@ -1,13 +1,18 @@
 defmodule Tr33ControlWeb.CommandComponent do
   use Tr33ControlWeb, :live_component
+  import Tr33ControlWeb.InputComponents
   require Logger
+
   alias Phoenix.LiveView.Socket
   alias Tr33Control.{Commands, Targets}
   alias Tr33Control.Commands.{Command, EnumParam, ValueParam}
-  alias Tr33ControlWeb.Router.Helpers, as: Routes
   alias Tr33ControlWeb.{Display, Inputs, Components}
 
   def mount(socket) do
+    if connected?(socket) do
+      Commands.subscribe_commands()
+    end
+
     socket =
       socket
       |> assign(command_targets: Targets.active_targets())
@@ -21,7 +26,7 @@ defmodule Tr33ControlWeb.CommandComponent do
     {:ok, socket}
   end
 
-  # index update, current command is differnt or there is none at all. Fetch it
+  # index update, current command is different or there is none at all. Fetch it
   def update(%{index: index}, %Socket{} = socket) do
     command = Commands.get_command(index)
     {:ok, update_command(socket, command)}
@@ -53,7 +58,31 @@ defmodule Tr33ControlWeb.CommandComponent do
     {:noreply, socket}
   end
 
-  def handle_event("param_select_change", %{"_target" => [name_str]} = data, %Socket{} = socket) do
+  def handle_event(
+        "select_change",
+        %{"_target" => ["command_type"], "command_type" => type_str},
+        %Socket{} = socket
+      ) do
+    %Command{index: index} = socket.assigns.command
+    type = String.to_existing_atom(type_str)
+    Commands.update_command_type(index, type)
+
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "select_change",
+        %{"_target" => ["color_palette"], "color_palette" => color_palette},
+        %Socket{} = socket
+      ) do
+    %Command{index: index} = socket.assigns.command
+
+    Commands.update_command_param(index, :color_palette, String.to_existing_atom(color_palette))
+
+    {:noreply, socket}
+  end
+
+  def handle_event("select_change", %{"_target" => [name_str]} = data, %Socket{} = socket) do
     %Command{index: index} = socket.assigns.command
 
     name = String.to_existing_atom(name_str)
@@ -65,7 +94,7 @@ defmodule Tr33ControlWeb.CommandComponent do
   end
 
   def handle_event("slider_change", %{"_target" => [name_str]} = data, %Socket{} = socket) do
-    %Command{index: index} = socket.assigns.command
+    %{command: %Command{index: index}} = socket.assigns
 
     name = String.to_existing_atom(name_str)
     value = Map.fetch!(data, name_str) |> String.to_integer()
@@ -75,54 +104,78 @@ defmodule Tr33ControlWeb.CommandComponent do
     {:noreply, socket}
   end
 
-  def handle_event("increment_command_index", _, %Socket{} = socket) do
-    %Command{index: old} = socket.assigns.command
-    new = old + 1
-
-    Commands.swap_commands(old, new)
-
-    socket = push_patch(socket, to: Routes.commands_path(socket, :show, new))
+  def handle_event("toggle_target", %{"target" => target_str}, %Socket{} = socket) do
+    %{command: %Command{index: index}} = socket.assigns
+    target = String.to_existing_atom(target_str)
+    Commands.toggle_command_target(index, target)
 
     {:noreply, socket}
   end
 
-  def handle_event("decrement_command_index", _, %Socket{} = socket) do
-    %Command{index: old} = socket.assigns.command
-    new = old - 1
+  def handle_event("switch_change", %{"_target" => ["command_enabled"], "command_enabled" => "on"}, %Socket{} = socket) do
+    %{command: %Command{index: index}} = socket.assigns
 
-    Commands.swap_commands(old, new)
-
-    socket = push_patch(socket, to: Routes.commands_path(socket, :show, new))
+    Commands.update_command_param(index, :enabled, true)
 
     {:noreply, socket}
   end
 
-  def handle_event("delete_command", _, %Socket{} = socket) do
-    socket.assigns.command.index
-    |> Commands.delete_command()
+  def handle_event("switch_change", %{"_target" => ["command_enabled"]}, %Socket{} = socket) do
+    %{command: %Command{index: index}} = socket.assigns
+
+    Commands.update_command_param(index, :enabled, false)
 
     {:noreply, socket}
   end
 
-  def handle_event("clone_command", _, %Socket{} = socket) do
-    socket.assigns.command.index
-    |> Commands.clone_command()
+  # def handle_event("increment_command_index", _, %Socket{} = socket) do
+  #   %Command{index: old} = socket.assigns.command
+  #   new = old + 1
 
-    {:noreply, socket}
-  end
+  #   Commands.swap_commands(old, new)
 
-  def handle_event("toggle_modifiers", _, %Socket{} = socket) do
-    modifier_count =
-      socket.assigns.command
-      |> Commands.get_modifier_params()
-      |> Enum.count()
+  #   socket = push_patch(socket, to: ~p"/commands/#{new}")
 
-    socket =
-      socket
-      |> assign(:modifiers_active, modifier_count != 0 || not socket.assigns.modifiers_active)
+  #   {:noreply, socket}
+  # end
 
-    {:noreply, socket}
-  end
+  # def handle_event("decrement_command_index", _, %Socket{} = socket) do
+  #   %Command{index: old} = socket.assigns.command
+  #   new = old - 1
+
+  #   Commands.swap_commands(old, new)
+
+  #   socket = push_patch(socket, to: ~p"/commands/#{new}")
+
+  #   {:noreply, socket}
+  # end
+
+  # def handle_event("delete_command", _, %Socket{} = socket) do
+  #   socket.assigns.command.index
+  #   |> Commands.delete_command()
+
+  #   {:noreply, socket}
+  # end
+
+  # def handle_event("clone_command", _, %Socket{} = socket) do
+  #   socket.assigns.command.index
+  #   |> Commands.clone_command()
+
+  #   {:noreply, socket}
+  # end
+
+  # def handle_event("toggle_modifiers", _, %Socket{} = socket) do
+  #   modifier_count =
+  #     socket.assigns.command
+  #     |> Commands.get_modifier_params()
+  #     |> Enum.count()
+
+  #   socket =
+  #     socket
+  #     |> assign(:modifiers_active, modifier_count != 0 || not socket.assigns.modifiers_active)
+
+  #   {:noreply, socket}
+  # end
 
   def handle_event("add_modifier", %{"name" => name_str}, %Socket{} = socket) do
     name = String.to_existing_atom(name_str)
@@ -160,17 +213,25 @@ defmodule Tr33ControlWeb.CommandComponent do
   end
 
   defp update_command(%Socket{} = socket, command) do
-    modifier_params = Commands.get_modifier_params(command)
+    color_palette_param = Commands.get_common_enum_param(command, :color_palette)
+    command_type_param = Commands.get_command_type_param(command)
+    # todo
+    # stip_index_param = Commands.get_strip_index_param(command)
+    stip_index_param = nil
+
+    enum_params =
+      ([command_type_param, color_palette_param, stip_index_param] ++ Commands.list_enum_params(command))
+      |> Enum.reject(&is_nil/1)
+
+    brightness_param = Commands.get_common_value_param(command, :brightness)
+    value_params = [brightness_param] ++ Commands.list_value_params(command)
 
     socket
     |> assign(command: command)
-    |> assign(value_params: Commands.list_value_params(command))
-    |> assign(enum_params: Commands.list_enum_params(command))
-    |> assign(color_palette_param: Commands.get_common_enum_param(command, :color_palette))
-    |> assign(strip_index_options: Commands.get_strip_index_options(command))
+    |> assign(value_params: value_params)
+    |> assign(enum_params: enum_params)
     |> assign(modifier_names: Commands.list_modifier_names(command))
-    |> assign(modifier_params: modifier_params)
-    |> assign(modifiers_active: socket.assigns.modifiers_active || length(modifier_params) > 0)
+    |> assign(modifier_params: Commands.get_modifier_params(command))
   end
 
   defp update_param(index, name, value) do

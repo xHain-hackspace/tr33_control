@@ -1,15 +1,16 @@
 defmodule Tr33ControlWeb.Navbar do
-  import Phoenix.LiveView
+  use Tr33ControlWeb, :controller
 
-  alias Tr33ControlWeb.Router.Helpers, as: Routes
+  import Phoenix.LiveView
+  import Phoenix.Component
 
   def on_mount(_, _params, _session, socket) do
     socket =
       assign(socket,
         navbar_content: [
-          {"Presets", Routes.presets_path(socket, :index)},
-          {"Commands", Routes.commands_path(socket, :show, 0)},
-          {"Status", Routes.status_path(socket, :index)}
+          {"Presets", ~p"/presets"},
+          {"Commands", ~p"/commands/0"},
+          {"Status", ~p"/status"}
         ]
       )
 

@@ -43,7 +43,7 @@ defmodule Tr33Control.Commands do
 
   ### Commands ########################################################################################################
 
-  def command_types() do
+  def list_command_types() do
     %Protobuf.OneOfField{fields: fields} = Schemas.CommandParams.defs(:field, :type_params)
 
     fields
@@ -75,7 +75,7 @@ defmodule Tr33Control.Commands do
     end
   end
 
-  def create_command(protobuf) when is_binary(protobuf) do
+  def create_command(protobuf) do
     Command.new(protobuf)
     |> insert_and_notify()
   end
@@ -215,12 +215,19 @@ defmodule Tr33Control.Commands do
     @common_params
   end
 
-  def get_strip_index_options(%Command{targets: [target]}) do
-    Tr33Control.Targets.get_strip_indices_for_target(target)
-    |> Enum.with_index()
+  def get_command_type_param(%Command{} = command) do
+    EnumParam.new(:command_type, Command.type(command), list_command_types())
   end
 
-  def get_strip_index_options(%Command{}), do: []
+  def get_strip_index_param(%Command{targets: [target], params: %CommandParams{} = params}) do
+    options =
+      Tr33Control.Targets.get_strip_indices_for_target(target)
+      |> Enum.with_index()
+
+    EnumParam.new(:strip_index, params.strip_index, options)
+  end
+
+  def get_strip_index_param(%Command{}), do: nil
 
   ### Modifiers ###################################################################################
 

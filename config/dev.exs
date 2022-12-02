@@ -1,6 +1,7 @@
 import Config
 
 config :tr33_control,
+  dev_routes: true,
   udp_debug: false,
   uart_debug: false,
   joystick_debug: false,
@@ -14,7 +15,8 @@ config :tr33_control,
 # watchers to your application. For example, we use it
 # with webpack to recompile .js and .css sources.
 config :tr33_control, Tr33ControlWeb.Endpoint,
-  http: [port: 4000],
+  # http: [port: 4000],
+  http: [ip: {127, 0, 0, 1}, port: 4000],
   debug_errors: true,
   code_reloader: true,
   check_origin: false,
@@ -37,7 +39,7 @@ config :tr33_control, Tr33ControlWeb.Endpoint,
   live_reload: [
     patterns: [
       ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
-      ~r"lib/tr33_control_web/(live|views)/.*(ex)$",
+      ~r"lib/tr33_control_web/*",
       ~r"lib/tr33_control_web/templates/.*(eex)$"
     ]
   ]

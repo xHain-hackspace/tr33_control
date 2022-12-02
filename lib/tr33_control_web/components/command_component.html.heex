@@ -1,0 +1,95 @@
+<div>
+  <h3 class="py-3">Command <%= @command.index + 1 %></h3>
+
+  <.switch name="command_enabled" value={Command.enabled?(@command)} target={@myself} />
+
+  <%= for param <- @enum_params do %>
+    <div class="me-3">
+      <.param_select param={param} target={@myself} />
+    </div>
+  <% end %>
+
+  <div class="d-flex">
+    <%= for param <- @value_params do %>
+      <div class="d-flex flex-column align-items-center m-4" style="width:6rem;">
+        <.param_slider param={param} target={@myself} />
+      </div>
+    <% end %>
+  </div>
+
+  <h4>Targets</h4>
+
+  <div class="list-group" style="width:10rem;">
+    <%= for target <- @command_targets do %>
+      <button
+        type="button"
+        class={"text-center list-group-item list-group-item-action #{if Display.target_active?(@command, target), do: "active", else: "" }"}
+        phx-click="toggle_target"
+        phx-value-target={target}
+        phx-target={@myself}
+      >
+        <%= Display.command_target(target) %>
+      </button>
+    <% end %>
+  </div>
+
+  <%= if @modifiers_active do %>
+    <h4 class="pt-5">Modifiers</h4>
+    <div class="d-flex flex-column">
+      <div class="d-flex justify-content-start">
+        <div class="btn-group my-3">
+          <%= for name <- @modifier_names do %>
+            <button
+              type="button"
+              class={"btn btn-" <> if modifier_active?(@command, name), do: "primary", else: "secondary"}
+              phx-click={if modifier_active?(@command, name), do: "delete_modifier", else: "add_modifier"}
+              phx-value-name={name}
+              phx-target={@myself}
+            >
+              <%= Display.humanize(name) %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+
+      <%= for {name, enums, values} <- @modifier_params do %>
+        <div class="d-flex justify-content-start">
+          <div class="mx-1 my-1">
+            <form class="d-flex input-group" phx-change="update_modifier" phx-target={@myself}>
+              <input name="name" type="hidden" value={name} />
+
+              <button type="button" class="btn btn-secondary text-start fw-bold" style="width: 8rem;" disabled>
+                <%= Display.humanize(name) %>
+              </button>
+
+              <%= for %EnumParam{options: options, name: param_name, value: value} <- enums do %>
+                <button type="button" class="btn btn-secondary ms-2" disabled>
+                  <%= Display.humanize(param_name) %>
+                </button>
+                <select class="form-select custom-select bg-dark" name={param_name} style="min-width:12rem;">
+                  <%= for option <- options do %>
+                    <option value={Atom.to_string(option)} selected={option == value}>
+                      <%= Display.humanize(option) %>
+                    </option>
+                  <% end %>
+                </select>
+              <% end %>
+
+              <%= for %ValueParam{name: param_name, value: value} <- values do %>
+                <button class="btn btn-secondary ms-2" disabled><%= Display.humanize(param_name) %></button>
+                <input
+                  type="text"
+                  class="form-control bg-dark text-body"
+                  style="width:5rem;"
+                  name={param_name}
+                  value={value}
+                  phx-debounce="1500"
+                />
+              <% end %>
+            </form>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</div>

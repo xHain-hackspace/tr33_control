@@ -1,4 +1,4 @@
-defmodule Tr33ControlWeb.CommandHeaderComponent do
+defmodule Tr33ControlWeb.CommandHeaderComponent.Old do
   use Tr33ControlWeb, :live_component
   require Logger
   alias Phoenix.LiveView.Socket

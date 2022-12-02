@@ -2,7 +2,7 @@ defmodule Tr33Control.UdpServer do
   use GenServer
   require Logger
   alias Tr33Control.{Commands, ESP}
-  alias Tr33Control.Commands.Schemas.{WireMessage, TargetMetrics}
+  alias Tr33Control.Commands.Schemas.{WireMessage, TargetMetrics, CommandParams}
 
   @listen_port Application.compile_env!(:tr33_control, :udp_listen_port)
 
@@ -34,9 +34,9 @@ defmodule Tr33Control.UdpServer do
         ESP.handle_metrics(ip, metrics)
         debug_log("Received target metrics #{inspect(metrics)}")
 
-      %WireMessage{message: {:command_params, _}} ->
+      %WireMessage{message: {:command_params, %CommandParams{} = params}} ->
         debug_log("Received command params")
-        Commands.create_command(protobuf)
+        Commands.create_command(params)
         send_ack(socket, ip, port)
 
       other ->

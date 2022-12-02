@@ -34,7 +34,7 @@ defmodule Tr33ControlWeb.PresetsLive do
   end
 
   def handle_event(event, _, socket) when event in ["new", "update", "delete"] do
-    {:noreply, push_patch(socket, to: Routes.presets_path(socket, String.to_existing_atom(event)))}
+    {:noreply, push_patch(socket, to: ~p"/presets/#{String.to_existing_atom(event)}")}
   end
 
   def handle_event("selected_preset_change", %{"name" => name}, socket) do
@@ -60,7 +60,7 @@ defmodule Tr33ControlWeb.PresetsLive do
   end
 
   def handle_event("modal_close", _, socket) do
-    {:noreply, push_patch(socket, to: Routes.presets_path(socket, :index))}
+    {:noreply, push_patch(socket, to: ~p"/presets")}
   end
 
   def handle_event("modal_validate", _, socket) do
@@ -77,7 +77,7 @@ defmodule Tr33ControlWeb.PresetsLive do
       socket
       |> assign(info: %{text: "#{inspect(name)} created", class: "success"})
       |> assign(selected_preset: nil)
-      |> push_patch(to: Routes.presets_path(socket, :index))
+      |> push_patch(to: ~p"/presets")
 
     {:noreply, socket}
   end
@@ -89,7 +89,7 @@ defmodule Tr33ControlWeb.PresetsLive do
       socket
       |> assign(info: %{text: "#{inspect(name)} updated", class: "success"})
       |> assign(selected_preset: nil)
-      |> push_patch(to: Routes.presets_path(socket, :index))
+      |> push_patch(to: ~p"/presets")
 
     {:noreply, socket}
   end
@@ -101,7 +101,7 @@ defmodule Tr33ControlWeb.PresetsLive do
       socket
       |> assign(info: %{text: "#{inspect(name)} deleted", class: "danger"})
       |> assign(selected_preset: nil)
-      |> push_patch(to: Routes.presets_path(socket, :index))
+      |> push_patch(to: ~p"/presets")
 
     {:noreply, socket}
   end

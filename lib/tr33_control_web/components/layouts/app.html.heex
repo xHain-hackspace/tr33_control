@@ -1,0 +1,26 @@
+<main role="main" class="container"></main>
+
+<div class="main p-2">
+  <nav class="navbar navbar-expand-sm navbar-dark bg-primary mb-2">
+    <div class="container-fluid">
+      <a class="navbar-brand pb-0" href="/" style="font-size: 1.5rem">
+        <img
+          class="d-inline-block align-text-center me-3"
+          src={~p"/images/xhain_logo_small.png"}
+          width="100"
+          height="100"
+        /> <%= Application.get_env(:tr33_control, :title, "Control") %>
+      </a>
+
+      <ul class="navbar-nav me-auto">
+        <%= for {name, path} <- @navbar_content do %>
+          <li class="nav-item">
+            <%= live_redirect(name, to: path, class: "nav-link #{if path == @navbar_active_path, do: "active"}") %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  </nav>
+
+  <%= @inner_content %>
+</div>

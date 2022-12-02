@@ -1,4 +1,4 @@
-defmodule Tr33ControlWeb.Inputs do
+defmodule Tr33ControlWeb.Inputs.Old do
   use Phoenix.Component
   alias Tr33Control.Commands.{EnumParam, ValueParam}
   alias Tr33ControlWeb.Display
@@ -30,38 +30,33 @@ defmodule Tr33ControlWeb.Inputs do
       |> assign_new(:id, fn -> name end)
       |> assign(:options, Enum.map(options, &sanetize_option/1))
 
-    # <button type="button" class={ "btn btn-#{label_class(@style)} text-start" }><%= Display.humanize(@display_name) %></button>
-    # <%= if @with_form do %>
-    #   <form phx-change="select_change" phx-target={ @target } phx-auto-recover="ignore">
-    # <% end %>
     ~H"""
-      <div class="row flex-nowrap">
-
-        <%= if @display_name != nil do %>
-          <div class="col-auto">
-            <label for={@id} class="col-form-label"><%= Display.humanize(@display_name) %></label>
-          </div>
-        <% end %>
-
+    <div class="row flex-nowrap">
+      <%= if @display_name != nil do %>
         <div class="col-auto">
-          <select
-            class={"form-select bg-#{@background}"}
-            style={"width: #{@width}rem;"}
-            size={@size}
-            name={@name}
-            id={@id}
-            data-pending-value={@value}
-            {if @hook != nil, do: ['phx-hook': @hook], else: []}
-            {if @tabindex != nil, do: [tabindex: to_string(@tabindex)], else: []}
-            >
-            <%= for {option_name, option_value} <- @options do %>
-              <option value={ option_value } selected={ option_value == @value }  >
-                <%= if @humanize, do: Display.humanize(option_name), else: option_name %>
-              </option>
-            <% end %>
-          </select>
+          <label for={@id} class="col-form-label"><%= Display.humanize(@display_name) %></label>
         </div>
+      <% end %>
+
+      <div class="col-auto">
+        <select
+          class={"form-select bg-#{@background}"}
+          style={"width: #{@width}rem;"}
+          size={@size}
+          name={@name}
+          id={@id}
+          data-pending-value={@value}
+          {if @hook != nil, do: ['phx-hook': @hook], else: []}
+          {if @tabindex != nil, do: [tabindex: to_string(@tabindex)], else: []}
+        >
+          <%= for {option_name, option_value} <- @options do %>
+            <option value={option_value} selected={option_value == @value}>
+              <%= if @humanize, do: Display.humanize(option_name), else: option_name %>
+            </option>
+          <% end %>
+        </select>
       </div>
+    </div>
     """
   end
 
@@ -82,12 +77,12 @@ defmodule Tr33ControlWeb.Inputs do
           type="range"
           class="form-range custom-vertical-range"
           {if @tabindex != nil, do: [tabindex: to_string(@tabindex)]}
-          mix={ @min }
-          max={ @max }
-          value={ @value }
-          step={ @step }
-          name={ @name }
-        >
+          mix={@min}
+          max={@max}
+          value={@value}
+          step={@step}
+          name={@name}
+        />
       </form>
     </div>
     <div class="h5">

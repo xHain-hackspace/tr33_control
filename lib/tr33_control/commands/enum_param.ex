@@ -1,6 +1,5 @@
 defmodule Tr33Control.Commands.EnumParam do
   alias Protobuf.Field
-  alias Tr33Control.Commands.Schemas
 
   @enforce_keys [:name, :options]
   defstruct [:value, :name, :options]
@@ -11,19 +10,15 @@ defmodule Tr33Control.Commands.EnumParam do
       value: Map.fetch!(struct, field_def.name),
       options: apply(type, :atoms, [])
     }
-    |> override(type)
   end
 
   def new(_, _), do: nil
 
-  # defp override(%__MODULE__{} = param, Schemas.ColorPalette) do
-  #   blacklist =
-  #     ~w(HEAT LAVA CLOUD OCEAN_BREEZE RGI RETRO2 ANALOGOUS ANOTHER_SUNSET LANDSCAPE LANDSCAPE2 IB15 COLORFULL BLACK_BLUE_MAGENTA_WHITE BLACK_MAGENTA_RED BLACK_RED_MAGENTA_YELLOW )a
-
-  #   options = Schemas.ColorPalette.atoms() |> Enum.reject(&(&1 in blacklist))
-
-  #   %__MODULE__{param | options: options}
-  # end
-
-  defp override(param, _), do: param
+  def new(name, value, options) do
+    %__MODULE__{
+      name: name,
+      value: value,
+      options: options
+    }
+  end
 end

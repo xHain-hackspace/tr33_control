@@ -8,12 +8,13 @@ defmodule Tr33ControlWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_tr33_control_key",
-    signing_salt: "yqBOxmGU"
+    signing_salt: "yqBOxmGU",
+    same_site: "Lax"
   ]
 
-  socket "/socket", Tr33ControlWeb.UserSocket,
-    websocket: true,
-    longpoll: false
+  # socket "/socket", Tr33ControlWeb.UserSocket,
+  #   websocket: true,
+  #   longpoll: false
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
@@ -25,7 +26,7 @@ defmodule Tr33ControlWeb.Endpoint do
     at: "/",
     from: :tr33_control,
     gzip: false,
-    only: ~w(assets fonts images favicon.ico robots.txt)
+    only: Tr33ControlWeb.static_paths()
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

@@ -1,13 +1,17 @@
 @use 'sass:math';
 
-// $secondary: #003a3e;
+// generator: https://mycolor.space/?hex=%23003A3E&sub=1
 $primary: #003a3e;
+// $secondary: #82b4b8;
 $warning: #ffc400;
+$danger: #872200;
+$success: #00c59b;
 
 
 // original: $web-font-path: "https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,400;0,700;1,400&display=swap";
 // loaded by bootswatch
 $web-font-path: "";
+
 @font-face {
   font-family: 'Lato';
   font-style: italic;
@@ -15,6 +19,7 @@ $web-font-path: "";
   font-display: swap;
   src: url(/fonts/S6u8w4BMUTPHjxswWw.ttf) format('truetype');
 }
+
 @font-face {
   font-family: 'Lato';
   font-style: normal;
@@ -22,6 +27,7 @@ $web-font-path: "";
   font-display: swap;
   src: url(/fonts/S6uyw4BMUTPHvxk.ttf) format('truetype');
 }
+
 @font-face {
   font-family: 'Lato';
   font-style: normal;
@@ -54,11 +60,11 @@ input[type=range] {
 }
 
 .custom-vertical-range-container {
-  height: $range_height; 
-  width: $range_width;  
+  height: $range_height;
+  width: $range_width;
 }
 
-.custom-vertical-range {  
+.custom-vertical-range {
   width: $range_height;
   transform: translateX(-1 * (math.div($range_height, 2) - math.div($range_width, 2))) translateY(math.div($range_height, 2) - 0.75rem) rotate(270deg);
 }
@@ -66,45 +72,45 @@ input[type=range] {
 .custom-vertical-range::-moz-range-thumb {
   width: 1.75rem;
   height: 5rem;
-  background: $primary; 
+  background: $primary;
   cursor: pointer;
   border-radius: 0.2rem;
 }
 
 .custom-vertical-range::-moz-range-thumb:focus {
-  background: $warning; 
+  background: $warning;
 }
 
 .custom-vertical-range:focus::-moz-range-thumb {
-  background: $warning; 
+  background: $warning;
 }
 
-.custom-vertical-range::-webkit-slider-thumb {    
+.custom-vertical-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   width: 1.75rem;
   height: 5rem;
   margin-top: -2.3rem;
-  background: $primary; 
+  background: $primary;
   cursor: pointer;
   border-radius: 0.2rem;
 }
 
-.custom-vertical-range::-webkit-slider-runnable-track {    
+.custom-vertical-range::-webkit-slider-runnable-track {
   height: 0.4rem;
-  background: $light;    
+  background: $light;
   border-radius: 0.2rem;
 }
 
-.custom-vertical-range::-moz-range-track {    
+.custom-vertical-range::-moz-range-track {
   height: 0.4rem;
-  background: $secondary;    
+  background: $secondary;
   border-radius: 0.2rem;
 }
 
 .modal {
-  display:block;
+  display: block;
 }
 
 .modal-backdrop {
-  opacity:0.7;
+  opacity: 0.7;
 }

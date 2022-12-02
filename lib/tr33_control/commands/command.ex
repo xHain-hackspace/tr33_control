@@ -1,8 +1,9 @@
 defmodule Tr33Control.Commands.Command do
   use Ecto.Schema
 
+  alias Protobuf.Serializable.Tr33Control.Commands.Schemas.WireMessage
   alias Protobuf.Field
-  alias Tr33Control.Commands.Schemas.{CommandParams, Modifier}
+  alias Tr33Control.Commands.Schemas.{CommandParams, Modifier, WireMessage}
 
   @active_targets Application.compile_env!(:tr33_control, :active_targets)
   @hash_size 32
@@ -25,9 +26,14 @@ defmodule Tr33Control.Commands.Command do
     |> new_type_params(type)
   end
 
+  # todo: is this needed?
   def new(protobuf) when is_binary(protobuf) do
-    params = %CommandParams{} = CommandParams.decode(protobuf)
+    params = %CommandParams{} = CommandParams.decode(protobuf) |> IO.inspect()
 
+    new(params)
+  end
+
+  def new(%CommandParams{} = params) do
     %__MODULE__{
       index: params.index,
       params: params
@@ -80,4 +86,6 @@ defmodule Tr33Control.Commands.Command do
   def type(%__MODULE__{params: %CommandParams{type_params: {type, _}}}), do: type
 
   def type_params(%__MODULE__{params: %CommandParams{type_params: {_, type_params}}}), do: type_params
+
+  def enabled?(%__MODULE__{params: %CommandParams{enabled: enabled}}), do: enabled
 end
