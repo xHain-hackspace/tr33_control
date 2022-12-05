@@ -3,7 +3,7 @@ export CACHE_PERSIST_DIR = $(HOME)/.tr33_cache
 
 init: deps-get assets-install
 
-console:
+console: deps-get
 	iex -S mix phx.server
 
 deps-get:
