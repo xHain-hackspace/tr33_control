@@ -413,9 +413,9 @@ h2.section_headline {
 .the_fader {
   background: transparent url(/images/fader_grid.svg) center/calc(100% - 46px) no-repeat;
   height: 34px;
-  transform: translateX(0px) translateY(148px) rotate(270deg);
+  transform: translateX(42px) translateY(324px) rotate(270deg);
   width: 320px;
-  transform-origin: center;
+  transform-origin: left top;
 }
 
 .the_fader::-moz-range-track {
@@ -427,6 +427,7 @@ h2.section_headline {
 .one_fader .fader_form {
   position: relative;
   height: 320px;
+  width: 120px;
 }
 
 .one_fader .fader_form::before {
@@ -546,6 +547,8 @@ h2.section_headline {
   background-color: rgb(107, 107, 107);
   margin: 12px;
 }
+
+// ### RESPONSIVE ###
 
 @media screen and (min-width: 1081px) {
   .modefier_wrap {
