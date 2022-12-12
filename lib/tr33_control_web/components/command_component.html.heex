@@ -1,16 +1,19 @@
-
 <div class="one_cmd_wrap">
   <h2 class="section_headline">command settings</h2>
   <div class="one_cmd_option">
-      <!-- well, at least an unique id -->
+    <!-- well, at least an unique id -->
     <label for={"cmd_nummer_#{@command.index + 1}"} class="cmd_option_label label_for_select">command</label>
-    <select class="option_select" name="cmd_nummer" id={"cmd_nummer_#{@command.index + 1}"} data-pending-value={@command.index + 1}>
-    <!-- hacky solution and doesn't work for selecting commands -->
-      <%= all_nums = [1,2,3,4,5,6,7,8]
-      all_nums_lit = ["one","two","three","four","five","six","seven","eight"] # : ( nicht hingekriegt
-      for num <- all_nums do %>
-        <option value={num} selected={num == (@command.index + 1)}>
-          <%= Display.humanize(num) %>
+    <select
+      class="option_select"
+      name="cmd_nummer"
+      id={"cmd_nummer_#{@command.index + 1}"}
+      data-pending-value={@command.index + 1}
+    >
+      <!-- hacky solution and doesn't work for selecting commands -->
+      <%= options = [{1, "one"},{2, "two"},{3, "three"},{4, "four"},{5, "five"}, {6, "six"},{7, "seven"},{8, "eight"}]
+      for {num, num_lit } <- options do %>
+        <option value={num} selected={num == @command.index + 1}>
+          <%= Display.humanize(num_lit) %>
         </option>
       <% end %>
     </select>
@@ -25,7 +28,6 @@
   <% end %>
 
   <div class="fader_wrap">
-
     <%= for param <- @value_params do %>
       <div class="one_fader">
         <.param_slider param={param} target={@myself} />
@@ -50,33 +52,32 @@
 
   <%= if @modifiers_active do %>
     <div class="one_cmd_paras beflipped">
-    <h4>Modifiers</h4>
-          <%= for name <- @modifier_names do %>
-            <button
-              type="button"
-              class={"btn flippy btn-" <> if modifier_active?(@command, name), do: "primary active", else: "secondary"}
-              phx-click={if modifier_active?(@command, name), do: "delete_modifier", else: "add_modifier"}
-              phx-value-name={name}
-              phx-target={@myself}
-            >
-              <%= Display.humanize(name) %>
-            </button>
-          <% end %>
+      <h4>Modifiers</h4>
+      <%= for name <- @modifier_names do %>
+        <button
+          type="button"
+          class={"btn flippy btn-" <> if modifier_active?(@command, name), do: "primary active", else: "secondary"}
+          phx-click={if modifier_active?(@command, name), do: "delete_modifier", else: "add_modifier"}
+          phx-value-name={name}
+          phx-target={@myself}
+        >
+          <%= Display.humanize(name) %>
+        </button>
+      <% end %>
     </div>
 
     <h2 class="section_headline">modefiers settings</h2>
 
     <div class="modefier_wrap">
-
       <%= for {name, enums, values} <- @modifier_params do %>
         <form class="one_modefier" phx-change="update_modifier" phx-target={@myself}>
-        <!-- maybe better as parameter -->
+          <!-- maybe better as parameter -->
           <div class="one_cmd_option">
             <label for={name} class="cmd_option_label ">modefier</label>
             <select class="option_select" name={name} id={name}>
-                <option value={name} selected>
-                  <%= Display.humanize(name) %>
-                </option>
+              <option value={name} selected>
+                <%= Display.humanize(name) %>
+              </option>
             </select>
           </div>
 
@@ -84,7 +85,9 @@
 
           <%= for %EnumParam{options: options, name: param_name, value: value} <- enums do %>
             <div class="one_cmd_option">
-              <label for={param_name} class="cmd_option_label label_for_select"><%= Display.humanize(param_name) %></label>
+              <label for={param_name} class="cmd_option_label label_for_select">
+                <%= Display.humanize(param_name) %>
+              </label>
               <select class="option_select" name={param_name} id={param_name}>
                 <%= for option <- options do %>
                   <option value={Atom.to_string(option)} selected={option == value}>
@@ -106,7 +109,7 @@
                 value={value}
                 phx-debounce="1500"
               />
-              </div>
+            </div>
           <% end %>
         </form>
       <% end %>

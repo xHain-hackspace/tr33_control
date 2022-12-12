@@ -2,7 +2,6 @@ defmodule Tr33ControlWeb.InputComponents do
   use Phoenix.Component
 
   alias Tr33Control.Commands.{ValueParam, EnumParam}
-  alias Tr33Control.Commands
   alias Tr33Control.Commands.{Command}
   alias Tr33ControlWeb.Display
 
@@ -22,7 +21,12 @@ defmodule Tr33ControlWeb.InputComponents do
     assigns = assign(assigns, btn_class: btn_class)
 
     ~H"""
-    <button type="button" class={["btn one_cmd_btn", @btn_class]} phx-click="set_active_command" phx-value-index={@command.index}>
+    <button
+      type="button"
+      class={["btn one_cmd_btn", @btn_class]}
+      phx-click="set_active_command"
+      phx-value-index={@command.index}
+    >
       <div class="the_cmd_index">Command <%= @command.index + 1 %></div>
       <div class="the_cmd_name"><%= Command.type(@command) |> Display.humanize() %></div>
       <!-- -> "disabled" doesn't seem to work and solved with css
@@ -52,32 +56,23 @@ defmodule Tr33ControlWeb.InputComponents do
     <div class="fader_display">
       <div class="param_name cmd_option_label">
         <%= Display.humanize(@name) %>
-        </div>
-        <div class="param_value">
-          <span class="all_7_segments">888</span>
-          <span class="the_value_display"><%= Display.humanize(round(@value/2.55)) %></span>
-          <span class="the_unit in_percent">
+      </div>
+      <div class="param_value">
+        <span class="all_7_segments">888</span>
+        <span class="the_value_display"><%= Display.humanize(round(@value / 2.55)) %></span>
+        <span class="the_unit in_percent">
           <!-- TODO: choose css class: in_percent, in_seconds or in_pixel; could be higher in DOM ? -->
-            <div>%</div>
-            <div>s</div>
-            <div>px</div>
-          </span>
-        </div>
+          <div>%</div>
+          <div>s</div>
+          <div>px</div>
+        </span>
+      </div>
     </div>
     <form class="fader_form" phx-change="slider_change" phx-auto-recover="ignore" phx-target={@target}>
-      <input
-        type="range"
-        class="the_fader"
-        mix={@min}
-        max={@max}
-        value={@value}
-        step={@step}
-        name={@name}
-      />
+      <input type="range" class="the_fader" mix={@min} max={@max} value={@value} step={@step} name={@name} />
     </form>
-      """
+    """
   end
-
 
   attr :param, EnumParam, required: true
   attr :target, :string, default: nil
@@ -111,12 +106,12 @@ defmodule Tr33ControlWeb.InputComponents do
   def switch(assigns) do
     ~H"""
     <form class="on_off_switch" phx-change="switch_change" phx-auto-recover="ignore" phx-target={@target}>
-        <label class="cmd_option_label">Status</label>
-        <input class="one_check_input" type="checkbox" name={@name} checked={@value} />
-        <span class="the_unit on_off">
-          <div>enabled</div>
-          <div>disengaged</div>
-        </span>
+      <label class="cmd_option_label">Status</label>
+      <input class="one_check_input" type="checkbox" name={@name} checked={@value} />
+      <span class="the_unit on_off">
+        <div>enabled</div>
+        <div>disengaged</div>
+      </span>
     </form>
     """
   end
