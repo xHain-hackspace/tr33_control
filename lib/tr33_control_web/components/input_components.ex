@@ -79,7 +79,6 @@ defmodule Tr33ControlWeb.InputComponents do
   end
 
 
-
   attr :param, EnumParam, required: true
   attr :target, :string, default: nil
 

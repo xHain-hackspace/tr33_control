@@ -548,20 +548,7 @@ h2.section_headline {
 }
 
 @media screen and (min-width: 1081px) {
-  .cmd_btn_wrap {
-    // justify-content: center;
-  }
-
-  .one_cmd_wrap {
-    // grid-template-columns: repeat(4, 25%);
-  }
-
-  .fader_wrap {
-    // grid-row: span 2;
-  }
-
   .modefier_wrap {
-    // grid-column: span 4;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   }
