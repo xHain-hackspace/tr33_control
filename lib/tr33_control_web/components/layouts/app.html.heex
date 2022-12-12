@@ -12,7 +12,7 @@
         /> <%= Application.get_env(:tr33_control, :title, "Control") %>
       </a>
 
-      <ul class="navbar-nav me-auto">
+      <ul class="navbar-nav">
         <%= for {name, path} <- @navbar_content do %>
           <li class="nav-item">
             <%= live_redirect(name, to: path, class: "nav-link #{if path == @navbar_active_path, do: "active"}") %>
@@ -22,5 +22,6 @@
     </div>
   </nav>
 
+  <h2 class="section_headline">commands</h2>
   <%= @inner_content %>
 </div>

@@ -1,4 +1,4 @@
-<div class="container-fluid ps-0">
+<div class="cmd_btn_wrap">
   <%= for command = %Command{} <- @commands do %>
     <.command_button command={command} active={command.index == @active_command_index} />
   <% end %>
