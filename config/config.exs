@@ -15,67 +15,77 @@ config :tr33_control,
   command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :beat_equalizer],
   active_targets: [:wand, :wolken],
   target_configs: %{
-    tr33: %{
-      strip_indices: [
-        :all,
-        :all_trunks,
-        :all_branches,
-        :trunk_1,
-        :trunk_2,
-        :trunk_3,
-        :trunk_4,
-        :trunk_5,
-        :trunk_6,
-        :trunk_7,
-        :trunk_8,
-        :branch_1,
-        :branch_2,
-        :branch_3,
-        :branch_4,
-        :branch_5,
-        :branch_6,
-        :branch_7,
-        :branch_8,
-        :branch_9,
-        :branch_10,
-        :branch_11,
-        :branch_12
-      ]
-    },
+    tr33:
+      %{
+        # strip_indices: [
+        #   :all,
+        #   :all_trunks,
+        #   :all_branches,
+        #   :trunk_1,
+        #   :trunk_2,
+        #   :trunk_3,
+        #   :trunk_4,
+        #   :trunk_5,
+        #   :trunk_6,
+        #   :trunk_7,
+        #   :trunk_8,
+        #   :branch_1,
+        #   :branch_2,
+        #   :branch_3,
+        #   :branch_4,
+        #   :branch_5,
+        #   :branch_6,
+        #   :branch_7,
+        #   :branch_8,
+        #   :branch_9,
+        #   :branch_10,
+        #   :branch_11,
+        #   :branch_12
+        # ]
+      },
     wolken: %{
-      name_regex: ~r/Wolke/,
-      strip_indices: [
-        :all,
-        :wolke_1,
-        :wolke_2,
-        :wolke_3,
-        :wolke_4,
-        :wolke_5,
-        :wolke_6,
-        :wolke_7,
-        :wolke_8,
-        :wolke_9,
-        :wolke_10,
-        :wolke_11,
-        :wolke_12,
-        :wolke_13
-      ]
+      name_regex: ~r/Wolke/
+      # strip_indices: [
+      #   :all,
+      #   :wolke_1,
+      #   :wolke_2,
+      #   :wolke_3,
+      #   :wolke_4,
+      #   :wolke_5,
+      #   :wolke_6,
+      #   :wolke_7,
+      #   :wolke_8,
+      #   :wolke_9,
+      #   :wolke_10,
+      #   :wolke_11,
+      #   :wolke_12,
+      #   :wolke_13
+      # ]
     },
-    ranken: %{
-      strip_indices: [
-        :all,
-        :strip_1,
-        :strip_2,
-        :strip_3,
-        :strip_4,
-        :strip_5,
-        :strip_6,
-        :strip_7,
-        :strip_8,
-        :strip_9,
-        :strip_10
-      ]
-    },
+    ranken:
+      %{
+        # strip_indices: [
+        #   :all,
+        #   :strip_1,
+        #   :strip_2,
+        #   :strip_3,
+        #   :strip_4,
+        #   :strip_5,
+        #   :strip_6,
+        #   :strip_7,
+        #   :strip_8,
+        #   :strip_9,
+        #   :strip_10
+        # ]
+      },
+    wand:
+      %{
+        # strip_indices: [
+        #   :all,
+        #   :foo,
+        #   :baa
+        # ]
+      },
     dev: %{
       name_regex: ~r/dev/
     }

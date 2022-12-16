@@ -220,11 +220,11 @@ defmodule Tr33Control.Commands do
   end
 
   def get_strip_index_param(%Command{targets: [target], params: %CommandParams{} = params}) do
-    options =
-      Tr33Control.Targets.get_strip_indices_for_target(target)
-      |> Enum.with_index()
-
-    EnumParam.new(:strip_index, params.strip_index, options)
+    case Tr33Control.ESP.get_strip_indices_for_target(target) do
+      [] -> nil
+      [0] -> nil
+      options -> EnumParam.new(:strip_index, params.strip_index, options)
+    end
   end
 
   def get_strip_index_param(%Command{}), do: nil

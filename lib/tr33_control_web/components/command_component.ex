@@ -4,19 +4,15 @@ defmodule Tr33ControlWeb.CommandComponent do
   require Logger
 
   alias Phoenix.LiveView.Socket
-  alias Tr33Control.{Commands, Targets}
+  alias Tr33Control.{Commands, ESP}
   alias Tr33Control.Commands.{Command, EnumParam, ValueParam}
-  alias Tr33ControlWeb.{Display, Inputs, Components}
+  alias Tr33ControlWeb.{Display}
 
   def mount(socket) do
-    if connected?(socket) do
-      Commands.subscribe_commands()
-    end
-
     socket =
       socket
-      |> assign(command_targets: Targets.active_targets())
       |> assign(modifiers_active: true)
+      |> update_targets()
 
     {:ok, socket}
   end
@@ -40,6 +36,12 @@ defmodule Tr33ControlWeb.CommandComponent do
   # command update, but its index does not match the active one. Ignore
   def update(%{command: _}, socket) do
     {:ok, socket}
+  end
+
+  # update without assigns, update targets
+
+  def update(%{}, socket) do
+    {:ok, update_targets(socket)}
   end
 
   def handle_event("palette_change", %{"color_palette" => color_palette}, %Socket{} = socket) do
@@ -215,9 +217,7 @@ defmodule Tr33ControlWeb.CommandComponent do
   defp update_command(%Socket{} = socket, command) do
     color_palette_param = Commands.get_common_enum_param(command, :color_palette)
     command_type_param = Commands.get_command_type_param(command)
-    # todo
-    # stip_index_param = Commands.get_strip_index_param(command)
-    stip_index_param = nil
+    stip_index_param = Commands.get_strip_index_param(command)
 
     enum_params =
       ([command_type_param, color_palette_param, stip_index_param] ++ Commands.list_enum_params(command))
@@ -232,6 +232,11 @@ defmodule Tr33ControlWeb.CommandComponent do
     |> assign(enum_params: enum_params)
     |> assign(modifier_names: Commands.list_modifier_names(command))
     |> assign(modifier_params: Commands.get_modifier_params(command))
+  end
+
+  def update_targets(%Socket{} = socket) do
+    socket
+    |> assign(command_targets: ESP.active_targets())
   end
 
   defp update_param(index, name, value) do

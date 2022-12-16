@@ -2,7 +2,7 @@ defmodule Tr33Control.ESP.Poller do
   # todo delete
   use GenServer
   require Logger
-  alias Tr33Control.ESP
+  # alias Tr33Control.ESP
 
   @tick_interval 60_000
 
@@ -16,7 +16,7 @@ defmodule Tr33Control.ESP.Poller do
   end
 
   def handle_info(:tick, state) do
-    ESP.reconnect()
+    # ESP.reconnect()
 
     {:noreply, state}
   end

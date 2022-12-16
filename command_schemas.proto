@@ -323,4 +323,5 @@ message TargetMetrics {
   required int32 wifi_strength = 3;  
   required string version = 4 [(nanopb).max_length = 20];
   repeated bytes hashes = 5 [(nanopb).max_size = 4, (nanopb).max_count = 8];
+  required int32 max_strip_index = 6;  
 }

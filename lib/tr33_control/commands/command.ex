@@ -1,7 +1,6 @@
 defmodule Tr33Control.Commands.Command do
   use Ecto.Schema
 
-  alias Protobuf.Serializable.Tr33Control.Commands.Schemas.WireMessage
   alias Protobuf.Field
   alias Tr33Control.Commands.Schemas.{CommandParams, Modifier, WireMessage}
 

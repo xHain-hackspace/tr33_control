@@ -4,13 +4,15 @@ defmodule Tr33ControlWeb.CommandsLive do
   require Logger
 
   alias Phoenix.LiveView.Socket
-  alias Tr33Control.{Commands}
+  alias Tr33Control.{Commands, ESP}
   alias Tr33Control.Commands.Command
+  alias Tr33Control.ESP.UDP
   alias Tr33ControlWeb.{CommandComponent}
 
   def mount(_params, _session, socket) do
     if connected?(socket) do
       Commands.subscribe_commands()
+      ESP.UDP.subscribe()
     end
 
     socket =
@@ -98,6 +100,16 @@ defmodule Tr33ControlWeb.CommandsLive do
         socket
       end
 
+    {:noreply, fetch(socket)}
+  end
+
+  def handle_info({:target_update, %UDP{connection_status: :started}}, socket) do
+    send_update(CommandComponent, id: "active_command")
+
+    {:noreply, fetch(socket)}
+  end
+
+  def handle_info({:target_update, %UDP{connection_status: _}}, socket) do
     {:noreply, fetch(socket)}
   end
 

@@ -1,7 +1,7 @@
 defmodule Tr33Control.ESP.UDP do
   use GenServer
   require Logger
-  alias Tr33Control.{Commands, ESP, Joystick, Targets}
+  alias Tr33Control.{Commands, ESP, Joystick}
   alias Tr33Control.Commands.Command
   alias Tr33Control.Commands.Schemas.TargetMetrics
 
@@ -26,13 +26,17 @@ defmodule Tr33Control.ESP.UDP do
 
   def subscribe(), do: Phoenix.PubSub.subscribe(Tr33Control.PubSub, @pubsub_topic)
 
-  def notify_subscribers(%__MODULE__{} = state) do
+  def notify_target_update(%__MODULE__{} = state) do
     Phoenix.PubSub.broadcast!(Tr33Control.PubSub, @pubsub_topic, {:target_update, state})
     state
   end
 
   def handle_metrics(pid, %TargetMetrics{} = tm) when is_pid(pid) do
     GenServer.cast(pid, {:metrics, tm})
+  end
+
+  def get_metrics(pid) when is_pid(pid) do
+    GenServer.call(pid, :get_metrics)
   end
 
   def start_link({_ip, %TargetMetrics{} = _target_metrics} = args) do
@@ -107,10 +111,15 @@ defmodule Tr33Control.ESP.UDP do
       %__MODULE__{state | last_metrics: System.os_time(:millisecond)}
       |> set_connection_state(new_connection_state)
       |> update_target_metrics(tm)
+      |> notify_target_update()
 
     state = Enum.reduce(resync_commands, state, fn command, state_acc -> maybe_enqueue(state_acc, command) end)
 
     {:noreply, state}
+  end
+
+  def handle_call(:get_metrics, _from, %__MODULE__{target_metrics: tm} = state) do
+    {:reply, tm, state}
   end
 
   def handle_info({:command_update, %Command{} = command}, state) do
@@ -146,7 +155,7 @@ defmodule Tr33Control.ESP.UDP do
   end
 
   def handle_info(:send_state, state) do
-    notify_subscribers(state)
+    notify_target_update(state)
     {:noreply, state}
   end
 
@@ -215,17 +224,17 @@ defmodule Tr33Control.ESP.UDP do
     end
   end
 
-  def set_connection_state(%__MODULE__{connection_status: status} = state, status), do: notify_subscribers(state)
+  def set_connection_state(%__MODULE__{connection_status: status} = state, status), do: state
 
   def set_connection_state(%__MODULE__{connection_status: old} = state, new) do
     debug_log(state, "Changed connection from #{old} to #{new}")
 
     %__MODULE__{state | connection_status: new}
-    |> notify_subscribers()
+    |> notify_target_update()
   end
 
   defp update_target_metrics(%__MODULE__{} = state, %TargetMetrics{} = tm) do
-    %__MODULE__{state | target_metrics: tm, target: Targets.get_target_from_metrics(tm)}
+    %__MODULE__{state | target_metrics: tm, target: ESP.get_target_from_metrics(tm)}
   end
 
   defp debug_log(%__MODULE__{target_metrics: %TargetMetrics{} = tm}, message) do
