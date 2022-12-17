@@ -57,22 +57,22 @@ defmodule Tr33Control.ESP do
     {:ok, _pid} = Registry.register(@udp_registry, ip, :foo)
   end
 
-  def list_target_metrics() do
+  def list_targets() do
     UDPSupervisor.children()
-    |> Enum.map(fn {_, pid, _, [UDP]} -> UDP.get_metrics(pid) end)
+    |> Enum.map(fn {_, pid, _, [UDP]} -> {pid, UDP.get_metrics(pid)} end)
   end
 
   def active_targets() do
-    list_target_metrics()
-    |> Enum.map(fn %TargetMetrics{} = tm -> get_target_from_metrics(tm) end)
+    list_targets()
+    |> Enum.map(fn {_pid, %TargetMetrics{} = tm} -> get_target_from_metrics(tm) end)
     |> Enum.uniq()
   end
 
   def get_strip_indices_for_target(target) do
-    list_target_metrics()
-    |> Enum.find(fn %TargetMetrics{} = tm -> get_target_from_metrics(tm) == target end)
+    list_targets()
+    |> Enum.find(fn {_pid, %TargetMetrics{} = tm} -> get_target_from_metrics(tm) == target end)
     |> case do
-      %TargetMetrics{max_strip_index: max_strip_index} ->
+      {_, %TargetMetrics{max_strip_index: max_strip_index}} ->
         0..max_strip_index
         |> Enum.into([])
 

@@ -29,10 +29,6 @@ defmodule Tr33ControlWeb.InputComponents do
     >
       <div class="the_cmd_index">Command <%= @command.index + 1 %></div>
       <div class="the_cmd_name"><%= Command.type(@command) |> Display.humanize() %></div>
-      <!-- -> "disabled" doesn't seem to work and solved with css
-      <%!-- <%= if not Command.enabled?(@command) do %>
-        <div>disabled</div>
-      <% end %> --%> -->
       <div class="the_cmd_light"></div>
     </button>
     """
@@ -51,6 +47,8 @@ defmodule Tr33ControlWeb.InputComponents do
       |> assign(max: param.max)
       |> assign(step: param.step)
       |> assign(name: param.name)
+      |> assign(type: param.type)
+      |> assign(palette: param.color_palette)
 
     ~H"""
     <div class="fader_display">
@@ -58,14 +56,37 @@ defmodule Tr33ControlWeb.InputComponents do
         <%= Display.humanize(@name) %>
       </div>
       <div class="param_value">
-        <span class="all_7_segments">888</span>
-        <span class="the_value_display"><%= Display.humanize(round(@value / 2.55)) %></span>
-        <span class="the_unit in_percent">
-          <!-- TODO: choose css class: in_percent, in_seconds or in_pixel; could be higher in DOM ? -->
-          <div>%</div>
-          <div>s</div>
-          <div>px</div>
-        </span>
+        <!-- TODO: This is an example of how to use the param type -->
+        <%= case @type do %>
+          <% :percent -> %>
+            <span class="all_7_segments">888</span>
+            <span class="the_value_display"><%= Display.humanize(round(@value / 2.55)) %></span>
+            <span class="the_unit in_percent">
+              <div>%</div>
+              <div>s</div>
+              <div>px</div>
+            </span>
+          <% :time -> %>
+            <span class="all_7_segments">8888</span>
+            <span class="the_value_display"><%= Display.humanize(@value / 10) %></span>
+            <span class="the_unit in_seconds">
+              <!-- TODO: choose css class: in_percent, in_seconds or in_pixel; could be higher in DOM ? -->
+              <div>%</div>
+              <div>s</div>
+              <div>px</div>
+            </span>
+          <% :count -> %>
+            <span class="all_7_segments">888</span>
+            <span class="the_value_display"><%= Display.humanize(@value) %></span>
+            <span class="the_unit">
+              <div>%</div>
+              <div>s</div>
+              <div>px</div>
+            </span>
+          <% :color -> %>
+            <div style={"margin-left: 15px; height: 30px; width: 30px; background-color: #{hex_color_from_palette(@palette, @value)}"}>
+            </div>
+        <% end %>
       </div>
     </div>
     <form class="fader_form" phx-change="slider_change" phx-auto-recover="ignore" phx-target={@target}>
@@ -114,5 +135,11 @@ defmodule Tr33ControlWeb.InputComponents do
       </span>
     </form>
     """
+  end
+
+  defp hex_color_from_palette(palette, color_index) do
+    {r, g, b} = Tr33Control.ColorPalettes.color_from_palette(palette, color_index)
+
+    "##{Integer.to_string(r, 16) |> String.pad_leading(2, "0")}#{Integer.to_string(g, 16) |> String.pad_leading(2, "0")}#{Integer.to_string(b, 16) |> String.pad_leading(2, "0")}"
   end
 end

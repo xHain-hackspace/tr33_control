@@ -35,6 +35,10 @@ defmodule Tr33Control.ESP.UDP do
     GenServer.cast(pid, {:metrics, tm})
   end
 
+  def color_palette_request(pid, palette) do
+    GenServer.cast(pid, {:color_palette_request, palette})
+  end
+
   def get_metrics(pid) when is_pid(pid) do
     GenServer.call(pid, :get_metrics)
   end
@@ -118,6 +122,12 @@ defmodule Tr33Control.ESP.UDP do
     {:noreply, state}
   end
 
+  def handle_cast({:color_palette_request, _} = request, %__MODULE__{} = state) do
+    state = maybe_enqueue(state, request)
+
+    {:noreply, state}
+  end
+
   def handle_call(:get_metrics, _from, %__MODULE__{target_metrics: tm} = state) do
     {:reply, tm, state}
   end
@@ -170,6 +180,7 @@ defmodule Tr33Control.ESP.UDP do
             case item do
               command = %Command{} -> Commands.command_binary(command, target)
               joystick = %Joystick{} -> Commands.joystick_event_binary(joystick)
+              {:color_palette_request, palette} -> Commands.color_palette_request_binary(palette)
             end
 
           transmit_binary(binary, state)

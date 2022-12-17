@@ -1,6 +1,6 @@
 defmodule Tr33Control.Commands do
-  alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset}
-  alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent}
+  alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset, ValueParamTypes}
+  alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent, ColorPaletteRequest}
 
   @command_type_blacklist Application.compile_env!(:tr33_control, :command_type_blacklist)
   @commands_topic "command_updates"
@@ -189,7 +189,7 @@ defmodule Tr33Control.Commands do
     type_params = Command.type_params(command)
 
     Command.list_type_field_defs(command)
-    |> Enum.map(&ValueParam.new(type_params, &1))
+    |> Enum.map(&ValueParam.new(type_params, &1, command))
     |> Enum.reject(&is_nil/1)
   end
 
@@ -434,6 +434,13 @@ defmodule Tr33Control.Commands do
       )
 
     WireMessage.new(message: {:joystick_event, joystick_event})
+    |> WireMessage.encode()
+  end
+
+  def color_palette_request_binary(palette) do
+    request = ColorPaletteRequest.new(color_palette: palette)
+
+    WireMessage.new(message: {:color_palette_request, request}, sequence: 0)
     |> WireMessage.encode()
   end
 
