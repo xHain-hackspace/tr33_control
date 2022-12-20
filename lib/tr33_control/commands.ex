@@ -1,5 +1,5 @@
 defmodule Tr33Control.Commands do
-  alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset, ValueParamTypes}
+  alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset}
   alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent, ColorPaletteRequest}
 
   @command_type_blacklist Application.compile_env!(:tr33_control, :command_type_blacklist)
