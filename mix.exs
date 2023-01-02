@@ -41,7 +41,7 @@ defmodule Tr33Control.MixProject do
       {:jason, "~> 1.2"},
       {:plug_cowboy, "~> 2.5"},
       # own
-      {:circuits_uart, "~> 1.2"},
+      # {:circuits_uart, "~> 1.2"},
       {:nerves_leds, "~> 0.8"},
       {:input_event, "~> 1.0"},
       {:cachex, "~> 3.3"},
