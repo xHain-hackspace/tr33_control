@@ -1,22 +1,11 @@
 <div class="one_cmd_wrap">
   <h2 class="section_headline">command settings</h2>
-  <div class="one_cmd_option">
-    <!-- well, at least an unique id -->
-    <label for={"cmd_nummer_#{@command.index + 1}"} class="cmd_option_label label_for_select">command</label>
-    <select
-      class="option_select"
-      name="cmd_nummer"
-      id={"cmd_nummer_#{@command.index + 1}"}
-      data-pending-value={@command.index + 1}
-    >
-      <!-- hacky solution and doesn't work for selecting commands -->
-      <%= options = [{1, "one"},{2, "two"},{3, "three"},{4, "four"},{5, "five"}, {6, "six"},{7, "seven"},{8, "eight"}]
-      for {num, num_lit } <- options do %>
-        <option value={num} selected={num == @command.index + 1}>
-          <%= Display.humanize(num_lit) %>
-        </option>
-      <% end %>
-    </select>
+  <div class="one_cmd_output one_digit">
+    <label class="cmd_output_label">command</label>
+    <div class="cmd_output_display">
+      <span class="all_7_seg_letters">8</span>
+      <span class="cmd_output_value"> <%= Display.humanize(@command.index + 1) %> </span>
+    </div>
   </div>
 
   <.switch name="command_enabled" value={Command.enabled?(@command)} target={@myself} />
@@ -66,19 +55,16 @@
       <% end %>
     </div>
 
-    <h2 class="section_headline">modefiers settings</h2>
-
     <div class="modefier_wrap">
       <%= for {name, enums, values} <- @modifier_params do %>
         <form class="one_modefier" phx-change="update_modifier" phx-target={@myself}>
-          <!-- maybe better as parameter -->
-          <div class="one_cmd_option">
-            <label for={name} class="cmd_option_label ">modefier</label>
-            <select class="option_select" name={name} id={name}>
-              <option value={name} selected>
-                <%= Display.humanize(name) %>
-              </option>
-            </select>
+
+          <div class="one_cmd_output">
+            <label class="cmd_output_label">modefier</label>
+            <div class="cmd_output_display">
+              <span class="all_7_seg_letters">88888888888</span>
+              <span class="cmd_output_value"> <%= Display.humanize(name) %> </span>
+            </div>
           </div>
 
           <input name="name" type="hidden" value={name} />

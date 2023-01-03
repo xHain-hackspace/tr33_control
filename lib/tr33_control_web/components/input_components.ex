@@ -40,6 +40,13 @@ defmodule Tr33ControlWeb.InputComponents do
   attr :target, :string, default: nil
 
   def param_slider(%{param: %ValueParam{} = param} = assigns) do
+    fader_class =
+      case {param.type} do
+        {:time} -> "in_seconds"
+        {:percent} -> "in_percent"
+        {:count} -> "in_pixel"
+        {:color} -> "in_color"
+      end
     assigns =
       assigns
       |> assign(value: param.value)
@@ -49,9 +56,12 @@ defmodule Tr33ControlWeb.InputComponents do
       |> assign(name: param.name)
       |> assign(type: param.type)
       |> assign(palette: param.color_palette)
+      |> assign(fader_class: fader_class)
 
     ~H"""
-    <div class="fader_display">
+    <div class={["fader_display", @fader_class]}>
+
+
       <div class="param_name cmd_option_label">
         <%= Display.humanize(@name) %>
       </div>
@@ -61,7 +71,7 @@ defmodule Tr33ControlWeb.InputComponents do
           <% :percent -> %>
             <span class="all_7_segments">888</span>
             <span class="the_value_display"><%= Display.humanize(round(@value / 2.55)) %></span>
-            <span class="the_unit in_percent">
+            <span class="the_unit">
               <div>%</div>
               <div>s</div>
               <div>px</div>
@@ -69,7 +79,7 @@ defmodule Tr33ControlWeb.InputComponents do
           <% :time -> %>
             <span class="all_7_segments">8888</span>
             <span class="the_value_display"><%= Display.humanize(@value / 10) %></span>
-            <span class="the_unit in_seconds">
+            <span class="the_unit">
               <!-- TODO: choose css class: in_percent, in_seconds or in_pixel; could be higher in DOM ? -->
               <div>%</div>
               <div>s</div>
@@ -84,12 +94,12 @@ defmodule Tr33ControlWeb.InputComponents do
               <div>px</div>
             </span>
           <% :color -> %>
-            <div style={"margin-left: 15px; height: 30px; width: 30px; background-color: #{hex_color_from_palette(@palette, @value)}"}>
+            <div class="the_color_value" style={"background-color: #{hex_color_from_palette(@palette, @value)}"}>
             </div>
         <% end %>
       </div>
     </div>
-    <form class="fader_form" phx-change="slider_change" phx-auto-recover="ignore" phx-target={@target}>
+    <form class={["fader_form", @fader_class]} phx-change="slider_change" phx-auto-recover="ignore" phx-target={@target}>
       <input type="range" class="the_fader" mix={@min} max={@max} value={@value} step={@step} name={@name} />
     </form>
     """

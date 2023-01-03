@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
+
 <svg
    width="235.45853mm"
    height="89.958351mm"
@@ -7,7 +8,7 @@
    version="1.1"
    id="svg5"
    inkscape:version="1.2.1 (9c6d41e4, 2022-07-14)"
-   sodipodi:docname="fader_thumb.svg"
+   sodipodi:docname="fader_thumb_select.svg"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
@@ -23,11 +24,11 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="true"
-     inkscape:zoom="1.4680242"
-     inkscape:cx="231.26322"
-     inkscape:cy="152.24545"
-     inkscape:window-width="1387"
-     inkscape:window-height="1205"
+     inkscape:zoom="1.0380499"
+     inkscape:cx="454.69876"
+     inkscape:cy="156.54353"
+     inkscape:window-width="1728"
+     inkscape:window-height="1353"
      inkscape:window-x="0"
      inkscape:window-y="23"
      inkscape:window-maximized="0"
