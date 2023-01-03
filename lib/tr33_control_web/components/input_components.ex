@@ -40,6 +40,7 @@ defmodule Tr33ControlWeb.InputComponents do
   attr :target, :string, default: nil
 
   def param_slider(%{param: %ValueParam{} = param} = assigns) do
+
     fader_class =
       case {param.type} do
         {:time} -> "in_seconds"
@@ -47,6 +48,7 @@ defmodule Tr33ControlWeb.InputComponents do
         {:count} -> "in_pixel"
         {:color} -> "in_color"
       end
+
     assigns =
       assigns
       |> assign(value: param.value)

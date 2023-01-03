@@ -655,6 +655,7 @@ h2.section_headline {
 .on_off_switch .one_check_input:checked ~ .the_unit.on_off > div:nth-child(2) {
   opacity: 0.12;
 }
+
 .on_off_switch .one_check_input:checked ~ .the_unit.on_off > div:nth-child(1),
 .on_off_switch .one_check_input ~ .the_unit.on_off > div:nth-child(2) {
   opacity: 1;
