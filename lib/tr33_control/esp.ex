@@ -72,6 +72,9 @@ defmodule Tr33Control.ESP do
     list_targets()
     |> Enum.find(fn {_pid, %TargetMetrics{} = tm} -> get_target_from_metrics(tm) == target end)
     |> case do
+      {_, %TargetMetrics{max_strip_index: nil}} ->
+        []
+
       {_, %TargetMetrics{max_strip_index: max_strip_index}} ->
         0..max_strip_index
         |> Enum.into([])
