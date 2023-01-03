@@ -119,7 +119,7 @@ defmodule Tr33ControlWeb.InputComponents do
       |> assign(:value, param.value)
 
     ~H"""
-    <form class="one_cmd_option" phx-change="select_change" phx-auto-recover="ignore" phx-target={@target}>
+    <form class="one_cmd_option " phx-change="select_change" phx-auto-recover="ignore" phx-target={@target}>
       <label for={@id} class="cmd_option_label label_for_select"><%= Display.humanize(@name) %></label>
       <select class="option_select" name={@name} id={@id} data-pending-value={@value}>
         <%= for option <- @options do %>

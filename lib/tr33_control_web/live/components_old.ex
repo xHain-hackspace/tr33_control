@@ -87,7 +87,7 @@ defmodule Tr33ControlWeb.Components do
       |> assign_new(:event, fn -> "list_select_change" end)
 
     ~H"""
-    <div class="presets_list">
+    <div class="presets_list ">
       <%= for option <- @options do %>
         <button
         type="button"
