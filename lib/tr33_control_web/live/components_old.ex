@@ -87,11 +87,11 @@ defmodule Tr33ControlWeb.Components do
       |> assign_new(:event, fn -> "list_select_change" end)
 
     ~H"""
-    <div class="list-group">
+    <div class="presets_list">
       <%= for option <- @options do %>
         <button
         type="button"
-        class={"list-group-item list-group-item-action rounded-0 border-0 #{if @active == option, do: "active"}"}
+        class={"presets_item #{if @active == option, do: "active"}"}
         style="line-height: 0.6;"
         phx-click={@event}
         phx-value-name={option}
