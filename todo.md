@@ -1,5 +1,9 @@
-# current
-* timeout UDP when no metrics are received
+# UI 
+* Apply new style to navigation
+* Rework presets
+* 
+* [bug] modifier values are not applied
+* [bug] sometimes the command index is changed for a command
 
 
 # nice to have
@@ -10,9 +14,7 @@
 
 # Tr33
 * ping pong period, don't jump on change
-* clone command
 * sawtooth reverse not working
-* 
 
 # Random/noise effect
 * Fade with random speed black -> color -> white
@@ -21,6 +23,7 @@
 * Send all commands at once
 
 # Bugs/features
+* timeout UDP when no metrics are received
 * regular preset backups
 * gravity not working
 * add random toggle to each slider (or some)
@@ -30,7 +33,6 @@
 * Idea for testing: create some sequence that uses all features
 * movement_type (or render option) circle (for trommel and others)
 * mapped position to 16bit
-* replace sequence with phash2 of all commands
 * movement_type: steps, steps_transition
 * Sync time between ESPs
 * Sync random seed betwenn ESPs
@@ -43,13 +45,10 @@
 * move slope, or render in general: color shift effect (or similar) instead of solid color 
   * slope -> change/shift color effect 
 * bug in mapped slope: use perpendicular distance instead of y distance
-* gravity
-* option to configure fade vs set in effects
 * generally more effects like kaleidoscope
 * mapped 2D bouncing ball
 * softer sparkle
-* send fps via UDP 
-
+* joystick
 
 
 ## Wont do
