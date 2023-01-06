@@ -465,9 +465,12 @@ defmodule Tr33Control.Commands do
   defp maybe_fill_commands(commands, false), do: commands
 
   defp maybe_fill_commands(commands, true) do
-    case Enum.count(commands) do
-      @command_max_count -> commands
-      count -> commands ++ Enum.map(count..(@command_max_count - 1), &Command.disabled/1)
-    end
+    0..(@command_max_count - 1)
+    |> Enum.map(fn index ->
+      case Enum.find(commands, &match?(%Command{index: ^index}, &1)) do
+        nil -> Command.disabled(index)
+        %Command{} = command -> command
+      end
+    end)
   end
 end

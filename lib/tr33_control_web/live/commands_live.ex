@@ -39,32 +39,6 @@ defmodule Tr33ControlWeb.CommandsLive do
     {:noreply, socket}
   end
 
-  # def handle_event("add_command", _, socket) do
-  #   on_add_command(socket)
-  # end
-
-  # def handle_event("modal_close", _, %Socket{assigns: %{active_command: active_command}} = socket) do
-  #   {:noreply, push_patch(socket, to: ~p"/commands/#{active_command}")}
-  # end
-
-  # def handle_event("modal_validate", _, socket) do
-  #   # noop
-  #   {:noreply, socket}
-  # end
-
-  def handle_event("modal_submit", %{"command_type" => type}, %Socket{assigns: %{live_action: :new}} = socket) do
-    index = Commands.count_commands()
-    type = String.to_existing_atom(type)
-    Commands.create_command(index, type, brightness: 200)
-
-    socket =
-      socket
-      |> push_patch(to: ~p"/commands/#{index}")
-      |> fetch()
-
-    {:noreply, socket}
-  end
-
   def handle_event("reset_commands", _, socket) do
     1..(Commands.count_commands() - 1)
     |> Enum.into([])

@@ -10,7 +10,7 @@ defmodule Tr33ControlWeb.Components do
       |> assign_new(:class, fn -> nil end)
 
     ~H"""
-      <%= @title %>
+    <%= @title %>
     """
   end
 
@@ -20,17 +20,17 @@ defmodule Tr33ControlWeb.Components do
       |> assign_new(:buttons, fn -> [] end)
 
     ~H"""
-      <div class="card border-secondary bg-body mb-3">
-        <div class="card-header text-nowrapss">
-          <div class="d-flex justify-content-start align-items-center">
-            <h4 class="m-0" style="width: 13rem;"><%= render_slot(@header) %></h4>
-            <%= render_slot(@buttons) %>
-          </div>
-        </div>
-        <div class="card-body">
-          <%= render_slot(@inner_block) %>
+    <div class="card border-secondary bg-body mb-3">
+      <div class="card-header text-nowrapss">
+        <div class="d-flex justify-content-start align-items-center">
+          <h4 class="m-0" style="width: 13rem;"><%= render_slot(@header) %></h4>
+          <%= render_slot(@buttons) %>
         </div>
       </div>
+      <div class="card-body">
+        <%= render_slot(@inner_block) %>
+      </div>
+    </div>
     """
   end
 
@@ -50,34 +50,34 @@ defmodule Tr33ControlWeb.Components do
       |> assign_new(:button_class, fn -> "primary" end)
 
     ~H"""
-      <div class="modal">
-        <div
-          class="modal-dialog"
-          role="document"
-          phx-capture-click="modal_close"
-          phx-window-keyup="modal_close"
-          phx-key="escape"
-          phx-target={ @target }
-          >
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title"><%= @title %></h5>
-              <button type="button" class="btn btn-close" phx-click="modal_close"></button>
-            </div>
-
-            <form phx-submit="modal_submit" phx-change="modal_validate">
-              <div class="modal-body">
-                <%= render_slot(@inner_block) %>
-              </div>
-              <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" phx-click="modal_close">Cancel</button>
-                <button type="submit" class={"btn btn-#{@button_class}"}><%= @button_text %></button>
-              </div>
-            </form>
+    <div class="modal">
+      <div
+        class="modal-dialog"
+        role="document"
+        phx-capture-click="modal_close"
+        phx-window-keyup="modal_close"
+        phx-key="escape"
+        phx-target={@target}
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title"><%= @title %></h5>
+            <button type="button" class="btn btn-close" phx-click="modal_close"></button>
           </div>
+
+          <form phx-submit="modal_submit" phx-change="modal_validate">
+            <div class="modal-body">
+              <%= render_slot(@inner_block) %>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" phx-click="modal_close">Cancel</button>
+              <button type="submit" class={"btn btn-#{@button_class}"}><%= @button_text %></button>
+            </div>
+          </form>
         </div>
       </div>
-      <div class="modal-backdrop"></div>
+    </div>
+    <div class="modal-backdrop"></div>
     """
   end
 
@@ -90,11 +90,11 @@ defmodule Tr33ControlWeb.Components do
     <div class="presets_list ">
       <%= for option <- @options do %>
         <button
-        type="button"
-        class={"presets_item #{if @active == option, do: "active"}"}
-        style="line-height: 0.6;"
-        phx-click={@event}
-        phx-value-name={option}
+          type="button"
+          class={"presets_item #{if @active == option, do: "active"}"}
+          style="line-height: 0.6;"
+          phx-click={@event}
+          phx-value-name={option}
         >
           <%= option %>
         </button>
