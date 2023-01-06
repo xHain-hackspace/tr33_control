@@ -22,8 +22,8 @@ defmodule Tr33ControlWeb.Router do
     live_session :live, on_mount: Tr33ControlWeb.Navbar do
       live "/presets", PresetsLive, :index
       live "/presets/new", PresetsLive, :new
-      live "/presets/update", PresetsLive, :update
-      live "/presets/delete", PresetsLive, :delete
+      live "/presets/:name/update", PresetsLive, :update
+      live "/presets/:name/delete", PresetsLive, :delete
 
       live "/commands/:index", CommandsLive, :show
       live "/commands/:index/new", CommandsLive, :new
