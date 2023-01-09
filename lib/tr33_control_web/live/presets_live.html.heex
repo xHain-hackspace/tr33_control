@@ -1,4 +1,4 @@
-<div>
+<div class="presets_wrap">
   <%= if @live_action in [:new] do %>
     <Components.modal title="New preset">
       <div class="mb-2">Create new preset with the current commands?</div>
@@ -28,37 +28,40 @@
     </div>
   <% end %>
 
-  <div class="p-3">
-    New Preset: <button type="button" class="presets_option_btn" phx-click="new">New Preset</button>
+  <div class="presets_item new_one">
+    <div>Create New Preset</div>
+    <button type="button" class="presets_option_btn" phx-click="new">New Preset</button>
+    <div></div>
+    <div></div>
+    <div></div>
   </div>
 
-  <table class="table table-hover">
-    <tbody>
+  <div class="presets_list">
+  <h4>presets</h4>
       <%= for %Preset{name: name} <- @presets do %>
-        <tr class="table-active">
-          <td><%= name %></td>
-          <td>
+        <div class="presets_item">
+          <div><%= name %></div>
+          <div>
             <button type="button" class="presets_option_btn " phx-click="load" phx-value-name={name}>
               Load Preset
             </button>
-          </td>
-          <td>
+          </div>
+          <div>
             <button type="button" class="presets_option_btn" phx-click="update" phx-value-name={name}>
               Update Preset
             </button>
-          </td>
-          <td>
+          </div>
+          <div>
             <button type="button" class="presets_option_btn" phx-click="clone" phx-value-name={name}>
               Clone Preset
             </button>
-          </td>
-          <td>
+          </div>
+          <div>
             <button type="button" class="presets_option_btn" phx-click="delete" phx-value-name={name}>
               Delete Preset
             </button>
-          </td>
-        </tr>
+          </div>
+        </div>
       <% end %>
-    </tbody>
-  </table>
+  </div>
 </div>

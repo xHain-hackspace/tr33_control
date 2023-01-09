@@ -77,54 +77,6 @@ input[type="range"] {
   appearance: none;
 }
 
-// .custom-vertical-range-container {
-//   height: $range_height;
-//   width: $range_width;
-// }
-
-// .custom-vertical-range {
-//   width: $range_height;
-//   transform: translateX(-1 * (math.div($range_height, 2) - math.div($range_width, 2))) translateY(math.div($range_height, 2) - 0.75rem) rotate(270deg);
-// }
-
-// .custom-vertical-range::-moz-range-thumb {
-//   width: 1.75rem;
-//   height: 5rem;
-//   background: $primary;
-//   cursor: pointer;
-//   border-radius: 0.2rem;
-// }
-
-// .custom-vertical-range::-moz-range-thumb:focus {
-//   background: $warning;
-// }
-
-// .custom-vertical-range:focus::-moz-range-thumb {
-//   background: $warning;
-// }
-
-// .custom-vertical-range::-webkit-slider-thumb {
-//   -webkit-appearance: none;
-//   width: 1.75rem;
-//   height: 5rem;
-//   margin-top: -2.3rem;
-//   background: $primary;
-//   cursor: pointer;
-//   border-radius: 0.2rem;
-// }
-
-// .custom-vertical-range::-webkit-slider-runnable-track {
-//   height: 0.4rem;
-//   background: $light;
-//   border-radius: 0.2rem;
-// }
-
-// .custom-vertical-range::-moz-range-track {
-//   height: 0.4rem;
-//   background: $secondary;
-//   border-radius: 0.2rem;
-// }
-
 .modal {
   display: block;
 }
@@ -133,28 +85,89 @@ input[type="range"] {
   opacity: 0.7;
 }
 
-// ######### LOS GEHT'S #########
+.main {
+  margin-right: 4px;
+}
 
 // ### HEADER ###
 
-.navbar {
+.the_navi {
+  grid-column: 1/-1;
   padding-bottom: 0;
   margin-bottom: 5px;
+  margin-bottom: 6px;
+  border-bottom: 10px double #302c1f;
 }
 
-.navbar-nav {
-  display: flex;
+.header_home_link {
+  background: #003a3e;
+  color: white;
+  display: grid;
+  grid-template-columns: 50% 50%;
+  text-decoration: none;
+  padding: 4px 7px;
+  height: 80px;
+}
+
+.header_home_link > img {
+  grid-row: span 2;
+  height: 70px;
+  width: 70px;
+  margin: 0px 4px;
+}
+
+.header_home_link > h1 {
+  text-decoration: none;
+  font-size: 55px;
+  color: #ffc400;
+  align-self: flex-end;
+  margin: 0;
+  justify-self: flex-end;
+  line-height: 43px;
+}
+
+.header_home_link > h2 {
+  text-decoration: none;
+  font-size: 20px;
+  align-self: flex-start;
+  margin: 0;
+  justify-self: flex-end;
+}
+
+.navi_list {
+  display: grid;
   width: 100%;
   flex-direction: row;
-  justify-content: space-around;
+  // justify-content: space-around;
+  margin: 4px 0 6px 0;
+  grid-auto-flow: column;
+  justify-content: stretch;
+  list-style: none;
+  padding: 0;
+  padding-left: 3px;
+  grid-gap: 3px;
+}
+
+.navi_list > li {
+  background: #003a3e;
+}
+
+.navi_item {
+  text-align: center;
+  width: 100%;
+  display: inline-block;
+  padding: 6px 0;
+  text-decoration: none;
+  color: white;
+  text-transform: uppercase;
+  font-size: 14px;
+}
+
+.navi_item.active {
+  color: #ffc400;
 }
 
 // ### SECTIONS ###
-
-// h2.section_headline {
-// color: #91ad46;
-// hidden for now
-// }
 
 h2.section_headline {
   display: flex;
@@ -195,7 +208,6 @@ h2.section_headline::after,
   padding-bottom: 8px;
   overflow-y: visible;
   height: 82px;
-  // border-left: 4px solid #586633;
   height: 92px;
 }
 
@@ -413,6 +425,10 @@ h2.section_headline::after,
   margin-bottom: 12px;
 }
 
+.fader_display .cmd_option_label {
+  line-height: 13px;
+}
+
 .fader_display .param_value {
   position: relative;
   display: grid;
@@ -598,6 +614,7 @@ h2.section_headline::after,
   font-weight: normal;
   letter-spacing: 0;
   -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
   line-height: 27px;
   display: block;
   grid-row: 1;
@@ -748,19 +765,30 @@ h2.section_headline::after,
 // ### PRESETS ###
 
 .presets_wrap {
-  display: grid;
-  grid-template-columns: 1fr 42px;
-  background: #332e1f;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
+  padding-bottom: 42px;
+}
+
+.presets_list > h4 {
+  font-size: 12px;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  background-position: top;
+  background-size: 101%;
+  background-color: transparent;
+  background-repeat: no-repeat;
+  background-image: url(/images/modifier_box.svg);
+  padding: 10px;
+  margin: 0;
 }
 
 .presets_list {
+  border-left: 4px solid #586633;
   display: grid;
-  // flex-direction: column;
   align-items: stretch;
-  gap: 5px;
-  padding: 16px 12px;
+  gap: 12px;
+  padding: 0;
+  margin-top: 12px;
 }
 
 .card-body {
@@ -773,7 +801,6 @@ h2.section_headline::after,
 
 .card-header h4 {
   font-size: 10.6px;
-  /*! text-align: center; */
   text-transform: uppercase;
   letter-spacing: 0.7px;
 }
@@ -783,12 +810,19 @@ h2.section_headline::after,
   display: grid;
   align-items: center;
   background: transparent;
-  height: 29px;
-  grid-template-columns: min-content 1fr 12px;
+  background: #332e1f;
+  height: auto;
+  grid-template-columns: min-content 1fr repeat(4, min-content);
   justify-items: flex-start;
+  margin-left: 11px;
 }
+
 .presets_item.active {
   background: rgb(84, 84, 84);
+}
+
+.presets_item.new_one {
+  margin: 16px 14px;
 }
 
 .presets_item::before {
@@ -802,6 +836,12 @@ h2.section_headline::after,
 
 .presets_item.active::after {
   content: ">";
+}
+
+.presets_item.new_one::before {
+  background-image: url(/images/icon_file_new.svg);
+  width: 34px;
+  height: 30px;
 }
 
 .presets_option_bar {
@@ -820,8 +860,12 @@ h2.section_headline::after,
   background: #586633 center/cover no-repeat;
   border: none;
   padding: 0;
+  margin-left: 1px;
 }
-
+.presets_item > div:last-child > .presets_option_btn {
+  background-color: #593f52;
+  margin-left: 4px;
+}
 .presets_option_btn[phx-click="load"] {
   background-image: url(/images/icon_open.svg);
 }
@@ -840,6 +884,19 @@ h2.section_headline::after,
 
 .presets_option_btn[phx-click="delete"] {
   background-image: url(/images/icon_delete.svg);
+}
+
+// ### ALERT ###
+
+.alert {
+  font-family: "BPdotsMinus";
+  border-radius: 2px;
+  background-color: #332e1f;
+  border: 2px solid #586633;
+  color: #ffc400;
+  font-size: 26px;
+  line-height: 26px;
+  padding: 8px;
 }
 
 // ### RESPONSIVE ###
@@ -862,7 +919,6 @@ h2.section_headline::after,
 
   .cmd_btn_wrap {
     grid-column: 1/-1;
-    grid-row: 3;
   }
 
   h2.section_headline,
@@ -905,8 +961,6 @@ h2.section_headline::after,
   .one_cmd_paras.beflipped {
     margin-right: 12px;
   }
-
-  /* app.css | http://localhost:4000/assets/app.css */
 
   h2.section_headline,
   .section_headline.h2 {

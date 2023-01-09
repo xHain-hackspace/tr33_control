@@ -1,26 +1,23 @@
 <main role="main" class="container"></main>
 
-<div class="main p-2 ">
-  <nav class="navbar navbar-expand-sm navbar-dark bg-primary">
-    <div class="container-fluid">
-      <a class="navbar-brand pb-0" href="/" style="font-size: 1.5rem">
-        <img
-          class="d-inline-block align-text-center me-3"
-          src={~p"/images/xhain_logo_small.png"}
-          width="100"
-          height="100"
-        /> <%= Application.get_env(:tr33_control, :title, "Control") %>
-      </a>
+<div class="main">
+  <div class="the_navi">
 
-      <ul class="navbar-nav">
-        <%= for {name, path} <- @navbar_content do %>
-          <li class="nav-item">
-            <%= live_redirect(name, to: path, class: "nav-link #{if path == @navbar_active_path, do: "active"}") %>
-          </li>
-        <% end %>
-      </ul>
-    </div>
-  </nav>
+    <a class="header_home_link" href="/">
+      <img src={~p"/images/xhain_logo_small.png"} width="100" height="100"/>
+      <h1>tr33</h1>
+      <h2><%= Application.get_env(:tr33_control, :title, "Control") %></h2>
+    </a>
+
+    <ul class="navi_list">
+      <%= for {name, path} <- @navbar_content do %>
+        <li>
+          <%= live_redirect(name, to: path, class: "navi_item #{if path == @navbar_active_path, do: "active"}") %>
+        </li>
+      <% end %>
+    </ul>
+
+  </div>
 
   <h2 class="section_headline">commands</h2>
 
