@@ -1,9 +1,6 @@
 # UI 
 * Apply new style to navigation
-* Rework presets
-* 
-* [bug] modifier values are not applied
-* [bug] sometimes the command index is changed for a command
+* Rework presets 
 
 
 # nice to have
@@ -24,19 +21,19 @@
 
 # Bugs/features
 * timeout UDP when no metrics are received
-* regular preset backups
 * gravity not working
 * add random toggle to each slider (or some)
 * white color palette
 * mapped ping_pong
+* regular preset backups
 * order branch and trunk indices/PINs
-* Idea for testing: create some sequence that uses all features
+* use some effects from WLED
 * movement_type (or render option) circle (for trommel and others)
+* Idea for testing: create some sequence that uses all features
 * mapped position to 16bit
 * movement_type: steps, steps_transition
 * Sync time between ESPs
 * Sync random seed betwenn ESPs
-* use some effects from WLED
 * effects relative to strip height/prixel count
   * gravity height relative to strip length
 * fix add ball for gravity
