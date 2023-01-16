@@ -53,7 +53,7 @@ $web-font-path: '';
 
 // ### STUFF ###
 
-@import '../node_modules/bootswatch/dist/darkly/variables';
+@import '../node_modules/bootswatch/dist/darkly/_variables';
 
 $form-select-bg: $primary;
 $form-select-indicator-padding: 0;
@@ -397,7 +397,7 @@ h2.section_headline::after,
   border: none;
   line-height: 8px;
   align-items: center;
-  margin-top: 12px;
+  margin-top: 12px !important;
 }
 
 .beflipped .flippy.active {
