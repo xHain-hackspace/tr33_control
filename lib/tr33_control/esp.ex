@@ -60,6 +60,7 @@ defmodule Tr33Control.ESP do
   def list_targets() do
     UDPSupervisor.children()
     |> Enum.map(fn {_, pid, _, [UDP]} -> {pid, UDP.get_metrics(pid)} end)
+    |> maybe_add_mock_targets(Application.fetch_env!(:tr33_control, :add_mock_targets))
   end
 
   def active_targets() do
@@ -94,4 +95,20 @@ defmodule Tr33Control.ESP do
       [{target, _} | _] -> target
     end
   end
+
+  def maybe_add_mock_targets([], true) do
+    for n <- 1..2 do
+      {nil,
+       %TargetMetrics{
+         name: "test_target_#{n}",
+         fps: 42,
+         wifi_strength: 23,
+         version: DateTime.utc_now() |> DateTime.to_unix() |> Integer.to_string(),
+         hashes: [],
+         max_strip_index: 1
+       }}
+    end
+  end
+
+  def maybe_add_mock_targets(targets, _), do: targets
 end

@@ -6,6 +6,7 @@ config :tr33_control,
   uart_debug: false,
   joystick_debug: false,
   udp_server_debug: false,
+  add_mock_targets: true,
   title: "Led Control"
 
 # For development, we disable any cache and enable

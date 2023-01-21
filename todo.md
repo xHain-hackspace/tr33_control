@@ -1,13 +1,6 @@
-# UI 
-* Apply new style to navigation
-* Rework presets 
-
-
 # nice to have
 * properly set max value for modifiers
-* close all modals on Enter
-* display loaded preset somewhere more prominent
-* Commands should stay selected when path == /commands/1
+* fix joystick
 
 # Tr33
 * ping pong period, don't jump on change

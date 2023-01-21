@@ -13,6 +13,7 @@ config :tr33_control,
   cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "/root/tr33/cache_persist",
   command_max_count: 8,
   command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :beat_equalizer],
+  add_mock_targets: false,
   target_configs: %{
     tr33:
       %{
