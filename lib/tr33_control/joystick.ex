@@ -1,8 +1,6 @@
 defmodule Tr33Control.Joystick do
   use GenServer
   require Logger
-  alias Tr33Control.Commands.{Event, Command, Inputs}
-  alias Tr33Control.Commands
 
   @joystick_silver "Mega World USB Game Controllers"
   @joystick_black "Saitek PLC Cyborg Force Rumble Pad"

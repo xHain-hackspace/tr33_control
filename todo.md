@@ -1,5 +1,6 @@
-# current
-* timeout UDP when no metrics are received
+# UI 
+* Apply new style to navigation
+* Rework presets 
 
 
 # nice to have
@@ -10,9 +11,7 @@
 
 # Tr33
 * ping pong period, don't jump on change
-* clone command
 * sawtooth reverse not working
-* 
 
 # Random/noise effect
 * Fade with random speed black -> color -> white
@@ -21,20 +20,20 @@
 * Send all commands at once
 
 # Bugs/features
-* regular preset backups
+* timeout UDP when no metrics are received
 * gravity not working
 * add random toggle to each slider (or some)
 * white color palette
 * mapped ping_pong
+* regular preset backups
 * order branch and trunk indices/PINs
-* Idea for testing: create some sequence that uses all features
+* use some effects from WLED
 * movement_type (or render option) circle (for trommel and others)
+* Idea for testing: create some sequence that uses all features
 * mapped position to 16bit
-* replace sequence with phash2 of all commands
 * movement_type: steps, steps_transition
 * Sync time between ESPs
 * Sync random seed betwenn ESPs
-* use some effects from WLED
 * effects relative to strip height/prixel count
   * gravity height relative to strip length
 * fix add ball for gravity
@@ -43,13 +42,10 @@
 * move slope, or render in general: color shift effect (or similar) instead of solid color 
   * slope -> change/shift color effect 
 * bug in mapped slope: use perpendicular distance instead of y distance
-* gravity
-* option to configure fade vs set in effects
 * generally more effects like kaleidoscope
 * mapped 2D bouncing ball
 * softer sparkle
-* send fps via UDP 
-
+* joystick
 
 
 ## Wont do

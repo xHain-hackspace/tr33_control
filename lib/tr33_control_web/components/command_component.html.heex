@@ -1,0 +1,106 @@
+<div class="one_cmd_wrap">
+  <h2 class="section_headline">command settings</h2>
+  <div class="one_cmd_output one_digit">
+    <label class="cmd_output_label">command</label>
+    <div class="cmd_output_display">
+      <span class="all_7_seg_letters">8</span>
+      <span class="cmd_output_value"> <%= Display.humanize(@command.index + 1) %> </span>
+    </div>
+  </div>
+
+  <.switch name="command_enabled" value={Command.enabled?(@command)} target={@myself} />
+
+  <%= for param <- @enum_params do %>
+    <div class="one_cmd_paras">
+      <.param_select param={param} target={@myself} />
+    </div>
+  <% end %>
+
+  <div class="fader_wrap">
+    <%= for param <- @value_params do %>
+      <div class="one_fader">
+        <.param_slider param={param} target={@myself} />
+      </div>
+    <% end %>
+  </div>
+
+  <div class="one_cmd_paras beflipped">
+    <h4>Targets</h4>
+
+    <%= for target <- @command_targets do %>
+      <button
+        type="button"
+        class={"flippy text-center list-group-item list-group-item-action #{if Display.target_active?(@command, target), do: "active", else: "" }"}
+        phx-click="toggle_target"
+        phx-value-target={target}
+        phx-target={@myself}
+      >
+        <%= Display.command_target(target) %>
+      </button>
+    <% end %>
+  </div>
+
+  <%= if @modifiers_active do %>
+    <div class="one_cmd_paras beflipped">
+      <h4>Modifiers</h4>
+      <%= for name <- @modifier_names do %>
+        <button
+          type="button"
+          class={"btn flippy btn-" <> if modifier_active?(@command, name), do: "primary active", else: "secondary"}
+          phx-click={if modifier_active?(@command, name), do: "delete_modifier", else: "add_modifier"}
+          phx-value-name={name}
+          phx-target={@myself}
+        >
+          <%= Display.humanize(name) %>
+        </button>
+      <% end %>
+    </div>
+
+    <div class="modefier_wrap">
+      <%= for {name, enums, values} <- @modifier_params do %>
+        <form class="one_modefier" phx-change="update_modifier" phx-target={@myself}>
+
+          <div class="one_cmd_output">
+            <label class="cmd_output_label">modefier</label>
+            <div class="cmd_output_display">
+              <span class="all_7_seg_letters">88888888888</span>
+              <span class="cmd_output_value"> <%= Display.humanize(name) %> </span>
+            </div>
+          </div>
+
+          <input name="name" type="hidden" value={name} />
+
+          <%= for %EnumParam{options: options, name: param_name, value: value} <- enums do %>
+            <div class="one_cmd_option">
+              <label for={param_name} class="cmd_option_label label_for_select">
+                <%= Display.humanize(param_name) %>
+              </label>
+              <select class="option_select" name={param_name} id={param_name}>
+                <%= for option <- options do %>
+                  <option value={Atom.to_string(option)} selected={option == value}>
+                    <%= Display.humanize(option) %>
+                  </option>
+                <% end %>
+              </select>
+            </div>
+          <% end %>
+
+          <%= for %ValueParam{name: param_name, value: value} <- values do %>
+            <div class="one_cmd_option">
+              <div class="cmd_option_label"><%= Display.humanize(param_name) %></div>
+              <input
+                type="text"
+                class="form-control bg-dark text-body"
+                style="width:5rem;"
+                name={param_name}
+                value={value}
+                phx-debounce="1500"
+              />
+            </div>
+          <% end %>
+
+        </form>
+      <% end %>
+    </div>
+  <% end %>
+</div>

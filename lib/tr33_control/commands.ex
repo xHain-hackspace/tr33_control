@@ -1,6 +1,6 @@
 defmodule Tr33Control.Commands do
   alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset}
-  alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent}
+  alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent, ColorPaletteRequest}
 
   @command_type_blacklist Application.compile_env!(:tr33_control, :command_type_blacklist)
   @commands_topic "command_updates"
@@ -43,7 +43,7 @@ defmodule Tr33Control.Commands do
 
   ### Commands ########################################################################################################
 
-  def command_types() do
+  def list_command_types() do
     %Protobuf.OneOfField{fields: fields} = Schemas.CommandParams.defs(:field, :type_params)
 
     fields
@@ -75,7 +75,7 @@ defmodule Tr33Control.Commands do
     end
   end
 
-  def create_command(protobuf) when is_binary(protobuf) do
+  def create_command(protobuf) do
     Command.new(protobuf)
     |> insert_and_notify()
   end
@@ -189,7 +189,7 @@ defmodule Tr33Control.Commands do
     type_params = Command.type_params(command)
 
     Command.list_type_field_defs(command)
-    |> Enum.map(&ValueParam.new(type_params, &1))
+    |> Enum.map(&ValueParam.new(type_params, &1, command))
     |> Enum.reject(&is_nil/1)
   end
 
@@ -215,12 +215,19 @@ defmodule Tr33Control.Commands do
     @common_params
   end
 
-  def get_strip_index_options(%Command{targets: [target]}) do
-    Tr33Control.Targets.get_strip_indices_for_target(target)
-    |> Enum.with_index()
+  def get_command_type_param(%Command{} = command) do
+    EnumParam.new(:command_type, Command.type(command), list_command_types())
   end
 
-  def get_strip_index_options(%Command{}), do: []
+  def get_strip_index_param(%Command{targets: [target], params: %CommandParams{} = params}) do
+    case Tr33Control.ESP.get_strip_indices_for_target(target) do
+      [] -> nil
+      [0] -> nil
+      options -> EnumParam.new(:strip_index, params.strip_index, options)
+    end
+  end
+
+  def get_strip_index_param(%Command{}), do: nil
 
   ### Modifiers ###################################################################################
 
@@ -430,6 +437,13 @@ defmodule Tr33Control.Commands do
     |> WireMessage.encode()
   end
 
+  def color_palette_request_binary(palette) do
+    request = ColorPaletteRequest.new(color_palette: palette)
+
+    WireMessage.new(message: {:color_palette_request, request}, sequence: 0)
+    |> WireMessage.encode()
+  end
+
   ### Helpers ###################################################################################
 
   defp modifier_field_index(%Command{} = command, name) do
@@ -451,9 +465,12 @@ defmodule Tr33Control.Commands do
   defp maybe_fill_commands(commands, false), do: commands
 
   defp maybe_fill_commands(commands, true) do
-    case Enum.count(commands) do
-      @command_max_count -> commands
-      count -> commands ++ Enum.map(count..(@command_max_count - 1), &Command.disabled/1)
-    end
+    0..(@command_max_count - 1)
+    |> Enum.map(fn index ->
+      case Enum.find(commands, &match?(%Command{index: ^index}, &1)) do
+        nil -> Command.disabled(index)
+        %Command{} = command -> command
+      end
+    end)
   end
 end

@@ -7,7 +7,6 @@ defmodule Tr33Control.MixProject do
       version: "0.1.0",
       elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
-      compilers: [:phoenix] ++ Mix.compilers(),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps()
@@ -26,25 +25,29 @@ defmodule Tr33Control.MixProject do
 
   defp deps do
     [
-      {:phoenix, "~> 1.6.0"},
-      {:phoenix_live_view, "~> 0.17.0"},
-      {:phoenix_ecto, "~> 4.0"},
+      {:phoenix, "~> 1.7.0-rc.0", override: true},
+      {:phoenix_ecto, "~> 4.4"},
+      {:ecto_sql, "~> 3.6"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
-      {:phoenix_live_dashboard, "~> 0.5"},
+      {:phoenix_live_view, "~> 0.18.3"},
+      {:heroicons, "~> 0.5"},
+      {:floki, ">= 0.30.0", only: :test},
+      {:phoenix_live_dashboard, "~> 0.7.2"},
+      # {:swoosh, "~> 1.3"},
+      # {:finch, "~> 0.13"},
       {:telemetry_metrics, "~> 0.6"},
       {:telemetry_poller, "~> 1.0"},
-      {:floki, "~> 0.0", only: :test},
-      {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.0"},
-      {:ecto, "~> 3.0"},
-      {:circuits_uart, "~> 1.2"},
+      {:jason, "~> 1.2"},
+      {:plug_cowboy, "~> 2.5"},
+      # own
+      # {:circuits_uart, "~> 1.2"},
       {:nerves_leds, "~> 0.8"},
       {:input_event, "~> 1.0"},
       {:cachex, "~> 3.3"},
       {:sentry, "~> 8.0", runtime: false},
       {:exprotobuf, github: "reimerei/exprotobuf"},
-      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:dart_sass, "~> 0.3", runtime: Mix.env() == :dev}
     ]
   end

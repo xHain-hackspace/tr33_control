@@ -1,47 +1,67 @@
-<div phx-window-keyup="keyup">
+<div class="presets_wrap">
   <%= if @live_action in [:new] do %>
-    <Components.modal title="Create new preset from current commands">
+    <Components.modal title="New preset">
+      <div class="mb-2">Create new preset with the current commands?</div>
       <div class="form-group">
         <label> Preset Name</label>
-        <input class="form-control" type="text" class="form-control" autofocus="autofocus" name="name">
+        <input class="form-control" type="text" class="form-control" autofocus="autofocus" name="name" />
       </div>
-      <br class="border-bottom"\>      
+      <br class="border-bottom" \ />
     </Components.modal>
   <% end %>
 
   <%= if @live_action in [:update] do %>
-    <Components.modal title={"Update Preset #{inspect(@selected_preset)}"} button_text="Update">
-      <p>This will update the preset with the current command settings.</p>
+    <Components.modal title="Update preset" button_text="Save">
+      <p>This will overwrite the preset <%= inspect(@current_preset) %> with the current commands. Are you sure?</p>
     </Components.modal>
   <% end %>
 
   <%= if @live_action in [:delete] do %>
-    <Components.modal title={"Delete Preset #{inspect(@selected_preset)}"} button_text="Delete", button_class="danger">
-      <p>Are you sure?</p>
+    <Components.modal title="Delete Preset" button_text="Delete" , button_class="danger">
+      <p>Are you sure out want to delete preset <%= inspect(@current_preset) %>?</p>
     </Components.modal>
   <% end %>
 
-  <Components.section_card>
-    <:header>Presets</:header>
-    <:buttons>
-      <%= if @info != nil do %>
-        <span class={"text-#{@info.class}"}><%= @info.text %></span>
-      <% end %>
-      <%# <button type="button" class="btn btn-dark" phx-click="new">New Preset</button>  %>
-    </:buttons>
+  <%= if not is_nil(@info) do %>
+    <div class={"alert alert-#{@info.class}"}>
+      <%= @info.text %>
+    </div>
+  <% end %>
 
-    <div class="d-flex">        
-      
-      <Components.list_select options={Enum.map(@presets, & &1.name)}, active={@selected_preset} event="selected_preset_change" />
-    
-      <div class="d-flex flex-column mx-2">
-        <button type="button" class="mb-2 btn btn-primary" phx-click="load">Load Preset</button> 
-        <button type="button" class="mb-2 btn btn-secondary" phx-click="new">New Preset</button> 
-        <button type="button" class="mb-2 btn btn-secondary" phx-click="update">Update Preset</button> 
-        <button type="button" class="mb-2 btn btn-secondary" phx-click="clone">Clone Preset</button> 
-        <button type="button" class="mb-2 btn btn-secondary" phx-click="delete">Delete Preset</button> 
-      </div>  
-      
-    </div>  
-  </Components.section_card>
+  <div class="presets_item new_one">
+    <div>Create New Preset</div>
+    <button type="button" class="presets_option_btn" phx-click="new">New Preset</button>
+    <div></div>
+    <div></div>
+    <div></div>
+  </div>
+
+  <div class="presets_list">
+  <h4>presets</h4>
+      <%= for %Preset{name: name} <- @presets do %>
+        <div class="presets_item">
+          <div><%= name %></div>
+          <div>
+            <button type="button" class="presets_option_btn " phx-click="load" phx-value-name={name}>
+              Load Preset
+            </button>
+          </div>
+          <div>
+            <button type="button" class="presets_option_btn" phx-click="update" phx-value-name={name}>
+              Update Preset
+            </button>
+          </div>
+          <div>
+            <button type="button" class="presets_option_btn" phx-click="clone" phx-value-name={name}>
+              Clone Preset
+            </button>
+          </div>
+          <div>
+            <button type="button" class="presets_option_btn" phx-click="delete" phx-value-name={name}>
+              Delete Preset
+            </button>
+          </div>
+        </div>
+      <% end %>
+  </div>
 </div>

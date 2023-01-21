@@ -28,6 +28,7 @@ defmodule Tr33ControlWeb.Display do
     name
     |> to_string()
     |> String.split("_")
+    |> Enum.reject(&match?("100ms", &1))
     |> Enum.map(&String.capitalize/1)
     |> Enum.map(&String.replace(&1, "Ms", "[ms]"))
     |> Enum.join(" ")

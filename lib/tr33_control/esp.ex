@@ -6,8 +6,8 @@ defmodule Tr33Control.ESP do
   alias Tr33Control.Commands.Schemas.TargetMetrics
 
   @pubsub_topic "esp"
-
   @udp_registry :udp_targets
+  @target_configs Application.compile_env!(:tr33_control, :target_configs)
 
   ### Supervisor ##############################################
 
@@ -44,15 +44,54 @@ defmodule Tr33Control.ESP do
 
   def handle_metrics(from_ip, %TargetMetrics{} = tm) do
     case Registry.lookup(@udp_registry, from_ip) do
-      [{pid, :udp}] ->
+      [{pid, _}] ->
         UDP.handle_metrics(pid, tm)
 
       _ ->
+        # todo: notify subscribers that a new target has been discovered
         {:ok, _pid} = UDPSupervisor.start_child(from_ip, tm)
     end
   end
 
   def register_target(ip) do
-    {:ok, _pid} = Registry.register(@udp_registry, ip, :udp)
+    {:ok, _pid} = Registry.register(@udp_registry, ip, :foo)
+  end
+
+  def list_targets() do
+    UDPSupervisor.children()
+    |> Enum.map(fn {_, pid, _, [UDP]} -> {pid, UDP.get_metrics(pid)} end)
+  end
+
+  def active_targets() do
+    list_targets()
+    |> Enum.map(fn {_pid, %TargetMetrics{} = tm} -> get_target_from_metrics(tm) end)
+    |> Enum.uniq()
+  end
+
+  def get_strip_indices_for_target(target) do
+    list_targets()
+    |> Enum.find(fn {_pid, %TargetMetrics{} = tm} -> get_target_from_metrics(tm) == target end)
+    |> case do
+      {_, %TargetMetrics{max_strip_index: nil}} ->
+        []
+
+      {_, %TargetMetrics{max_strip_index: max_strip_index}} ->
+        0..max_strip_index
+        |> Enum.into([])
+
+      nil ->
+        Logger.warn("#{__MODULE__}: could not find active process for target: #{inspect(target)}")
+        []
+    end
+  end
+
+  def get_target_from_metrics(%TargetMetrics{name: name}) do
+    @target_configs
+    |> Enum.filter(&match?({_, %{name_regex: _}}, &1))
+    |> Enum.filter(fn {_, %{name_regex: regex}} -> Regex.match?(regex, name) end)
+    |> case do
+      [] -> String.downcase(name) |> String.to_atom()
+      [{target, _} | _] -> target
+    end
   end
 end

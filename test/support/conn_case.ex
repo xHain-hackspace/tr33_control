@@ -24,8 +24,6 @@ defmodule Tr33ControlWeb.ConnCase do
       import Phoenix.ConnTest
       import Tr33ControlWeb.ConnCase
 
-      alias Tr33ControlWeb.Router.Helpers, as: Routes
-
       # The default endpoint for testing
       @endpoint Tr33ControlWeb.Endpoint
     end
