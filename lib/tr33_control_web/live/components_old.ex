@@ -20,7 +20,7 @@ defmodule Tr33ControlWeb.Components do
       |> assign_new(:buttons, fn -> [] end)
 
     ~H"""
-    <div class="card border-secondary bg-body mb-3">
+    <div class="status_wrap card border-secondary bg-body mb-3">
       <div class="card-header text-nowrapss">
         <div class="d-flex justify-content-start align-items-center">
           <h4 class="m-0" style="width: 13rem;"><%= render_slot(@header) %></h4>

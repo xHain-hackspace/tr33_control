@@ -68,6 +68,14 @@ $form-select-indicator-color: $body-color;
 $range_height: 20rem;
 $range_width: 5rem;
 
+a {
+  transition: color 0.4s;
+}
+
+a:hover {
+  color: #ffc400;
+}
+
 .alert:empty {
   display: none;
 }
@@ -714,7 +722,7 @@ h2.section_headline::after,
   background-color: transparent;
   background-repeat: no-repeat;
   background-image: url(/images/modifier_box.svg);
-  padding: 10px;
+  padding: 8px;
   margin: 0 0 16px;
 }
 
@@ -750,12 +758,13 @@ h2.section_headline::after,
   background-size: 101% auto;
   background-color: transparent;
   background-repeat: no-repeat;
+  margin-left: -1px;
 }
 .one_modefier .one_cmd_output label {
   justify-self: flex-start;
-  align-self: center;
+  align-self: flex-end;
   padding: 0;
-  height: 19px;
+  height: 31px;
   display: block;
   text-align: left;
 }
@@ -783,6 +792,7 @@ h2.section_headline::after,
   background-image: url(/images/modifier_box.svg);
   padding: 10px;
   margin: 0;
+  margin-left: -2px;
 }
 
 .presets_list {
@@ -900,6 +910,16 @@ h2.section_headline::after,
   font-size: 26px;
   line-height: 26px;
   padding: 8px;
+  grid-column: 1/-1;
+  margin-top: 12px;
+}
+
+// ### STATUS ###
+.main .status_wrap:nth-child(3) {
+  grid-column: 1/-1;
+}
+.main .status_wrap:nth-child(4) {
+  grid-column: -2;
 }
 
 // ### RESPONSIVE ###
@@ -988,6 +1008,7 @@ h2.section_headline::after,
     grid-gap: 5vw;
     padding: 0vw 5vw;
     align-items: flex-start;
+    grid-row-gap: 1vw;
   }
 
   .presets_item.new_one {
