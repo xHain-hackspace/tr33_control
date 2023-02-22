@@ -13,12 +13,19 @@
 * Send all commands at once
 
 # Bugs/features
+* enable targets by default
+* smoothed beat function
+* fix memory on ESP32
 * timeout UDP when no metrics are received
 * gravity not working
 * add random toggle to each slider (or some)
 * white color palette
 * mapped ping_pong
 * regular preset backups
+* ping_pong bugs:
+  * comet on random transitions flickers
+  * comet on quadratic movement flickers
+  * filled shape is jumping around
 * order branch and trunk indices/PINs
 * use some effects from WLED
 * movement_type (or render option) circle (for trommel and others)

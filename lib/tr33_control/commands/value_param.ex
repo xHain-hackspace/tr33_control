@@ -41,6 +41,7 @@ defmodule Tr33Control.Commands.ValueParam do
   end
 
   def get_type(:fairy_index, _), do: :count
+  def get_type(:color_temperature, _), do: :count
   def get_type(:count, _), do: :count
   def get_type(:period_100ms, _), do: :time
   def get_type(:flicker_delay, _), do: :time
