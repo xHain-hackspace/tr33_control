@@ -1,5 +1,6 @@
 defmodule Tr33Control.Commands.Command do
   use Ecto.Schema
+  require Logger
 
   alias Protobuf.Field
   alias Tr33Control.Commands.Schemas.{CommandParams, Modifier}
@@ -46,14 +47,21 @@ defmodule Tr33Control.Commands.Command do
     %Field{type: {:msg, type_full}} = Enum.find(fields, &match?(%Field{name: ^type}, &1))
     type_params = apply(type_full, :new, [])
 
-    %__MODULE__{command | params: %CommandParams{params | type_params: {type, type_params}}}
+    %__MODULE__{command | params: %CommandParams{params | type_params: {type, type_params}, modifiers: []}}
   end
 
   def encode(%__MODULE__{index: index, params: %CommandParams{} = params} = command) do
     corrected = %CommandParams{params | index: index}
     hash = <<:erlang.phash2(corrected, :math.pow(2, @hash_size) |> trunc)::@hash_size>>
     with_hash = %CommandParams{corrected | hash: hash}
+
     %__MODULE__{command | params: with_hash, encoded: CommandParams.encode(with_hash)}
+  rescue
+    error ->
+      msg = "Failed to encode #{inspect(command)}: #{inspect(error)}"
+      Logger.error(msg)
+      Sentry.capture_message(msg)
+      command
   end
 
   def get_field_def(name) when is_atom(name) do

@@ -40,7 +40,6 @@ defmodule Tr33ControlWeb.InputComponents do
   attr :target, :string, default: nil
 
   def param_slider(%{param: %ValueParam{} = param} = assigns) do
-
     fader_class =
       case {param.type} do
         {:time} -> "in_seconds"
@@ -62,8 +61,6 @@ defmodule Tr33ControlWeb.InputComponents do
 
     ~H"""
     <div class={["fader_display", @fader_class]}>
-
-
       <div class="param_name cmd_option_label">
         <%= Display.humanize(@name) %>
       </div>
@@ -72,7 +69,7 @@ defmodule Tr33ControlWeb.InputComponents do
         <%= case @type do %>
           <% :percent -> %>
             <span class="all_7_segments">888</span>
-            <span class="the_value_display"><%= Display.humanize(round(@value / 2.55)) %></span>
+            <span class="the_value_display"><%= Display.humanize(round((@value - @min) / (@max - @min) * 100)) %></span>
             <span class="the_unit">
               <div>%</div>
               <div>s</div>
@@ -96,8 +93,7 @@ defmodule Tr33ControlWeb.InputComponents do
               <div>px</div>
             </span>
           <% :color -> %>
-            <div class="the_color_value" style={"background-color: #{hex_color_from_palette(@palette, @value)}"}>
-            </div>
+            <div class="the_color_value" style={"background-color: #{hex_color_from_palette(@palette, @value)}"}></div>
         <% end %>
       </div>
     </div>

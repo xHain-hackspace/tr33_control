@@ -1,3 +1,7 @@
+# current
+fix UDP Packet of death
+* shifting rain is broken
+
 # nice to have
 * properly set max value for modifiers
 * fix joystick
@@ -13,12 +17,10 @@
 * Send all commands at once
 
 # Bugs/features
+* new color_type: NYAN
 * enable targets by default
 * smoothed beat function
-* fix memory on ESP32
 * timeout UDP when no metrics are received
-* gravity not working
-* add random toggle to each slider (or some)
 * white color palette
 * mapped ping_pong
 * regular preset backups
@@ -34,9 +36,6 @@
 * movement_type: steps, steps_transition
 * Sync time between ESPs
 * Sync random seed betwenn ESPs
-* effects relative to strip height/prixel count
-  * gravity height relative to strip length
-* fix add ball for gravity
 * random walk for tr33
 * diffusion (lava lamp) effect
 * move slope, or render in general: color shift effect (or similar) instead of solid color 
@@ -44,7 +43,6 @@
 * bug in mapped slope: use perpendicular distance instead of y distance
 * generally more effects like kaleidoscope
 * mapped 2D bouncing ball
-* softer sparkle
 * joystick
 
 
