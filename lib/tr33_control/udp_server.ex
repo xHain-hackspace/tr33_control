@@ -37,8 +37,14 @@ defmodule Tr33Control.UdpServer do
 
       %WireMessage{message: {:command_params, %CommandParams{} = params}} ->
         debug_log("Received command params")
-        Commands.create_command(params)
-        send_ack(socket, ip, port)
+
+        try do
+          Commands.create_command(params)
+          send_ack(socket, ip, port)
+        rescue
+          error ->
+            Sentry.capture_exception(error)
+        end
 
       %WireMessage{message: {:color_palette_response, %ColorPaletteResponse{} = response}} ->
         debug_log("Received color_palette_response")
