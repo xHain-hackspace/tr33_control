@@ -3,7 +3,13 @@ defmodule Tr33Control.UdpServer do
   require Logger
   alias Tr33Control.Commands.Schemas.ColorPalette
   alias Tr33Control.{Commands, ESP, ColorPalettes}
-  alias Tr33Control.Commands.Schemas.{WireMessage, TargetMetrics, CommandParams, ColorPaletteResponse}
+
+  alias Tr33Control.Commands.Schemas.{
+    WireMessage,
+    TargetMetrics,
+    CommandParams,
+    ColorPaletteResponse
+  }
 
   @listen_port Application.compile_env!(:tr33_control, :udp_listen_port)
 
@@ -55,6 +61,12 @@ defmodule Tr33Control.UdpServer do
     end
 
     {:noreply, state}
+  rescue
+    error ->
+      msg = "UDPServer: Failed to decode #{inspect(protobuf)}\n #{inspect(error)}"
+      Logger.error(msg)
+      Sentry.capture_message(msg)
+      {:noreply, state}
   end
 
   def handle_info(other, state) do
