@@ -1,4 +1,6 @@
 defmodule Tr33Control.Commands do
+  alias Tr33Control.Commands.Schemas.FirmwareConfig
+  alias Tr33Control.ESP
   alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset}
   alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent, ColorPaletteRequest}
 
@@ -69,6 +71,7 @@ defmodule Tr33Control.Commands do
   def create_command(index, type, params \\ []) when is_atom(type) and is_number(index) and is_list(params) do
     if(index < @command_max_count) do
       Command.new(index, type, params)
+      |> Map.put(:targets, ESP.active_targets())
       |> insert_and_notify()
     else
       :noop
@@ -77,6 +80,7 @@ defmodule Tr33Control.Commands do
 
   def create_command(protobuf) do
     Command.new(protobuf)
+    |> Map.put(:targets, ESP.active_targets())
     |> insert_and_notify()
   end
 
@@ -441,6 +445,11 @@ defmodule Tr33Control.Commands do
     request = ColorPaletteRequest.new(color_palette: palette)
 
     WireMessage.new(message: {:color_palette_request, request}, sequence: 0)
+    |> WireMessage.encode()
+  end
+
+  def firmware_config_binary(%FirmwareConfig{} = config) do
+    WireMessage.new(message: {:firmware_config, config}, sequence: 0)
     |> WireMessage.encode()
   end
 

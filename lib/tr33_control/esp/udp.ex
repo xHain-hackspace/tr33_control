@@ -1,6 +1,7 @@
 defmodule Tr33Control.ESP.UDP do
   use GenServer
   require Logger
+  alias Tr33Control.Commands.Schemas.FirmwareConfig
   alias Tr33Control.{Commands, ESP, Joystick}
   alias Tr33Control.Commands.Command
   alias Tr33Control.Commands.Schemas.TargetMetrics
@@ -37,6 +38,10 @@ defmodule Tr33Control.ESP.UDP do
 
   def color_palette_request(pid, palette) do
     GenServer.cast(pid, {:color_palette_request, palette})
+  end
+
+  def send_firmware_config(pid, %FirmwareConfig{} = config) do
+    GenServer.cast(pid, {:firmware_config, config})
   end
 
   def get_metrics(pid) when is_pid(pid) do
@@ -128,6 +133,12 @@ defmodule Tr33Control.ESP.UDP do
     {:noreply, state}
   end
 
+  def handle_cast({:firmware_config, config}, %__MODULE__{} = state) do
+    state = maybe_enqueue(state, config)
+
+    {:noreply, state}
+  end
+
   def handle_call(:get_metrics, _from, %__MODULE__{target_metrics: tm} = state) do
     {:reply, tm, state}
   end
@@ -181,6 +192,7 @@ defmodule Tr33Control.ESP.UDP do
               command = %Command{} -> Commands.command_binary(command, target)
               joystick = %Joystick{} -> Commands.joystick_event_binary(joystick)
               {:color_palette_request, palette} -> Commands.color_palette_request_binary(palette)
+              %FirmwareConfig{} = config -> Commands.firmware_config_binary(config)
             end
 
           transmit_binary(binary, state)

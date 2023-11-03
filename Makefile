@@ -1,10 +1,9 @@
 export SERIAL_PORT = ttyUSB0
-export CACHE_PERSIST_DIR = $(HOME)/.tr33_cache
 
-init: deps-get assets-install
-
-console: deps-get
+run: 
 	iex -S mix phx.server
+
+setup: deps-get assets-install
 
 deps-get:
 	mix deps.get
@@ -24,3 +23,9 @@ assets-update:
 
 assets-release:
 	MIX_ENV=prod mix assets.deploy
+
+release: export MIX_ENV=prod
+release: deps-get
+	mix release --overwrite
+
+

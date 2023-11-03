@@ -3,6 +3,7 @@ defmodule Tr33Control.UdpServer do
   require Logger
   alias Tr33Control.Commands.Schemas.ColorPalette
   alias Tr33Control.{Commands, ESP, ColorPalettes}
+  alias Tr33Control.Commands.Command
 
   alias Tr33Control.Commands.Schemas.{
     WireMessage,
@@ -33,8 +34,26 @@ defmodule Tr33Control.UdpServer do
     {:ok, %{}}
   end
 
+  def handle_info({:udp, _socket, ip, port, <<r::8, g::8, b::8>>}, state) do
+    debug_log("Incoming Color Packet #{r},#{g},#{b} from: #{inspect(ip)}:#{inspect(port)}")
+
+    case Commands.get_command(7) do
+      %Command{params: %CommandParams{enabled: true, type_params: {:calibrate, _}}} ->
+        :noop
+
+      _ ->
+        Commands.create_command(7, :calibrate, enabled: true, brightness: 255)
+    end
+
+    Commands.update_command_param(7, :red, r)
+    Commands.update_command_param(7, :green, g)
+    Commands.update_command_param(7, :blue, b)
+
+    {:noreply, state}
+  end
+
   def handle_info({:udp, socket, ip, port, protobuf}, state) do
-    debug_log("Incoming Packaet: #{inspect(protobuf)}, from: #{inspect(ip)}:#{inspect(port)}")
+    debug_log("Incoming Packet: #{inspect(protobuf)}, from: #{inspect(ip)}:#{inspect(port)}")
 
     case WireMessage.decode(protobuf) do
       %WireMessage{message: {:target_metrics, %TargetMetrics{} = metrics}} ->
@@ -57,7 +76,7 @@ defmodule Tr33Control.UdpServer do
         ColorPalettes.handle_color_palette_response(response)
 
       other ->
-        Logger.warn("Received unexpected UDP data. Decoded as #{inspect(other)}")
+        Logger.warning("Received unexpected UDP data. Decoded as #{inspect(other)}")
     end
 
     {:noreply, state}
@@ -70,7 +89,7 @@ defmodule Tr33Control.UdpServer do
   end
 
   def handle_info(other, state) do
-    Logger.warn(" Unexpected message: #{inspect(other)}")
+    Logger.warning(" Unexpected message: #{inspect(other)}")
     {:noreply, state}
   end
 

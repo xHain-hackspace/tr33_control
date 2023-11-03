@@ -3,7 +3,7 @@ defmodule Tr33Control.ESP do
   require Logger
 
   alias Tr33Control.ESP.{UDP, UDPSupervisor}
-  alias Tr33Control.Commands.Schemas.TargetMetrics
+  alias Tr33Control.Commands.Schemas.{TargetMetrics, FirmwareConfig}
 
   @pubsub_topic "esp"
   @udp_registry :udp_targets
@@ -81,7 +81,7 @@ defmodule Tr33Control.ESP do
         |> Enum.into([])
 
       nil ->
-        Logger.warn("#{__MODULE__}: could not find active process for target: #{inspect(target)}")
+        Logger.warning("#{__MODULE__}: could not find active process for target: #{inspect(target)}")
         []
     end
   end
@@ -111,4 +111,9 @@ defmodule Tr33Control.ESP do
   end
 
   def maybe_add_mock_targets(targets, _), do: targets
+
+  def broadcast_firmware_config(%FirmwareConfig{} = config) do
+    list_targets()
+    |> Enum.map(fn {pid, _} -> UDP.send_firmware_config(pid, config) end)
+  end
 end

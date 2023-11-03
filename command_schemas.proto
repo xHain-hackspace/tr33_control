@@ -125,6 +125,7 @@ enum ColorType {
   WHITE = 2;
 }
 
+
 message WireMessage {    
   required int32 sequence = 1 [default = 0];  // deprecated
   oneof message {
@@ -134,6 +135,7 @@ message WireMessage {
     TargetMetrics target_metrics = 5;
     ColorPaletteRequest color_palette_request = 6;
     ColorPaletteResponse color_palette_response = 7;
+    FirmwareConfig firmware_config = 8;
   }
 }
 
@@ -166,6 +168,7 @@ message CommandParams {
     Twang twang = 24;
     FairyLight fairy_light = 25;
     BeatEqualizer beat_equalizer = 26;
+    Calibrate calibrate = 27;
   }
 }
 
@@ -188,6 +191,12 @@ message White {
 
 message SingleColor {
   required int32 color = 1 [default = 226];
+}
+
+message Calibrate {
+  required int32 red = 1 [default = 130];
+  required int32 green = 2 [default = 130];
+  required int32 blue = 3 [default = 130];
 }
 
 message Pixel {
@@ -351,4 +360,11 @@ message ColorPaletteRequest {
 message ColorPaletteResponse {
   required ColorPalette color_palette = 1;
   repeated uint32 colors = 2 [(nanopb).max_count = 256, (nanopb).fixed_count = true];
+}
+
+message FirmwareConfig {
+  required uint32 phash = 1;
+  required bool calibration_fastled = 2 [default = false];
+  required bool calibration_custom = 3 [default = false];
+  required bool calibration_lookup_table = 4 [default = false];
 }

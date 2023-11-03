@@ -4,6 +4,7 @@ defmodule Tr33Control.Commands.Command do
 
   alias Protobuf.Field
   alias Tr33Control.Commands.Schemas.{CommandParams, Modifier}
+  alias Tr33Control.ESP
 
   @hash_size 32
 
@@ -21,7 +22,10 @@ defmodule Tr33Control.Commands.Command do
   def new(index, type, common_values \\ []) when is_atom(type) do
     params = CommandParams.new([index: index] ++ common_values)
 
-    %__MODULE__{index: index, params: params}
+    %__MODULE__{
+      index: index,
+      params: params
+    }
     |> new_type_params(type)
   end
 

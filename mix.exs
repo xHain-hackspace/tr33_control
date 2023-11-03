@@ -9,7 +9,8 @@ defmodule Tr33Control.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      releases: releases()
     ]
   end
 
@@ -43,9 +44,10 @@ defmodule Tr33Control.MixProject do
       # own
       # {:circuits_uart, "~> 1.2"},
       {:nerves_leds, "~> 0.8"},
-      {:input_event, "~> 1.0"},
+      # {:input_event, "~> 1.0"},
       {:cachex, "~> 3.3"},
-      {:sentry, "~> 8.0", runtime: false},
+      {:sentry, "~> 9.0"},
+      {:hackney, "~> 1.8"},
       {:exprotobuf, github: "reimerei/exprotobuf"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:dart_sass, "~> 0.3", runtime: Mix.env() == :dev}
@@ -58,6 +60,15 @@ defmodule Tr33Control.MixProject do
         "esbuild default --minify",
         "sass default --no-source-map --style=compressed",
         "phx.digest"
+      ]
+    ]
+  end
+
+  defp releases do
+    [
+      tr33_control: [
+        include_executables_for: [:unix],
+        steps: [:assemble, :tar]
       ]
     ]
   end

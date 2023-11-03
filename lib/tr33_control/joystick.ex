@@ -34,22 +34,22 @@ defmodule Tr33Control.Joystick do
   end
 
   def init(_) do
-    InputEvent.enumerate()
-    |> Enum.find(fn {_, %InputEvent.Info{name: name}} -> name in @joysticks end)
-    |> case do
-      nil ->
-        debug_log("No joystick found")
-        notify_subscribers(nil)
-        :ignore
+    # InputEvent.enumerate()
+    # |> Enum.find(fn {_, %InputEvent.Info{name: name}} -> name in @joysticks end)
+    # |> case do
+    #   nil ->
+    #     debug_log("No joystick found")
+    #     notify_subscribers(nil)
+    #     :ignore
 
-      {device, %InputEvent.Info{name: name}} ->
-        Logger.info("#{__MODULE__}: Found joystick on device #{inspect(device)}")
-        {:ok, _pid} = InputEvent.start_link(device)
-        Logger.info("#{__MODULE__}: Listening on #{device} for joystick commands")
-        state = %__MODULE__{device: device, name: name}
-        notify_subscribers(state)
-        {:ok, state}
-    end
+    #   {device, %InputEvent.Info{name: name}} ->
+    #     Logger.info("#{__MODULE__}: Found joystick on device #{inspect(device)}")
+    #     {:ok, _pid} = InputEvent.start_link(device)
+    #     Logger.info("#{__MODULE__}: Listening on #{device} for joystick commands")
+    #     state = %__MODULE__{device: device, name: name}
+    #     notify_subscribers(state)
+    #     {:ok, state}
+    # end
   end
 
   def handle_call(:state, _from, state) do
