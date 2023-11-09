@@ -13,12 +13,11 @@ defmodule Tr33Control.Commands do
   def init() do
     Cache.init_all()
 
-    case get_default_preset() do
-      nil ->
-        create_command(0, :rainbow)
+    notify_subscribers(:preset_update)
 
-      %Preset{commands: commands} ->
-        Enum.map(commands, &Cache.insert/1)
+    case get_default_preset() do
+      nil -> create_command(0, :rainbow)
+      %Preset{name: name} -> load_preset(name)
     end
   end
 
@@ -31,12 +30,12 @@ defmodule Tr33Control.Commands do
     Phoenix.PubSub.broadcast!(Tr33Control.PubSub, @commands_topic, {:command_update, command})
   end
 
-  def notify_subscribers(%Preset{} = preset) do
-    Phoenix.PubSub.broadcast!(Tr33Control.PubSub, @presets_topic, {:preset_update, preset})
+  def notify_subscribers(:preset_update) do
+    Phoenix.PubSub.broadcast!(Tr33Control.PubSub, @presets_topic, :preset_update)
   end
 
-  def notify_subscribers(:preset_deleted, name) do
-    Phoenix.PubSub.broadcast!(Tr33Control.PubSub, @presets_topic, {:preset_deleted, name})
+  def notify_subscribers(:preset_loaded, name) do
+    Phoenix.PubSub.broadcast!(Tr33Control.PubSub, @presets_topic, {:preset_loaded, name})
   end
 
   def notify_subscribers(:command_deleted, index) do
@@ -326,14 +325,18 @@ defmodule Tr33Control.Commands do
         preset -> preset
       end
 
-    %Preset{preset | commands: list_commands()}
-    |> Cache.insert()
-    |> tap(&notify_subscribers/1)
+    preset =
+      %Preset{preset | commands: list_commands()}
+      |> Cache.insert()
+
+    notify_subscribers(:preset_update)
+
+    preset
   end
 
   def delete_preset(name) do
     Cache.delete(Preset, name)
-    notify_subscribers(:preset_deleted, name)
+    notify_subscribers(:preset_update)
   end
 
   def load_preset(name) do
@@ -350,6 +353,8 @@ defmodule Tr33Control.Commands do
 
     commands
     |> Enum.map(&insert_and_notify/1)
+
+    notify_subscribers(:preset_loaded, name)
 
     preset
   end
@@ -369,9 +374,12 @@ defmodule Tr33Control.Commands do
           end
       end
 
-    %Preset{preset | name: new_name}
-    |> Cache.insert()
-    |> tap(&notify_subscribers/1)
+    preset =
+      %Preset{preset | name: new_name}
+      |> Cache.insert()
+
+    notify_subscribers(:preset_update)
+    preset
   end
 
   def list_presets() do
@@ -402,7 +410,6 @@ defmodule Tr33Control.Commands do
     load_preset(name)
     |> then(fn preset -> %Preset{preset | default: true} end)
     |> Cache.insert()
-    |> notify_subscribers()
   end
 
   ### Protobuf ###################################################################################

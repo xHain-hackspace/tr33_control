@@ -50,7 +50,8 @@ defmodule Tr33Control.MixProject do
       {:hackney, "~> 1.8"},
       {:exprotobuf, github: "reimerei/exprotobuf"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
-      {:dart_sass, "~> 0.3", runtime: Mix.env() == :dev}
+      {:dart_sass, "~> 0.3", runtime: Mix.env() == :dev},
+      {:ex_homeassistant, git: "git@github.com:Reimerei/ex_homeassistant.git", branch: "main"}
     ]
   end
 

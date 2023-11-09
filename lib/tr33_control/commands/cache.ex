@@ -19,7 +19,7 @@ defmodule Tr33Control.Commands.Cache do
       Cachex.load!(Preset, presets_persist_file())
       Enum.map(@all_cache_keys, &migrate/1)
     else
-      Logger.warn("No preset persist file found #{inspect(presets_persist_file())}")
+      Logger.warning("No preset persist file found #{inspect(presets_persist_file())}")
     end
   end
 

@@ -167,8 +167,8 @@ message CommandParams {
     MappedPingPong mapped_ping_pong = 23;
     Twang twang = 24;
     FairyLight fairy_light = 25;
-    BeatEqualizer beat_equalizer = 26;
     Calibrate calibrate = 27;
+    PixelFun pixel_fun = 28;
   }
 }
 
@@ -315,9 +315,8 @@ message MappedPingPong {
   required int32 fade_distance = 3 [default = 5];
 }
 
-message BeatEqualizer {
-  required int32 color = 1 [default = 23];
-  required int32 band = 2 [default = 0, (nanopb).max_size=6];
+message PixelFun {
+  required string function = 1 [(nanopb).max_length = 40]; 
 }
 
 message Twang {

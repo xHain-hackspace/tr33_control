@@ -19,7 +19,8 @@ defmodule Tr33Control.Application do
       Tr33Control.UdpServer,
       # Tr33Control.Joystick,
       # Tr33Control.Joystick.Poller,
-      Tr33Control.ColorPalettes
+      Tr33Control.ColorPalettes,
+      Tr33Control.Homeassistant
       # Tr33Control.Commands.Updater
     ]
 

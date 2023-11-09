@@ -35,3 +35,14 @@ if config_env() == :prod do
     },
     included_environments: [:prod]
 end
+
+case {System.fetch_env("MQTT_HOST"), System.fetch_env("MQTT_PASSWORD")} do
+  {{:ok, mqtt_host}, {:ok, mqtt_password}} ->
+    config :ex_homeassistant, :mqtt_config,
+      mqtt_host: mqtt_host,
+      password: mqtt_password,
+      client_id: "tr33_control"
+
+  _ ->
+    :noop
+end
