@@ -1,7 +1,7 @@
 defmodule Tr33Control.Commands do
   alias Tr33Control.Commands.Schemas.FirmwareConfig
   alias Tr33Control.ESP
-  alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, Preset}
+  alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, StringParam, Preset}
   alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent, ColorPaletteRequest}
 
   @command_type_blacklist Application.compile_env!(:tr33_control, :command_type_blacklist)
@@ -201,6 +201,14 @@ defmodule Tr33Control.Commands do
 
     Command.list_type_field_defs(command)
     |> Enum.map(&EnumParam.new(type_params, &1))
+    |> Enum.reject(&is_nil/1)
+  end
+
+  def list_string_params(%Command{} = command) do
+    type_params = Command.type_params(command)
+
+    Command.list_type_field_defs(command)
+    |> Enum.map(&StringParam.new(type_params, &1))
     |> Enum.reject(&is_nil/1)
   end
 

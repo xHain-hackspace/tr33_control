@@ -108,7 +108,7 @@ defmodule Tr33Control.ESP.UART do
         {:noreply, state}
 
       _ ->
-        Logger.warn("#{__MODULE__}:  RECEIVED UNEXPECTED: #{inspect(bytes)}")
+        Logger.warning("#{__MODULE__}:  RECEIVED UNEXPECTED: #{inspect(bytes)}")
         {:noreply, state}
     end
   end

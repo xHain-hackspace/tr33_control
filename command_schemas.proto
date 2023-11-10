@@ -146,7 +146,7 @@ message CommandParams {
   required int32 strip_index = 4 [default = 0]; 
   required ColorPalette color_palette = 5 [default = RAINBOW];
   repeated Modifier modifiers = 6 [(nanopb).max_count = 5];
-  optional bytes hash = 100 [(nanopb).max_size = 4];
+  required bytes hash = 100 [default = "", (nanopb).max_size = 4];
   oneof type_params {
     White white = 7;
     SingleColor single_color = 8;
@@ -168,7 +168,7 @@ message CommandParams {
     Twang twang = 24;
     FairyLight fairy_light = 25;
     Calibrate calibrate = 27;
-    PixelFun pixel_fun = 28;
+    PixelFunc pixel_func = 28;
   }
 }
 
@@ -315,8 +315,8 @@ message MappedPingPong {
   required int32 fade_distance = 3 [default = 5];
 }
 
-message PixelFun {
-  required string function = 1 [(nanopb).max_length = 40]; 
+message PixelFunc {
+  required string function = 1 [ default = "sin(2*t-hypot(x-3.5,y-3.5))", (nanopb).max_length = 40]; 
 }
 
 message Twang {

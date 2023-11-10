@@ -4,7 +4,7 @@
     <label class="cmd_output_label">command</label>
     <div class="cmd_output_display">
       <span class="all_7_seg_letters">8</span>
-      <span class="cmd_output_value"> <%= Display.humanize(@command.index + 1) %> </span>
+      <span class="cmd_output_value"><%= Display.humanize(@command.index + 1) %></span>
     </div>
   </div>
 
@@ -20,6 +20,14 @@
     <%= for param <- @value_params do %>
       <div class="one_fader">
         <.param_slider param={param} target={@myself} />
+      </div>
+    <% end %>
+  </div>
+
+  <div class="string_wrap">
+    <%= for param <- @string_params do %>
+      <div>
+        <.param_text param={param} target={@myself} />
       </div>
     <% end %>
   </div>
@@ -59,12 +67,11 @@
     <div class="modefier_wrap">
       <%= for {name, enums, values} <- @modifier_params do %>
         <form class="one_modefier" phx-change="update_modifier" phx-target={@myself}>
-
           <div class="one_cmd_output">
             <label class="cmd_output_label">modefier</label>
             <div class="cmd_output_display">
               <span class="all_7_seg_letters">88888888888</span>
-              <span class="cmd_output_value"> <%= Display.humanize(name) %> </span>
+              <span class="cmd_output_value"><%= Display.humanize(name) %></span>
             </div>
           </div>
 
@@ -98,7 +105,6 @@
               />
             </div>
           <% end %>
-
         </form>
       <% end %>
     </div>

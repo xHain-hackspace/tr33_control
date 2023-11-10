@@ -30,7 +30,7 @@ defmodule Tr33Control.Commands.Command do
   end
 
   def new(protobuf) when is_binary(protobuf) do
-    params = %CommandParams{} = CommandParams.decode(protobuf) |> IO.inspect()
+    params = %CommandParams{} = CommandParams.decode(protobuf)
 
     new(params)
   end

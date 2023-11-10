@@ -106,6 +106,17 @@ defmodule Tr33ControlWeb.CommandComponent do
     {:noreply, socket}
   end
 
+  def handle_event("text_change", %{"_target" => [name_str]} = data, %Socket{} = socket) do
+    %{command: %Command{index: index}} = socket.assigns
+
+    name = String.to_existing_atom(name_str)
+    value = Map.fetch!(data, name_str)
+
+    update_param(index, name, value)
+
+    {:noreply, socket}
+  end
+
   def handle_event("toggle_target", %{"target" => target_str}, %Socket{} = socket) do
     %{command: %Command{index: index}} = socket.assigns
     target = String.to_existing_atom(target_str)
@@ -210,7 +221,7 @@ defmodule Tr33ControlWeb.CommandComponent do
   end
 
   def handle_event(event, data, socket) do
-    Logger.warn("#{__MODULE__}: Unhandled event #{inspect(event)} Data: #{inspect(data)}")
+    Logger.warning("#{__MODULE__}: Unhandled event #{inspect(event)} Data: #{inspect(data)}")
     {:noreply, socket}
   end
 
@@ -225,11 +236,13 @@ defmodule Tr33ControlWeb.CommandComponent do
 
     brightness_param = Commands.get_common_value_param(command, :brightness)
     value_params = [brightness_param] ++ Commands.list_value_params(command)
+    string_params = Commands.list_string_params(command)
 
     socket
     |> assign(command: command)
     |> assign(value_params: value_params)
     |> assign(enum_params: enum_params)
+    |> assign(string_params: string_params)
     |> assign(modifier_names: Commands.list_modifier_names(command))
     |> assign(modifier_params: Commands.get_modifier_params(command))
   end

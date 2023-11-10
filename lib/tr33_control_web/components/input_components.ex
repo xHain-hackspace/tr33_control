@@ -1,7 +1,7 @@
 defmodule Tr33ControlWeb.InputComponents do
   use Phoenix.Component
 
-  alias Tr33Control.Commands.{ValueParam, EnumParam}
+  alias Tr33Control.Commands.{ValueParam, EnumParam, StringParam}
   alias Tr33Control.Commands.{Command}
   alias Tr33ControlWeb.Display
 
@@ -124,6 +124,27 @@ defmodule Tr33ControlWeb.InputComponents do
           </option>
         <% end %>
       </select>
+    </form>
+    """
+  end
+
+  attr :param, StringParam, required: true
+  attr :target, :string, default: nil
+
+  def param_text(%{param: %StringParam{}} = assigns) do
+    ~H"""
+    <form phx-change="text_change" phx-auto-recover="ignore" phx-target={@target}>
+      <div class="one_cmd_option">
+        <div class="cmd_option_label"><%= Display.humanize(@param.name) %></div>
+        <input
+          type="text"
+          class="form-control bg-dark text-body"
+          style="width:30rem;"
+          name={@param.name}
+          value={@param.value}
+          phx-debounce="1500"
+        />
+      </div>
     </form>
     """
   end

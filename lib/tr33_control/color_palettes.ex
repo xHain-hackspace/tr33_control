@@ -55,7 +55,7 @@ defmodule Tr33Control.ColorPalettes do
           Enum.at(colors, color_index)
 
         :error ->
-          Logger.warn("#{__MODULE__} Palette does not exist: #{inspect(palette)}")
+          Logger.warning("#{__MODULE__} Palette does not exist: #{inspect(palette)}")
           {0, 0, 0}
       end
 

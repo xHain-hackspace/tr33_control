@@ -271,6 +271,6 @@ defmodule Tr33Control.ESP.UDP do
   end
 
   defp warn_log(%__MODULE__{target_metrics: %TargetMetrics{} = tm}, message) do
-    Logger.warn("#{__MODULE__} #{inspect(tm.name)}: #{message}")
+    Logger.warning("#{__MODULE__} #{inspect(tm.name)}: #{message}")
   end
 end
