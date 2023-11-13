@@ -142,7 +142,7 @@ defmodule Tr33ControlWeb.InputComponents do
           style="width:30rem;"
           name={@param.name}
           value={@param.value}
-          phx-debounce="1500"
+          phx-debounce="0"
         />
       </div>
     </form>

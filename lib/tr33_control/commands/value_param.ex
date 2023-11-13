@@ -1,6 +1,5 @@
 defmodule Tr33Control.Commands.ValueParam do
   alias Protobuf.Field
-  alias Tr33Control.Commands
   alias Tr33Control.Commands.Command
   alias Tr33Control.Commands.Schemas.CommandParams
 

@@ -1,12 +1,14 @@
-<table class="table">
+<table class="table table-dark table-bordered">
   <thead>
-    <tr>
+    <tr class="bg-light">
       <th scope="col">Name</th>
       <th scope="col">Target</th>
       <th scope="col">IP</th>
       <th scope="col">Build Time</th>
       <th scope="col">FPS</th>
       <th scope="col">WifiStrength</th>
+      <th scope="col">Heap Total</th>
+      <th scope="col">Heap Free</th>
       <th scope="col">Last Message</th>
       <th scope="col">Status</th>
     </tr>
@@ -14,13 +16,15 @@
 
   <tbody>
     <%= for %UDP{target_metrics: %TargetMetrics{} = tm} = target<- @sorted_targets do %>
-      <tr class={"text-#{class_for_target(target)}"}>
-        <th><%= tm.name %></th>
+      <tr class={"bg-#{class_for_target(target)}"}>
+        <td><%= tm.name %></td>
         <td><%= target.target %></td>
         <td><%= Display.ip(target.ip) %></td>
         <th><%= Display.unix_timestamp(tm.version) %></th>
         <td><%= Display.humanize(tm.fps) %></td>
         <td><%= Display.humanize(tm.wifi_strength) %></td>
+        <td><%= Display.humanize(tm.heap_size) %></td>
+        <td><%= Display.humanize(tm.free_heap) %></td>
         <td><%= Display.humanize(@now - div(target.last_metrics, 1000)) %> s</td>
         <td><%= Display.humanize(target.connection_status) %></td>
       </tr>
@@ -28,4 +32,4 @@
   </tbody>
 </table>
 
-<button type="button" class="btn btn-primary" phx-click="resync">Resync</button>
+<%!-- <button type="button" class="btn btn-primary" phx-click="resync">Resync</button> --%>

@@ -4,7 +4,6 @@ defmodule Tr33Control.Commands.Command do
 
   alias Protobuf.Field
   alias Tr33Control.Commands.Schemas.{CommandParams, Modifier}
-  alias Tr33Control.ESP
 
   @hash_size 32
 

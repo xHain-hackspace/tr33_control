@@ -420,6 +420,18 @@ defmodule Tr33Control.Commands do
     |> Cache.insert()
   end
 
+  ### FirmwareConfig ###################################################################################
+
+  def set_firmware_config(calibration_fastled, calibration_custom, gamma_correction) do
+    %FirmwareConfig{
+      calibration_fastled: calibration_fastled,
+      calibration_custom: calibration_custom,
+      calibration_lookup_table: false,
+      gamma_correction: gamma_correction
+    }
+    |> ESP.broadcast_firmware_config()
+  end
+
   ### Protobuf ###################################################################################
 
   def time_sync_binary() do

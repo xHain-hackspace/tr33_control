@@ -1,10 +1,9 @@
-
-  <Components.section_card>
-    <:header>Targets</:header>
-    <%= live_render(@socket, Tr33ControlWeb.ConnectionStatusLive, id: "targets") %>
-  </Components.section_card>
-
+<Components.section_card>
+  <:header>Targets</:header>
+  <%= live_render(@socket, Tr33ControlWeb.ConnectionStatusLive, id: "targets") %>
+</Components.section_card>
+<%!-- 
   <Components.section_card>
     <:header>Joystick</:header>
     <%= live_render(@socket, Tr33ControlWeb.JoystickLive, id: "joystick") %>
-  </Components.section_card>
+  </Components.section_card> --%>

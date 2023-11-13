@@ -133,6 +133,7 @@ message WireMessage {
     TimeSync time_sync = 3;
     JoystickEvent joystick_event = 4;
     TargetMetrics target_metrics = 5;
+    RemoteLog remote_log = 9;
     ColorPaletteRequest color_palette_request = 6;
     ColorPaletteResponse color_palette_response = 7;
     FirmwareConfig firmware_config = 8;
@@ -169,6 +170,7 @@ message CommandParams {
     FairyLight fairy_light = 25;
     Calibrate calibrate = 27;
     PixelFunc pixel_func = 28;
+    Debug debug = 29;
   }
 }
 
@@ -317,6 +319,13 @@ message MappedPingPong {
 
 message PixelFunc {
   required string function = 1 [ default = "sin(2*t-hypot(x-3.5,y-3.5))", (nanopb).max_length = 40]; 
+  required int32 saturation = 2 [ default = 255] ;
+}
+
+message Debug {
+  required int32 param1 = 1 [default = 0];
+  required int32 param2 = 2 [default = 0];
+  required int32 param3 = 3 [default = 0];
 }
 
 message Twang {
@@ -344,6 +353,12 @@ message TargetMetrics {
   required string version = 4 [(nanopb).max_length = 20];
   repeated bytes hashes = 5 [(nanopb).max_size = 4, (nanopb).max_count = 8];
   required int32 max_strip_index = 6;  
+  required uint32 heap_size = 12;
+  required uint32 free_heap = 13;
+}
+
+message RemoteLog {
+  required string message = 1 [(nanopb).max_length = 100];
 }
 
 message Color {
@@ -362,8 +377,10 @@ message ColorPaletteResponse {
 }
 
 message FirmwareConfig {
-  required uint32 phash = 1;
+  required uint32 phash = 1 [default = 0];
   required bool calibration_fastled = 2 [default = false];
-  required bool calibration_custom = 3 [default = false];
+  required bool calibration_custom = 3 [default = true];
   required bool calibration_lookup_table = 4 [default = false];
+  required bool gamma_correction = 5 [default = true];
+
 }

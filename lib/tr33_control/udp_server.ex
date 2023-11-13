@@ -1,7 +1,6 @@
 defmodule Tr33Control.UdpServer do
   use GenServer
   require Logger
-  alias Tr33Control.Commands.Schemas.ColorPalette
   alias Tr33Control.{Commands, ESP, ColorPalettes}
   alias Tr33Control.Commands.Command
 
@@ -9,7 +8,8 @@ defmodule Tr33Control.UdpServer do
     WireMessage,
     TargetMetrics,
     CommandParams,
-    ColorPaletteResponse
+    ColorPaletteResponse,
+    RemoteLog
   }
 
   @listen_port Application.compile_env!(:tr33_control, :udp_listen_port)
@@ -74,6 +74,9 @@ defmodule Tr33Control.UdpServer do
       %WireMessage{message: {:color_palette_response, %ColorPaletteResponse{} = response}} ->
         debug_log("Received color_palette_response")
         ColorPalettes.handle_color_palette_response(response)
+
+      %WireMessage{message: {:remote_log, %RemoteLog{} = log}} ->
+        Logger.info("Remote Log: #{inspect(log.message)}")
 
       other ->
         Logger.warning("Received unexpected UDP data. Decoded as #{inspect(other)}")
