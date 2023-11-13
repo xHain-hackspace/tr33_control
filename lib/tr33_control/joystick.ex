@@ -50,6 +50,7 @@ defmodule Tr33Control.Joystick do
     #     notify_subscribers(state)
     #     {:ok, state}
     # end
+    {:ok, %{}}
   end
 
   def handle_call(:state, _from, state) do
