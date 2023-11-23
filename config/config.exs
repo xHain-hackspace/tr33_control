@@ -11,80 +11,41 @@ config :tr33_control,
   serial_port: System.get_env("SERIAL_PORT") || "ttyAMA0",
   udp_listen_port: 1337,
   command_max_count: 8,
-  command_type_blacklist: [:pixel, :pixel_rgb, :mapped_triangle, :beat_equalizer, :mapped_ping_pong],
+  command_blacklist: [
+    :pixel,
+    :pixel_rgb,
+    :beat_equalizer,
+    :mapped_triangle,
+    :mapped_ping_pong,
+    :debug,
+    :calibrate,
+    :fairy_light,
+    :twang
+  ],
+  command_priority: [
+    :rainbow,
+    :rain,
+    :sparkle,
+    :pixel_func,
+    :ping_pong,
+    :single_color,
+    :gravity,
+    :flicker_sparkle,
+    :mapped_shape,
+    :mapped_slope,
+    :mapped_particles,
+    :render,
+    :kaleidoscope,
+    :white
+  ],
   add_mock_targets: false,
   target_configs: %{
-    tr33:
-      %{
-        # strip_indices: [
-        #   :all,
-        #   :all_trunks,
-        #   :all_branches,
-        #   :trunk_1,
-        #   :trunk_2,
-        #   :trunk_3,
-        #   :trunk_4,
-        #   :trunk_5,
-        #   :trunk_6,
-        #   :trunk_7,
-        #   :trunk_8,
-        #   :branch_1,
-        #   :branch_2,
-        #   :branch_3,
-        #   :branch_4,
-        #   :branch_5,
-        #   :branch_6,
-        #   :branch_7,
-        #   :branch_8,
-        #   :branch_9,
-        #   :branch_10,
-        #   :branch_11,
-        #   :branch_12
-        # ]
-      },
+    tr33: %{},
     wolken: %{
       name_regex: ~r/Wolke/
-      # strip_indices: [
-      #   :all,
-      #   :wolke_1,
-      #   :wolke_2,
-      #   :wolke_3,
-      #   :wolke_4,
-      #   :wolke_5,
-      #   :wolke_6,
-      #   :wolke_7,
-      #   :wolke_8,
-      #   :wolke_9,
-      #   :wolke_10,
-      #   :wolke_11,
-      #   :wolke_12,
-      #   :wolke_13
-      # ]
     },
-    ranken:
-      %{
-        # strip_indices: [
-        #   :all,
-        #   :strip_1,
-        #   :strip_2,
-        #   :strip_3,
-        #   :strip_4,
-        #   :strip_5,
-        #   :strip_6,
-        #   :strip_7,
-        #   :strip_8,
-        #   :strip_9,
-        #   :strip_10
-        # ]
-      },
-    wand:
-      %{
-        # strip_indices: [
-        #   :all,
-        #   :foo,
-        #   :baa
-        # ]
-      },
+    ranken: %{},
+    wand: %{},
     dev: %{
       name_regex: ~r/dev/
     }

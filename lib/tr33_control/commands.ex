@@ -4,7 +4,8 @@ defmodule Tr33Control.Commands do
   alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, StringParam, Preset}
   alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent, ColorPaletteRequest}
 
-  @command_type_blacklist Application.compile_env!(:tr33_control, :command_type_blacklist)
+  @command_blacklist Application.compile_env!(:tr33_control, :command_blacklist)
+  @command_priority Application.compile_env!(:tr33_control, :command_priority)
   @commands_topic "command_updates"
   @presets_topic "preset_updates"
   @common_params %CommandParams{} |> Map.from_struct() |> Map.delete(:type_params) |> Map.keys()
@@ -47,9 +48,16 @@ defmodule Tr33Control.Commands do
   def list_command_types() do
     %Protobuf.OneOfField{fields: fields} = Schemas.CommandParams.defs(:field, :type_params)
 
-    fields
-    |> Enum.map(fn %Protobuf.Field{name: name} -> name end)
-    |> Enum.reject(&(&1 in @command_type_blacklist))
+    all =
+      fields
+      |> Enum.map(fn %Protobuf.Field{name: name} -> name end)
+      |> Enum.reject(&(&1 in @command_blacklist))
+
+    prio =
+      @command_priority
+      |> Enum.filter(&(&1 in all))
+
+    Enum.uniq(prio ++ all)
   end
 
   def get_command(index) do
@@ -415,9 +423,13 @@ defmodule Tr33Control.Commands do
       preset -> %Preset{preset | default: false} |> Cache.insert()
     end
 
-    load_preset(name)
-    |> then(fn preset -> %Preset{preset | default: true} end)
-    |> Cache.insert()
+    preset =
+      load_preset(name)
+      |> then(fn preset -> %Preset{preset | default: true} end)
+      |> Cache.insert()
+
+    notify_subscribers(:preset_update)
+    preset
   end
 
   ### FirmwareConfig ###################################################################################
@@ -426,7 +438,6 @@ defmodule Tr33Control.Commands do
     %FirmwareConfig{
       calibration_fastled: calibration_fastled,
       calibration_custom: calibration_custom,
-      calibration_lookup_table: false,
       gamma_correction: gamma_correction
     }
     |> ESP.broadcast_firmware_config()

@@ -19,7 +19,7 @@ defmodule Tr33Control.ESP.UDP do
   # todo: implement shutdown after some timeout
 
   @tick_interval_ms 30
-  @max_queue_len 5
+  @max_queue_len 16
   @target_port 1337
   @pubsub_topic "udp_clients"
   @metrics_timeout 11_000

@@ -7,8 +7,9 @@
       <th scope="col">Build Time</th>
       <th scope="col">FPS</th>
       <th scope="col">WifiStrength</th>
-      <th scope="col">Heap Total</th>
-      <th scope="col">Heap Free</th>
+      <th scope="col">Heap</th>
+      <th scope="col">Chip Model</th>
+      <th scope="col">SDK version</th>
       <th scope="col">Last Message</th>
       <th scope="col">Status</th>
     </tr>
@@ -23,8 +24,9 @@
         <th><%= Display.unix_timestamp(tm.version) %></th>
         <td><%= Display.humanize(tm.fps) %></td>
         <td><%= Display.humanize(tm.wifi_strength) %></td>
-        <td><%= Display.humanize(tm.heap_size) %></td>
-        <td><%= Display.humanize(tm.free_heap) %></td>
+        <td><%= Display.humanize(tm.free_heap) %>/<%= Display.humanize(tm.heap_size) %></td>
+        <td><%= Display.humanize(tm.chip_model) %> rev. <%= Display.humanize(tm.chip_revision) %></td>
+        <td><%= Display.humanize(tm.sdk_version) %></td>
         <td><%= Display.humanize(@now - div(target.last_metrics, 1000)) %> s</td>
         <td><%= Display.humanize(target.connection_status) %></td>
       </tr>

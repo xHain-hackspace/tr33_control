@@ -43,6 +43,12 @@ defmodule Tr33ControlWeb.PresetsLive do
     {:noreply, push_patch(socket, to: ~p"/presets/#{name}/delete")}
   end
 
+  def handle_event("set_default", %{"name" => name}, socket) do
+    Commands.set_default_preset(name)
+
+    {:noreply, socket}
+  end
+
   def handle_event("load", %{"name" => name}, socket) do
     Commands.load_preset(name)
 
@@ -110,6 +116,10 @@ defmodule Tr33ControlWeb.PresetsLive do
 
   def handle_event(event, data, socket) do
     Logger.warning("#{__MODULE__}: Unhandled event #{inspect(event)} Data: #{inspect(data)}")
+    {:noreply, socket}
+  end
+
+  def handle_info({:preset_loaded, _name}, socket) do
     {:noreply, socket}
   end
 

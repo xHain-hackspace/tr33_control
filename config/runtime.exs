@@ -1,7 +1,7 @@
 import Config
 
 config :tr33_control,
-  cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "~/.tr33_cache"
+  cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "presets"
 
 if config_env() == :prod do
   secret_key_base =

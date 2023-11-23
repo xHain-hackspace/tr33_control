@@ -837,7 +837,7 @@ h2.section_headline::after,
   background: transparent;
   background: #332e1f;
   height: auto;
-  grid-template-columns: min-content 1fr repeat(4, min-content);
+  grid-template-columns: min-content 1fr repeat(6, min-content);
   justify-items: flex-start;
   margin-left: 11px;
 }
@@ -911,6 +911,14 @@ h2.section_headline::after,
 
 .presets_option_btn[phx-click='delete'] {
   background-image: url(/images/icon_delete.svg);
+}
+
+.presets_option_btn[phx-click='set_default'] {
+  background-image: url(/images/cmd_light.svg);
+}
+
+.presets_option_btn[phx-click='set_default'][default] {
+  background-image: url(/images/cmd_light_on.svg);
 }
 
 // ### ALERT ###

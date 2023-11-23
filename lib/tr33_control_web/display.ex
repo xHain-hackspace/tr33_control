@@ -24,6 +24,10 @@ defmodule Tr33ControlWeb.Display do
   def value(%ValueParam{value: value}), do: humanize(value)
   def value(%EnumParam{value: value}), do: humanize(value)
 
+  def humanize(:pixel_func) do
+    humanize(:pixel_fun)
+  end
+
   def humanize(name) do
     name
     |> to_string()

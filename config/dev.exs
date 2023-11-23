@@ -46,7 +46,7 @@ config :tr33_control, Tr33ControlWeb.Endpoint,
   ]
 
 # Do not include metadata nor timestamps in development logs
-config :logger, :console, format: "[$level] $message\n"
+config :logger, :console, format: "[$level] $time: $message\n"
 
 config :logger, level: :debug
 

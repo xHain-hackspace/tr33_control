@@ -37,31 +37,42 @@
   </div>
 
   <div class="presets_list">
-  <h4>presets</h4>
-      <%= for %Preset{name: name} <- @presets do %>
-        <div class="presets_item">
-          <div><%= name %></div>
-          <div>
-            <button type="button" class="presets_option_btn " phx-click="load" phx-value-name={name}>
-              Load Preset
-            </button>
-          </div>
-          <div>
-            <button type="button" class="presets_option_btn" phx-click="update" phx-value-name={name}>
-              Update Preset
-            </button>
-          </div>
-          <div>
-            <button type="button" class="presets_option_btn" phx-click="clone" phx-value-name={name}>
-              Clone Preset
-            </button>
-          </div>
-          <div>
-            <button type="button" class="presets_option_btn" phx-click="delete" phx-value-name={name}>
-              Delete Preset
-            </button>
-          </div>
+    <h4>presets</h4>
+    <%= for %Preset{name: name, default: default} <- @presets do %>
+      <div class="presets_item">
+        <div><%= name %></div>
+        <div>
+          <button type="button" class="presets_option_btn " phx-click="load" phx-value-name={name}>
+            Load Preset
+          </button>
         </div>
-      <% end %>
+        <div>
+          <button type="button" class="presets_option_btn" phx-click="update" phx-value-name={name}>
+            Update Preset
+          </button>
+        </div>
+        <div>
+          <button type="button" class="presets_option_btn" phx-click="clone" phx-value-name={name}>
+            Clone Preset
+          </button>
+        </div>
+        <div>
+          <button
+            type="button"
+            class="presets_option_btn"
+            phx-click="set_default"
+            phx-value-name={name}
+            default={default}
+          >
+            Set as Default
+          </button>
+        </div>
+        <div>
+          <button type="button" class="presets_option_btn" phx-click="delete" phx-value-name={name}>
+            Delete Preset
+          </button>
+        </div>
+      </div>
+    <% end %>
   </div>
 </div>
