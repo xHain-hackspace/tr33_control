@@ -1,7 +1,7 @@
 defmodule Tr33Control.Commands do
   alias Tr33Control.Commands.Schemas.FirmwareConfig
   alias Tr33Control.ESP
-  alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, StringParam, Preset}
+  alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, StringParam, ColorParam, Preset}
   alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent, ColorPaletteRequest}
 
   @command_blacklist Application.compile_env!(:tr33_control, :command_blacklist)
@@ -228,6 +228,19 @@ defmodule Tr33Control.Commands do
   def get_common_enum_param(%Command{} = command, name) do
     Command.get_field_def(name)
     |> then(&EnumParam.new(command.params, &1))
+  end
+
+  def get_common_color_params(%Command{} = command) do
+    field_names = [:color_1, :color_2]
+
+    if Tr33Control.ColorManager.command_supported?(command) do
+      Enum.map(field_names, fn name ->
+        Command.get_field_def(name)
+        |> then(&ColorParam.new(command.params, &1))
+      end)
+    else
+      []
+    end
   end
 
   def list_common_params() do

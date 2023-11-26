@@ -5,7 +5,7 @@ defmodule Tr33ControlWeb.CommandComponent do
 
   alias Phoenix.LiveView.Socket
   alias Tr33Control.{Commands, ESP}
-  alias Tr33Control.Commands.{Command, EnumParam, ValueParam}
+  alias Tr33Control.Commands.{Command, EnumParam, ValueParam, ColorParam}
   alias Tr33ControlWeb.{Display}
 
   def mount(socket) do
@@ -235,14 +235,17 @@ defmodule Tr33ControlWeb.CommandComponent do
       |> Enum.reject(&is_nil/1)
 
     brightness_param = Commands.get_common_value_param(command, :brightness)
-    value_params = [brightness_param] ++ Commands.list_value_params(command)
+    color_distance_param = Commands.get_common_value_param(command, :color_distance)
+    value_params = [brightness_param, color_distance_param] ++ Commands.list_value_params(command)
     string_params = Commands.list_string_params(command)
+    color_params = Commands.get_common_color_params(command)
 
     socket
     |> assign(command: command)
     |> assign(value_params: value_params)
     |> assign(enum_params: enum_params)
     |> assign(string_params: string_params)
+    |> assign(color_params: color_params)
     |> assign(modifier_names: Commands.list_modifier_names(command))
     |> assign(modifier_params: Commands.get_modifier_params(command))
   end

@@ -5,7 +5,7 @@ defmodule Tr33Control.Commands.ValueParam do
 
   @enforce_keys [:name]
   # valid types: percent, time, count, color
-  defstruct [:value, :name, :display, min: 0, max: 255, step: 1, type: :percent, color_palette: nil]
+  defstruct [:value, :name, min: 0, max: 255, step: 1, type: :percent, color_palette: nil]
 
   def new(struct, field_def, command \\ nil)
 

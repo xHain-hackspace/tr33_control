@@ -418,6 +418,14 @@ h2.section_headline::after,
   grid-row-start: 2;
 }
 
+.color_wrap {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  position: relative;
+  margin-top: 24px;
+}
+
 // ### INPUT RANGE FADERS ###
 
 .fader_wrap {
@@ -608,7 +616,7 @@ h2.section_headline::after,
   // margin-top: 3px;
   // margin-bottom: -3px;
   background-position: top;
-  background-image: url(/images/dot_mask.svg);
+  // background-image: url(/images/dot_mask.svg);
   background-size: cover;
   background-repeat: no-repeat;
 }

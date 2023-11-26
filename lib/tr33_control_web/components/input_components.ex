@@ -93,13 +93,21 @@ defmodule Tr33ControlWeb.InputComponents do
               <div>px</div>
             </span>
           <% :color -> %>
-            <div class="the_color_value" style={"background-color: #{hex_color_from_palette(@palette, @value)}"}></div>
+            <.color_display hex_color={hex_color_from_palette(@palette, @value)} />
         <% end %>
       </div>
     </div>
     <form class={["fader_form", @fader_class]} phx-change="slider_change" phx-auto-recover="ignore" phx-target={@target}>
       <input type="range" class="the_fader" mix={@min} max={@max} value={@value} step={@step} name={@name} />
     </form>
+    """
+  end
+
+  attr :hex_color, :string, required: true
+
+  def color_display(assigns) do
+    ~H"""
+    <div class="the_color_value" style={"background-color: #{@hex_color}"}></div>
     """
   end
 
