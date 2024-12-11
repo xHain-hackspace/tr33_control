@@ -22,6 +22,10 @@ defmodule Tr33Control.ColorManager do
     Command.type(command) in @enabled_for_commands
   end
 
+  def new_color_distance(index) do
+    GenServer.cast(__MODULE__, {:new_color_distance, index})
+  end
+
   # GenServer callbacks
   def init(_) do
     configs = 0..@command_max_count |> Enum.map(fn index -> {index, CommandConfig.new()} end) |> Enum.into(%{})
@@ -40,6 +44,11 @@ defmodule Tr33Control.ColorManager do
         Map.update!(state_acc, index, fn config -> CommandConfig.maybe_change_colors(config, index) end)
       end)
 
+    {:noreply, %State{state | configs: configs}}
+  end
+
+  def handle_cast({:new_color_distance, index}, %State{} = state) do
+    configs = Map.update!(state.configs, index, fn config -> CommandConfig.change_colors(config, index) end)
     {:noreply, %State{state | configs: configs}}
   end
 end

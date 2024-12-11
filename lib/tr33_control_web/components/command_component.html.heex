@@ -17,11 +17,12 @@
   <% end %>
 
   <div class="fader_wrap">
-    <div class="color_wrap">
-      <%= for param <- @color_params do %>
-        <.color_display hex_color={ColorParam.hex_string(param)} />
-      <% end %>
-    </div>
+    <%= if @color_manager_enabled do %>
+      <%= live_render(@socket, Tr33ControlWeb.ColorManagerLive,
+        id: "color_manager",
+        session: %{"index" => @command.index}
+      ) %>
+    <% end %>
 
     <%= for param <- @value_params do %>
       <div class="one_fader">

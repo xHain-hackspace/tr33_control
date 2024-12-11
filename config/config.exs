@@ -17,7 +17,7 @@ config :tr33_control,
     :beat_equalizer,
     :mapped_triangle,
     :mapped_ping_pong,
-    :debug,
+    # :debug,
     :calibrate,
     :fairy_light,
     :twang

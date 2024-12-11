@@ -1,7 +1,13 @@
 import Config
 
+persist_dir = System.get_env("CACHE_PERSIST_DIR") || "presets"
+
 config :tr33_control,
-  cache_persist_dir: System.get_env("CACHE_PERSIST_DIR") || "presets"
+  cache_persist_dir: persist_dir
+
+config :tr33_control, Tr33Control.Repo,
+  database: Path.join(persist_dir, "tr33_control.db"),
+  pool_size: 5
 
 if config_env() == :prod do
   secret_key_base =
@@ -38,7 +44,7 @@ end
 
 case {System.fetch_env("MQTT_HOST"), System.fetch_env("MQTT_PASSWORD")} do
   {{:ok, mqtt_host}, {:ok, mqtt_password}} ->
-    config :ex_homeassistant, :mqtt_config,
+    config :tr33_control, :mqtt_config,
       mqtt_host: mqtt_host,
       password: mqtt_password,
       client_id: "tr33_control"

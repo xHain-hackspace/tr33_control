@@ -7,6 +7,8 @@ defmodule Tr33Control.Application do
     Application.fetch_env!(:tr33_control, :cache_persist_dir)
     |> File.mkdir_p!()
 
+    mqtt_config = Application.get_env(:tr33_control, :mqtt_config)
+
     children = [
       Tr33ControlWeb.Telemetry,
       {Phoenix.PubSub, name: Tr33Control.PubSub},
@@ -17,6 +19,7 @@ defmodule Tr33Control.Application do
       Tr33ControlWeb.Endpoint,
       Tr33Control.ESP,
       Tr33Control.UdpServer,
+      {ExHomeassistant, mqtt_config},
       # Tr33Control.Joystick,
       # Tr33Control.Joystick.Poller,
       Tr33Control.ColorPalettes,

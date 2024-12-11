@@ -1,7 +1,7 @@
 defmodule Tr33Control.ESP.UDP do
   use GenServer
   require Logger
-  alias Tr33Control.Commands.Schemas.FirmwareConfig
+  alias Tr33Control.Commands.Schemas.{FirmwareConfig, FadeOutEvent}
   alias Tr33Control.{Commands, ESP, Joystick}
   alias Tr33Control.Commands.Command
   alias Tr33Control.Commands.Schemas.TargetMetrics
@@ -164,6 +164,11 @@ defmodule Tr33Control.ESP.UDP do
     {:noreply, state}
   end
 
+  def handle_info({:event, %FadeOutEvent{} = event}, state) do
+    state = maybe_enqueue(state, event)
+    {:noreply, state}
+  end
+
   def handle_info(:time_sync, state) do
     binary = Commands.time_sync_binary()
     transmit_binary(binary, state)
@@ -187,12 +192,14 @@ defmodule Tr33Control.ESP.UDP do
           state
 
         {{:value, item}, rest} ->
+          # todo: move this to Commands
           binary =
             case item do
               command = %Command{} -> Commands.command_binary(command, target)
               joystick = %Joystick{} -> Commands.joystick_event_binary(joystick)
               {:color_palette_request, palette} -> Commands.color_palette_request_binary(palette)
               %FirmwareConfig{} = config -> Commands.firmware_config_binary(config)
+              %FadeOutEvent{} = event -> Commands.event_binary(event)
             end
 
           transmit_binary(binary, state)

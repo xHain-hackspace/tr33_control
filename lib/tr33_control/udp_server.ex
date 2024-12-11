@@ -1,6 +1,8 @@
 defmodule Tr33Control.UdpServer do
   use GenServer
   require Logger
+  alias Tr33Control.Commands.Schemas.FadeOutEvent
+  alias Tr33Control.Commands.Schemas.FadeOut
   alias Tr33Control.{Commands, ESP, ColorPalettes}
   alias Tr33Control.Commands.Command
 
@@ -77,6 +79,10 @@ defmodule Tr33Control.UdpServer do
 
       %WireMessage{message: {:remote_log, %RemoteLog{} = log}} ->
         Logger.info("Remote Log: #{inspect(log.message)}")
+
+      %WireMessage{message: {:fade_out_event, %FadeOutEvent{} = event}} ->
+        debug_log("Received fade_out_event")
+        ESP.broadcast_event(event)
 
       other ->
         Logger.warning("Received unexpected UDP data. Decoded as #{inspect(other)}")

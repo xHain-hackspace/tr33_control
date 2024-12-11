@@ -137,6 +137,10 @@ message WireMessage {
     ColorPaletteRequest color_palette_request = 6;
     ColorPaletteResponse color_palette_response = 7;
     FirmwareConfig firmware_config = 8;
+
+    // events
+    PixelFuncEvent pixel_func_event = 100;
+    FadeOutEvent fade_out_event = 101;
   }
 }
 
@@ -148,9 +152,7 @@ message CommandParams {
   required ColorPalette color_palette = 5 [default = RAINBOW];
   repeated Modifier modifiers = 6 [(nanopb).max_count = 5];
   required bytes hash = 100 [default = "", (nanopb).max_size = 4];
-  required bytes color_1 = 101 [default = "\xFF\x00\x00", (nanopb).max_size = 3];
-  required bytes color_2 = 102 [default = "\x00\xFF\x00", (nanopb).max_size = 3];
-  required int32 color_distance = 103 [default = 128];
+
   oneof type_params {
     White white = 7;
     SingleColor single_color = 8;
@@ -174,7 +176,12 @@ message CommandParams {
     Calibrate calibrate = 27;
     PixelFunc pixel_func = 28;
     Debug debug = 29;
+    RandomWalk random_walk = 30;
+    FadeOut fade_out = 31;
   }
+  // legacy
+  required bytes color_1 = 101 [default = "\xFF\x00\x00", (nanopb).max_size = 3];
+  required bytes color_2 = 102 [default = "\x00\xFF\x00", (nanopb).max_size = 3];
 }
 
 message TimeSync {  
@@ -321,14 +328,42 @@ message MappedPingPong {
 }
 
 message PixelFunc {
-  required string function = 1 [ default = "sin(2*t-hypot(x-3.5,y-3.5))", (nanopb).max_length = 40]; 
+  required string function = 1 [ default = "sin(2*t-hypot(x-3.5,y-3.5))", (nanopb).max_length = 80]; 
   // required int32 color_distance = 2 [ default = 100 ];
+}
+
+message PixelFuncEvent {
+  required int32 a = 1 [default = 0];
+  required int32 b = 2 [default = 0];
 }
 
 message Debug {
   required int32 param1 = 1 [default = 0];
   required int32 param2 = 2 [default = 0];
   required int32 param3 = 3 [default = 0];
+}
+
+message FadeOut {
+}
+
+message FadeOutEvent {
+  required Shape1D shape = 1 [default = BALL];
+
+  required int32 strip_index = 2 [default = 0];
+  required int32 position = 3 [default = 20, (nanopb).max_size=65535];
+  required int32 width = 4 [default = 20];  
+
+  required int32 color = 5 [default = 210];  
+  required int32 brightness = 6 [default = 255];
+  required int32 decay = 7 [default = 10];
+}
+
+message RandomWalk {
+  required Shape1D shape = 1 [default = BALL];
+  required int32 color = 2 [default = 65];
+  required int32 width = 3 [default = 20];  
+  required int32 count = 4 [default = 1, (nanopb).max_size=10];
+  required int32 speed = 6 [default = 100];
 }
 
 message Twang {

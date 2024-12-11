@@ -1,8 +1,17 @@
 defmodule Tr33Control.Commands do
   alias Tr33Control.Commands.Schemas.FirmwareConfig
-  alias Tr33Control.ESP
+  alias Tr33Control.{ESP, ColorManager}
   alias __MODULE__.{Schemas, Command, Cache, ValueParam, EnumParam, StringParam, ColorParam, Preset}
-  alias __MODULE__.Schemas.{CommandParams, Modifier, WireMessage, TimeSync, JoystickEvent, ColorPaletteRequest}
+
+  alias __MODULE__.Schemas.{
+    CommandParams,
+    Modifier,
+    WireMessage,
+    TimeSync,
+    JoystickEvent,
+    ColorPaletteRequest,
+    FadeOutEvent
+  }
 
   @command_blacklist Application.compile_env!(:tr33_control, :command_blacklist)
   @command_priority Application.compile_env!(:tr33_control, :command_priority)
@@ -495,12 +504,17 @@ defmodule Tr33Control.Commands do
   def color_palette_request_binary(palette) do
     request = ColorPaletteRequest.new(color_palette: palette)
 
-    WireMessage.new(message: {:color_palette_request, request}, sequence: 0)
+    WireMessage.new(message: {:color_palette_request, request})
     |> WireMessage.encode()
   end
 
   def firmware_config_binary(%FirmwareConfig{} = config) do
-    WireMessage.new(message: {:firmware_config, config}, sequence: 0)
+    WireMessage.new(message: {:firmware_config, config})
+    |> WireMessage.encode()
+  end
+
+  def event_binary(%FadeOutEvent{} = event) do
+    WireMessage.new(message: {:fade_out_event, event})
     |> WireMessage.encode()
   end
 

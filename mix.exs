@@ -28,7 +28,9 @@ defmodule Tr33Control.MixProject do
     [
       {:phoenix, "~> 1.7"},
       {:phoenix_ecto, "~> 4.4"},
-      {:ecto_sql, "~> 3.6"},
+      {:ecto_sql, "~> 3.10"},
+      {:ecto_sqlite3, ">= 0.0.0"},
+      {:ecto_sqlite3_extras, "~> 1.2.0"},
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.20"},
@@ -51,7 +53,7 @@ defmodule Tr33Control.MixProject do
       {:exprotobuf, github: "reimerei/exprotobuf"},
       {:esbuild, "~> 0.5", runtime: Mix.env() == :dev},
       {:dart_sass, "~> 0.3", runtime: Mix.env() == :dev},
-      {:ex_homeassistant, git: "git@github.com:Reimerei/ex_homeassistant.git", branch: "main"},
+      {:ex_homeassistant, github: "reimerei/ex_homeassistant"},
       {:tint, "~> 1.1"}
     ]
   end

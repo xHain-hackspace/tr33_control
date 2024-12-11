@@ -3,7 +3,7 @@ defmodule Tr33Control.ESP do
   require Logger
 
   alias Tr33Control.ESP.{UDP, UDPSupervisor}
-  alias Tr33Control.Commands.Schemas.{TargetMetrics, FirmwareConfig}
+  alias Tr33Control.Commands.Schemas.{TargetMetrics, FirmwareConfig, FadeOutEvent}
 
   @pubsub_topic "esp"
   @udp_registry :udp_targets
@@ -41,6 +41,12 @@ defmodule Tr33Control.ESP do
   def time_sync(), do: notify_subscribers(:time_sync)
 
   def resync(), do: notify_subscribers(:resync)
+
+  def broadcast_event(%struct{} = event) when struct in [FadeOutEvent] do
+    notify_subscribers({:event, event})
+  end
+
+  ### Internal API ###########################################
 
   def handle_metrics(from_ip, %TargetMetrics{} = tm) do
     case Registry.lookup(@udp_registry, from_ip) do

@@ -4,11 +4,16 @@ defmodule Tr33Control.ColorManager.CommandConfig do
   alias Tr33Control.Commands
   alias Tr33Control.Commands.{ValueParam, Command}
 
-  defstruct color_1: nil, color_2: nil, change_interval: 60_000, last_change: 0, color_distance: 10
+  defstruct enabled: false,
+            color_1: nil,
+            color_2: nil,
+            change_interval: 60_000,
+            last_change: 0,
+            color_distance: 20,
+            command_index: nil
 
   def new() do
     %__MODULE__{}
-    |> change_colors()
   end
 
   def maybe_change_colors(%__MODULE__{change_interval: 0} = config, _index) do
@@ -17,19 +22,22 @@ defmodule Tr33Control.ColorManager.CommandConfig do
 
   def maybe_change_colors(%__MODULE__{} = config, index) do
     if System.os_time(:millisecond) - config.last_change > config.change_interval do
-      command = Commands.get_command(index)
-
-      config
-      |> set_color_distance(command)
-      |> change_colors()
-      |> set_command_colors(command)
-      |> set_last_changed()
+      change_colors(config, index)
     else
       config
     end
   end
 
-  defp change_colors(%__MODULE__{} = config) do
+  def change_colors(%__MODULE__{} = config, index) do
+    command = Commands.get_command(index)
+
+    config
+    |> set_colors()
+    |> set_command_colors(command)
+    |> set_last_changed()
+  end
+
+  defp set_colors(%__MODULE__{} = config) do
     color_1 = random_color()
     color_2 = random_color_with_distance(color_1, config.color_distance)
 

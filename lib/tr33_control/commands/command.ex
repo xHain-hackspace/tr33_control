@@ -12,6 +12,7 @@ defmodule Tr33Control.Commands.Command do
     # internal
     field :index, :integer, default: 0
     field :targets, {:array, Tr33Control.Atom}, default: []
+    field :color_manager_config, :map, default: %{}
 
     # protobuf
     field :params, :map

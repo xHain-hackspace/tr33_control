@@ -2,7 +2,7 @@ defmodule Tr33Control.Homeassistant do
   use GenServer
   require Logger
 
-  alias Homeassistant.Devices.Select
+  alias ExHomeassistant.Devices.Select
   alias Tr33Control.Commands.Preset
   alias Tr33Control.Commands
 
